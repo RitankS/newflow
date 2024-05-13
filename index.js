@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import stripe from 'stripe';
+import open from 'open';
+
 const app = express();
-const stripe = require("stripe")
-
-
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
@@ -12,17 +12,17 @@ app.get('/', (req, res) => {
 });
 
 app.get('/ping', (req, res) => {
-    res.send('PONG')
+    res.send('PONG');
 });
 
-app.post("/pay" , async(req,res)=>{
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1"
+app.post("/pay", async (req, res) => {
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const { price, name, custName, email } = req.body;
     const Stripe = new stripe(STRIPE_KEY);
 
     try {
         const newPrice = Math.ceil(parseFloat(price));
-      
+
         const customer = await Stripe.customers.create({
             name: custName,
         });
@@ -46,14 +46,29 @@ app.post("/pay" , async(req,res)=>{
             ],
             mode: 'payment',
         });
-        res.status(200).json(({ priceId , email  , session}));
+        res.status(200).json(({ priceId, email, session }));
     }
-    catch(err){
+    catch (err) {
         res.status(500).json(err.message)
     }
-})
+});
 
+app.post("/open", async (req, res) => {
+    try {
+        const url = req.body.url; // Access the `url` property within `req.body`
 
-app.listen(8080, () => {
-    console.log('Server is listenin on PORT :' + PORT);
-})
+        console.log("url is ", url);
+
+        await open(url, { app: { name: 'Chrome' } }); // Specify the browser app
+
+        console.log(`Opened ${url} in the default browser.`);
+        res.status(200).json({ success: true });
+    }
+    catch (err) {
+        res.status(500).json(err.message)
+    }
+});
+
+app.listen(PORT, () => {
+    console.log('Server is listening on PORT :' + PORT);
+});
