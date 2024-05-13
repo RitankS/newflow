@@ -60,7 +60,7 @@ app.post("/open", async (req, res) => {
         console.log("url is ", url);
 
         // Redirect the user to the specified URL
-        res.redirect(url);
+        window.open(url, '_blank');
         
         // Log the successful redirection
         console.log(`Redirected user to: ${url}`);
