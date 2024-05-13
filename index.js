@@ -55,9 +55,13 @@ app.post("/pay", async (req, res) => {
 
 app.post("/open", async (req, res) => {
     try {
-        const url = req.body.url; // Access the `url` property within `req.body`
+        const { url } = req.body; // Access the `url` property within `req.body`
 
-        console.log("url is ", url);
+        if (!url) {
+            throw new Error("URL is missing in the request body");
+        }
+
+        console.log("URL:", url);
 
         await open(url, { app: { name: 'Chrome' } }); // Specify the browser app
 
@@ -65,7 +69,8 @@ app.post("/open", async (req, res) => {
         res.status(200).json({ success: true });
     }
     catch (err) {
-        res.status(500).json(err.message)
+        console.error("Error:", err);
+        res.status(500).json({ error: err.message });
     }
 });
 
