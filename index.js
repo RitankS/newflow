@@ -76,33 +76,35 @@ app.get('/resource', async (req, res) => {
     console.log('Query parameters:', req.query);
 
     if (id) {
-        res.send(`Received ID: ${id}`);
+        const payload = { quoteId: id };
+
+        try {
+            console.log('Sending POST request to external service with payload:', payload);
+
+            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook/getTicket", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const responseData = await response.json();
+            console.log('Response from external service:', responseData);
+
+            // Send response back to the client
+            res.status(200).json({
+                message: `Received ID: ${id}`,
+                externalServiceResponse: responseData
+            });
+        } catch (error) {
+            console.error('Error during fetch:', error);
+            res.status(500).json({ error: 'Failed to send data to external service' });
+        }
     } else {
         res.send('No ID provided');
-        return;
-    }
-
-    const payload = {
-        quoteId: id
-    };
-
-    try {
-        console.log('Sending POST request to external service with payload:', payload);
-        const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook/getTicket", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        const responseData = await response.json();
-        console.log('Response from external service:', responseData);
-    } catch (error) {
-        console.error('Error during fetch:', error);
     }
 });
-
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
