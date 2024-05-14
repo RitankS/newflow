@@ -83,7 +83,7 @@ app.get('/resource', async (req, res) => {
         try {
             console.log('Sending POST request to external service with payload:', payload);
 
-            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook/autotask", {
+            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook-test/autotask", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
