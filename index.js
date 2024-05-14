@@ -53,17 +53,19 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-app.post("/open", async (req, res) => {
+app.post('/open', async (req, res) => {
     try {
         // Access the `url` property within `req.body`
         const url = req.body.url;
         if (!url) {
-          return res.status(400).send('Missing URL parameter');
+            return res.status(400).send('Missing URL parameter');
         }
-        openURLInBrowser(url);
+        
+        // Use the open package to open the URL in the default browser
+        await open(url);
+        
         res.send('URL opened successfully');
-    }
-    catch (err) {
+    } catch (err) {
         // Handle errors
         console.error(err);
         res.status(500).json({ error: err.message });
