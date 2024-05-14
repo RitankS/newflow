@@ -55,15 +55,13 @@ app.post("/pay", async (req, res) => {
 
 app.post("/open", async (req, res) => {
     try {
-        const url = req.body.url; // Access the `url` property within `req.body`
-        
-        console.log("url is ", url);
-
-        // Redirect the user to the specified URL
-        window.open(url, '_blank');
-        
-        // Log the successful redirection
-        console.log(`Redirected user to: ${url}`);
+        // Access the `url` property within `req.body`
+        const url = req.body.url;
+        if (!url) {
+          return res.status(400).send('Missing URL parameter');
+        }
+        openURLInBrowser(url);
+        res.send('URL opened successfully');
     }
     catch (err) {
         // Handle errors
@@ -71,6 +69,40 @@ app.post("/open", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+app.get('/resource', async (req, res) => {
+    const id = req.query.id;
+    console.log('Received request for /resource');
+    console.log('Query parameters:', req.query);
+
+    if (id) {
+        res.send(`Received ID: ${id}`);
+    } else {
+        res.send('No ID provided');
+        return;
+    }
+
+    const payload = {
+        quoteId: id
+    };
+
+    try {
+        console.log('Sending POST request to external service with payload:', payload);
+        const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook-test/getTicket", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const responseData = await response.json();
+        console.log('Response from external service:', responseData);
+    } catch (error) {
+        console.error('Error during fetch:', error);
+    }
+});
+
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
