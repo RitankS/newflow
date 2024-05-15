@@ -127,6 +127,7 @@ app.post('/open', async (req, res) => {
     try {
         // Access the `url` property within `req.body`
         const url = req.body.url;
+        console.log(url)
         if (!url) {
             return res.status(400).send('Missing URL parameter');
         }
