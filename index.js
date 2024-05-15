@@ -75,11 +75,6 @@ app.get('/resource', async (req, res) => {
             const responseData = await response.json();
             console.log('Response from external service:', responseData);
 
-            // Check if responseData contains the URL
-            if (!responseData.url) {
-                throw new Error('URL not found in the response');
-            }
-
             // Instead of sending JSON, render an HTML page with a button
             const htmlContent = `
                 <!DOCTYPE html>
