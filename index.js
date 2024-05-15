@@ -138,7 +138,7 @@ app.post('/open', async (req, res) => {
             return res.status(400).send('Missing URL parameter');
         }
 
-        res.status(200).json();
+        res.status(200).json(url);
     } catch (err) {
         // Handle errors
         console.error(err);
