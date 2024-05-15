@@ -46,13 +46,12 @@ app.post("/pay", async (req, res) => {
             ],
             mode: 'payment',
         });
-        res.send(priceId, email, session)
+        res.status(200).json(({ priceId, email, session }));
     }
     catch (err) {
         res.status(500).json(err.message)
     }
 });
-
 
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
@@ -139,7 +138,7 @@ app.post('/open', async (req, res) => {
             return res.status(400).send('Missing URL parameter');
         }
 
-        res.status(200).json(url);
+        res.status(200).json();
     } catch (err) {
         // Handle errors
         console.error(err);
