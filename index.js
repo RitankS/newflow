@@ -134,7 +134,7 @@ app.post('/open', async (req, res) => {
         // Use the open package to open the URL in the default browser
         await open(url);
 
-        res.send('URL opened successfully');
+        res.send(url);
     } catch (err) {
         // Handle errors
         console.error(err);
