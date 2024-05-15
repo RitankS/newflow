@@ -133,14 +133,17 @@ app.post('/open', async (req, res) => {
             return res.status(400).send('Missing URL parameter');
         }
 
-        res.status(200).json();
+        // Use the open package to open the URL in the default browser
+        await open(url);
+
+        // Send a success response
+        res.status(200).json({ message: 'URL opened successfully', url: url });
     } catch (err) {
         // Handle errors
         console.error(err);
         res.status(500).json({ error: err.message });
     }
-});
-
+})
 
 
 app.post("/monthly" , async(req,res)=>{
