@@ -154,7 +154,7 @@ app.post("/monthly" , async(req,res)=>{
       const customer = await Stripe.customers.create({
         name: custName,
       });
-      custId = customer.id
+      const custId = customer.id
       console.log(custId)
       const newprice = await Stripe.prices.create({
         currency: 'inr',
@@ -181,7 +181,7 @@ app.post("/monthly" , async(req,res)=>{
       const subssessionsId = session.id
       const nextDate = session.days_until_due
       console.log(subssessionsId)
-      res.status(200).json(CircularJSON.stringify({ session  , nextDate , subssessionsId}))
+      res.status(200).json(({ session  , nextDate , subssessionsId}))
     }
     catch(err){
         res.status(500).json({err: err.message})
