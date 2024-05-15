@@ -76,39 +76,59 @@ app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
-
+  
     if (id) {
-        const payload = { quoteId: id };
-
-        try {
-            console.log('Sending POST request to external service with payload:', payload);
-
-            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook-test/autotask", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const responseData = await response.json();
-            console.log('Response from external service:', responseData);
-
-            // Send response back to the client
-            res.status(200).json({
-                message: `Received ID: ${id}`,
-                externalServiceResponse: responseData
-            });
-        } catch (error) {
-            console.error('Error during fetch:', error);
-            res.status(500).json({ error: 'Failed to send data to external service' });
-        }
+      const payload = { quoteId: id };
+  
+      try {
+        console.log('Sending POST request to external service with payload:', payload);
+  
+        const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook-test/autotask", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+  
+        const responseData = await response.json();
+        console.log('Response from external service:', responseData);
+  
+        // Instead of sending JSON, render an HTML page with a button
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Resource Page</title>
+          </head>
+          <body>
+            <h1>Resource Details</h1>
+            <p>ID: ${id}</p>
+            <button id="processButton">Process Data</button>
+            <script>
+              const button = document.getElementById('processButton');
+              button.addEventListener('click', async () => {
+                // Handle button click here (potentially using fetch API)
+                // You can access 'id' and 'responseData' from the server-side variables
+              });
+            </script>
+          </body>
+          </html>
+        `;
+  
+        res.setHeader('Content-Type', 'text/html');
+        res.send(htmlContent);
+      } catch (error) {
+        console.error('Error during fetch:', error);
+        res.status(500).send('Failed to process request'); // Simpler error message
+      }
     } else {
-        res.send('No ID provided');
+      res.send('No ID provided');
     }
-});
-
-
+  });
+  
 
 
 app.post("/monthly" , async(req,res)=>{
