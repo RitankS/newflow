@@ -132,10 +132,6 @@ app.post('/open', async (req, res) => {
         if (!url) {
             return res.status(400).send('Missing URL parameter');
         }
-
-        // Use the open package to open the URL in the default browser
-        await open(url);
-
         // Send a success response
         res.status(200).json({ url: url });
     } catch (err) {
