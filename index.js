@@ -46,12 +46,13 @@ app.post("/pay", async (req, res) => {
             ],
             mode: 'payment',
         });
-        res.status(200).json(({ priceId, email, session }));
+        res.send(priceId, email, session)
     }
     catch (err) {
         res.status(500).json(err.message)
     }
 });
+
 
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
@@ -74,6 +75,11 @@ app.get('/resource', async (req, res) => {
 
             const responseData = await response.json();
             console.log('Response from external service:', responseData);
+
+            // Check if responseData contains the URL
+            if (!responseData.url) {
+                throw new Error('URL not found in the response');
+            }
 
             // Instead of sending JSON, render an HTML page with a button
             const htmlContent = `
@@ -127,21 +133,20 @@ app.post('/open', async (req, res) => {
     try {
         // Access the `url` property within `req.body`
         const url = req.body.url;
-        console.log(url)
+        console.log('Received URL to open:', url);
+
         if (!url) {
             return res.status(400).send('Missing URL parameter');
         }
 
-        // Use the open package to open the URL in the default browser
-        await open(url);
-
-        res.send(url);
+        res.status(200).json(url);
     } catch (err) {
         // Handle errors
         console.error(err);
         res.status(500).json({ error: err.message });
     }
-});  
+});
+
 
 
 app.post("/monthly" , async(req,res)=>{
