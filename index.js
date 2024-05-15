@@ -108,6 +108,53 @@ app.get('/resource', async (req, res) => {
     }
 });
 
+
+
+
+app.post("/monthly" , async(req,res)=>{
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const Stripe = new stripe(STRIPE_KEY)
+    const { custName, price, name } = req.body
+    const newPrice = Math.ceil(parseFloat(price))
+  
+    try {
+      const customer = await Stripe.customers.create({
+        name: custName,
+      });
+      custId = customer.id
+      console.log(custId)
+      const newprice = await Stripe.prices.create({
+        currency: 'inr',
+        unit_amount: newPrice * 100,
+        recurring: {
+          interval: 'month',
+        },
+        product_data: {
+          name: name,
+        },
+      });
+      const  priceId = newprice.id
+      const session = await Stripe.checkout.sessions.create({
+        customer: custId,
+        success_url: 'http://localhost:3110/payments/sessionstatus',
+        line_items: [
+          {
+            price: priceId,
+            quantity: 1,
+          },
+        ],
+        mode: 'subscription',
+      });
+      const subssessionsId = session.id
+      const nextDate = session.days_until_due
+      console.log(subssessionsId)
+      res.status(200).json(CircularJSON.stringify({ session  , nextDate , subssessionsId}))
+    }
+    catch(err){
+        res.status(500).json({err: err.message})
+    }
+})
+
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
