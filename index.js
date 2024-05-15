@@ -137,7 +137,7 @@ app.post('/open', async (req, res) => {
         await open(url);
 
         // Send a success response
-        res.status(200).json({ message: 'URL opened successfully', url: url });
+        res.status(200).json({ url: url });
     } catch (err) {
         // Handle errors
         console.error(err);
