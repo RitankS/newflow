@@ -97,9 +97,19 @@ app.get('/resource', async (req, res) => {
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
 
-                            // Perform multiple async operations using Promise.all
-                            console.log("1st");
+                            // Fetch data from /open endpoint
+                            const response = await fetch('https://newflow.vercel.app/open', {
+                                method: 'POST'
+                            });
 
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch from /open');
+                            }
+
+                            const result = await response.json();
+                            console.log('Response from /open:', result);
+                            resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                            resultDiv.style.display = 'block';
                         } catch (error) {
                             console.error('Error:', error);
                             resultDiv.innerText = 'Failed to fetch from /open';
@@ -108,28 +118,6 @@ app.get('/resource', async (req, res) => {
                             loader.style.display = 'none';
                         }
                     });
-
-                    setTimeout(() => {
-                        console.log("2nd");
-                        Promise.all([
-                            fetch('https://newflow.vercel.app/open', {
-                                method: 'POST'
-                            })
-                        ]).then(async (responses) => {
-                            console.log("3rd=", responses);
-
-                            for (const response of responses) {
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
-                                }
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                                resultDiv.style.display = 'block';
-                            }
-                        });
-                        console.log("4th");
-                    }, 20000);
                 </script>
             </body>
             </html>
