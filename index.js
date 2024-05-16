@@ -54,8 +54,6 @@ app.post("/pay", async (req, res) => {
 });
 
 
-let quoteId;
-
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -76,19 +74,12 @@ app.get('/resource', async (req, res) => {
             <body>
                 <h1>Resource Details</h1>
                 <p>quoteId: ${quoteId}</p>
-                <button id="fetchButton">Fetch URL</button>
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    const fetchButton = document.getElementById('fetchButton');
-                    const loader = document.getElementById('loader');
-                    const resultDiv = document.getElementById('result');
-
-                    fetchButton.addEventListener('click', async () => {
-                        loader.style.display = 'block';
-                        fetchButton.style.display = 'none';
+                    // Send quoteId to N8N server when the page loads
+                    window.addEventListener('DOMContentLoaded', async () => {
                         try {
-                            // Send quoteId to N8N server
                             await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
                                 method: 'POST',
                                 headers: {
@@ -96,28 +87,46 @@ app.get('/resource', async (req, res) => {
                                 },
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
-
-                            // Fetch the response from /open endpoint
-                            let response;
-                            while (!response || !response.ok) {
-                                response = await fetch('https://newflow.vercel.app/open', {
-                                    method: 'POST'
-                                });
-                                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second before retrying
-                            }
-
-                            const result = await response.json();
-                            console.log('Response from /open:', result);
-                            resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                            resultDiv.style.display = 'block';
-                            loader.style.display = 'none';
+                            console.log('Quote ID sent to N8N server successfully');
                         } catch (error) {
-                            console.error('Error:', error);
-                            resultDiv.innerText = 'Failed to fetch from /open';
-                            resultDiv.style.display = 'block';
-                            loader.style.display = 'none';
+                            console.error('Error sending quote ID to N8N:', error);
                         }
                     });
+
+                    // Show the fetch button after 10 seconds
+                    setTimeout(() => {
+                        const fetchButton = document.createElement('button');
+                        fetchButton.innerText = 'Fetch URL';
+                        fetchButton.addEventListener('click', async () => {
+                            const loader = document.getElementById('loader');
+                            const resultDiv = document.getElementById('result');
+                            
+                            loader.style.display = 'block';
+                            try {
+                                // Fetch the response from /open endpoint
+                                const response = await fetch('https://newflow.vercel.app/open', {
+                                    method: 'POST'
+                                });
+                                
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
+                                }
+
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
+                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                                resultDiv.style.display = 'block';
+                            } catch (error) {
+                                console.error('Error fetching from /open:', error);
+                                resultDiv.innerText = 'Failed to fetch from /open';
+                                resultDiv.style.display = 'block';
+                            } finally {
+                                loader.style.display = 'none';
+                            }
+                        });
+
+                        document.body.appendChild(fetchButton);
+                    }, 10000); // 10 seconds delay
                 </script>
             </body>
             </html>
