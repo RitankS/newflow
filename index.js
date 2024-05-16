@@ -1,6 +1,7 @@
 import express from 'express';
 import stripe from 'stripe';
 import open from 'open';
+import cron from 'node-cron'
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -55,6 +56,30 @@ app.post("/pay", async (req, res) => {
 
 let urlArr = [];
 
+// Schedule a cron job to run every 10 seconds
+cron.schedule('*/10 * * * * *', async () => {
+    try {
+        // Fetch the response from /open endpoint
+        const response = await fetch('https://newflow.vercel.app/open', {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch from /open');
+        }
+
+        const result = await response.json();
+        console.log('Response from /open:', result);
+
+        // Push the url to urlArr if it's not undefined
+        if (result.url !== undefined) {
+            urlArr.push(result.url);
+        }
+    } catch (error) {
+        console.error('Error fetching from /open:', error);
+    }
+});
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -80,22 +105,6 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    // Send quoteId to N8N server when the page loads
-                    window.addEventListener('DOMContentLoaded', async () => {
-                        try {
-                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ quoteId: '${quoteId}' })
-                            });
-                            console.log('Quote ID sent to N8N server successfully');
-                        } catch (error) {
-                            console.error('Error sending quote ID to N8N:', error);
-                        }
-                    });
-
                     // Show the fetch button after 6 seconds
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
@@ -106,23 +115,6 @@ app.get('/resource', async (req, res) => {
                             
                             loader.style.display = 'block';
                             try {
-                                // Fetch the response from /open endpoint
-                                const response = await fetch('https://newflow.vercel.app/open', {
-                                    method: 'POST'
-                                });
-                                
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
-                                }
-
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-
-                                // Push the url to urlArr if it's not undefined
-                                if (result.url !== undefined) {
-                                    urlArr.push(result.url);
-                                }
-
                                 // Display the contents of urlArr
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
