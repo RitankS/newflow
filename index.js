@@ -53,7 +53,7 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-
+let urlArr = []
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -145,6 +145,8 @@ app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
         console.log('Received URLss:', url)
+        urlArr.push(url)
+        console.log(urlArr)
         // res.status(200).json({ url });
         res.send({"url": url});
     } catch (err) {
