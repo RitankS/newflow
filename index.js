@@ -125,7 +125,7 @@ app.get('/resource', async (req, res) => {
                                 await new Promise(resolve => setTimeout(resolve, 15000));
 
                                 // Trigger the /open API
-                                const response = await fetch(' https://newflow.vercel.app/open', {
+                                const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'GET'
                                 });
 
