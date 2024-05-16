@@ -85,6 +85,9 @@ app.get('/resource', async (req, res) => {
                 throw new Error('URL not found in the response');
             }
 
+            // Store the URL on the server side for the /open endpoint to access later
+            app.set('responseURL', responseData.url);
+
             // Render an HTML page with a loader and delayed API call
             const htmlContent = `
                 <!DOCTYPE html>
@@ -121,7 +124,10 @@ app.get('/resource', async (req, res) => {
                     <script>
                         document.addEventListener('DOMContentLoaded', async () => {
                             try {
-                                // Wait for 15 seconds
+                                // Show the resource details immediately
+                                document.getElementById('status').style.display = 'block';
+
+                                // Wait for 30 seconds
                                 await new Promise(resolve => setTimeout(resolve, 30000));
 
                                 // Trigger the /open API
@@ -135,28 +141,23 @@ app.get('/resource', async (req, res) => {
                                 // Save the URL in localStorage
                                 if (result.url) {
                                     localStorage.setItem('resourceURL', result.url);
-                                    document.getElementById('status').innerText = 'URL saved to local storage';
+                                    document.getElementById('status').innerText += '\\nURL saved to local storage';
                                 } else {
-                                    document.getElementById('status').innerText = 'Failed to retrieve URL';
+                                    document.getElementById('status').innerText += '\\nFailed to retrieve URL';
                                 }
 
                                 // Hide loader and show status
                                 document.getElementById('loader').style.display = 'none';
-                                document.getElementById('status').style.display = 'block';
                             } catch (error) {
                                 console.error('Error:', error);
-                                document.getElementById('status').innerText = 'Failed to process request';
+                                document.getElementById('status').innerText += '\\nFailed to process request';
                                 document.getElementById('loader').style.display = 'none';
-                                document.getElementById('status').style.display = 'block';
                             }
                         });
                     </script>
                 </body>
                 </html>
             `;
-
-            // Store the URL on the server side for the /open endpoint to access later
-            app.set('responseURL', responseData.url);
 
             res.setHeader('Content-Type', 'text/html');
             res.send(htmlContent);
@@ -182,7 +183,6 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
