@@ -140,7 +140,7 @@ app.post('/open', async (req, res) => {
         setTimeout(() => {
             // Sending the quoteId back as a response
             res.status(200).json({ url });
-        }, 6000); // Delaying the response by 5 seconds for demonstration
+        }, 12000); // Delaying the response by 5 seconds for demonstration
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
