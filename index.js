@@ -80,9 +80,6 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    // Define urlArr in the client-side JavaScript code
-                    const urlArr = ${JSON.stringify(urlArr)};
-
                     // Send quoteId to N8N server when the page loads
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
@@ -120,9 +117,13 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
                                 
-                                // Display the first item of urlArr
-                                resultDiv.innerHTML = '<h2>URL received:</h2>';
-                                resultDiv.innerHTML += '<p>' + urlArr[0] + '</p>';
+                                // Display the urlArr
+                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                                resultDiv.innerHTML += '<ul>';
+                                urlArr.forEach(url => {
+                                    resultDiv.innerHTML += '<li>' + url + '</li>';
+                                });
+                                resultDiv.innerHTML += '</ul>';
                                 resultDiv.style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
@@ -151,8 +152,10 @@ app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
         console.log('Received URL:', url);
-        urlArr.push(url);
-        console.log("urlArr is", urlArr);
+        if (url !== undefined) {
+            urlArr.push(url);
+            console.log("urlArr is", urlArr);
+        }
         res.send({ "url": url });
     } catch (err) {
         console.error(err);
