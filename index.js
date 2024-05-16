@@ -141,7 +141,7 @@ app.post('/open', async (req, res) => {
         let responseReceived = false;
         while (!responseReceived) {
             // Check if the response is received
-            if (url !== '{}' || url !== undefined) {
+            if (url != {} || url != undefined) {
                 responseReceived = true;
             }
         }
