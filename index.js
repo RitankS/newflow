@@ -54,120 +54,121 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-let urlArr = [];
+const urlArr = []; // Array to store received URLs
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Define the route for the resource
+// Route for the resource
 app.get('/resource', async (req, res) => {
-    const id = req.query.id;
-    console.log('Received request for /resource');
-    console.log('Query parameters:', req.query);
+  const id = req.query.id;
+  console.log('Received request for /resource');
+  console.log('Query parameters:', req.query);
 
-    let quoteId;
+  let quoteId;
 
-    if (id) {
-        quoteId = id;
+  if (id) {
+    quoteId = id;
 
-        // Render an HTML page with quoteId and a button
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Resource Page</title>
-            </head>
-            <body>
-                <h1>Resource Details</h1>
-                <p>quoteId: ${quoteId}</p>
-                <div id="loader" style="display: none;">Loading...</div>
-                <div id="result" style="display: none;"></div>
-                <script>
-                    window.addEventListener('DOMContentLoaded', async () => {
-                        try {
-                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ quoteId: '${quoteId}' })
-                            });
-                            console.log('Quote ID sent to N8N server successfully');
-                        } catch (error) {
-                            console.error('Error sending quote ID to N8N:', error);
-                        }
-                    });
+    // Render HTML page with quoteId and a button
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Resource Page</title>
+      </head>
+      <body>
+        <h1>Resource Details</h1>
+        <p>quoteId: <span class="math-inline">\{quoteId\}</p\>
+<div id\="loader" style\="display\: none;"\>Loading\.\.\.</div\>
+<div id\="result" style\="display\: none;"\></div\>
+<script\>
+window\.addEventListener\('DOMContentLoaded', async \(\) \=\> \{
+try \{
+await fetch\('https\://testingautotsk\.app\.n8n\.cloud/webhook/autotask', \{
+method\: 'POST',
+headers\: \{
+'Content\-Type'\: 'application/json'
+\},
+body\: JSON\.stringify\(\{ quoteId\: '</span>{quoteId}' })
+              });
+              console.log('Quote ID sent to N8N server successfully');
+            } catch (error) {
+              console.error('Error sending quote ID to N8N:', error);
+            }
 
-                    setTimeout(() => {
-                        const fetchButton = document.createElement('button');
-                        fetchButton.innerText = 'Fetch URL';
-                        fetchButton.addEventListener('click', async () => {
-                            const loader = document.getElementById('loader');
-                            const resultDiv = document.getElementById('result');
-                            
-                            loader.style.display = 'block';
-                            try {
-                                const response = await fetch('https://newflow.vercel.app/open', {
-                                    method: 'POST'
-                                });
-                                
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
-                                }
+            setTimeout(() => {
+              const fetchButton = document.createElement('button');
+              fetchButton.innerText = 'Fetch URL';
+              fetchButton.addEventListener('click', async () => {
+                const loader = document.getElementById('loader');
+                const resultDiv = document.getElementById('result');
 
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
+                loader.style.display = 'block';
+                try {
+                  const response = await fetch('https://newflow.vercel.app/open', {
+                    method: 'POST'
+                  });
 
-                                if (result.url !== undefined) {
-                                    urlArr.push(result.url);
-                                }
+                  if (!response.ok) {
+                    throw new Error('Failed to fetch from /open');
+                  }
 
-                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                
-                                    resultDiv.innerHTML += '<p>' + urlArr[0] + <p>';
-                                
-                                resultDiv.style.display = 'block';
-                            } catch (error) {
-                                console.error('Error fetching from /open:', error.message);
-                                resultDiv.innerText = 'Failed to fetch from /open';
-                                resultDiv.style.display = 'block';
-                            } finally {
-                                loader.style.display = 'none';
-                            }
-                        });
+                  const result = await response.json();
+                  console.log('Response from /open:', result);
 
-                        document.body.appendChild(fetchButton);
-                    }, 6000); // 6 seconds delay
-                </script>
-            </body>
-            </html>
-        `;
+                  if (result.url !== undefined) {
+                    urlArr.push(result.url);
+                  }
 
-        res.setHeader('Content-Type', 'text/html');
-        res.send(htmlContent);
-    } else {
-        res.send('No ID provided');
-    }
+                  resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                  resultDiv.innerHTML += '<ul>';
+                  for (const url of urlArr) {
+                    resultDiv.innerHTML += url;
+                  }
+                  resultDiv.innerHTML += '</ul>';
+
+                  resultDiv.style.display = 'block';
+                } catch (error) {
+                  console.error('Error fetching from /open:', error.message);
+                  resultDiv.innerText = 'Failed to fetch from /open';
+                } finally {
+                  loader.style.display = 'none';
+                }
+              });
+
+              document.body.appendChild(fetchButton);
+            }, 6000); // 6 seconds delay
+          });
+        </script>
+      </body>
+      </html>
+    `;
+
+    res.setHeader('Content-Type', 'text/html');
+    res.send(htmlContent);
+  } else {
+    res.send('No ID provided');
+  }
 });
 
-// Define the route for the /open endpoint
+// Route for the /open endpoint (assuming the response structure remains the same)
 app.post('/open', async (req, res) => {
-    const { url } = req.body;
-    try {
-        console.log('Received URL:', url);
-        if (url !== undefined) {
-            urlArr.push(url);
-        }
-        console.log("urlArr is", urlArr);
-        res.json({ "url": url });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
+  const { url } = req.body;
+  try {
+    console.log('Received URL:', url);
+    if (url !== undefined) {
+      urlArr.push(url);
     }
-});
-
+    console.log("urlArr is", urlArr);
+    res.json({ "url": url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ err })
+  }
+})
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
