@@ -53,13 +53,14 @@ app.post("/pay", async (req, res) => {
     }
 });
 
+let urlArr = [];
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
     let quoteId; // Define the quoteId variable here
-    let urlArr = []; // Declare urlArr here
 
     if (id) {
         quoteId = id;
@@ -79,6 +80,7 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
+                    // Send quoteId to N8N server when the page loads
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
                             await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
@@ -94,6 +96,7 @@ app.get('/resource', async (req, res) => {
                         }
                     });
 
+                    // Show the fetch button after 6 seconds
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Fetch URL';
@@ -153,7 +156,6 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
