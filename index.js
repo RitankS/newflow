@@ -148,7 +148,7 @@ app.post('/open', async (req, res) => {
     try {
         console.log('Received URL:', url)
         // res.status(200).json({ url });
-        res.send(url);
+        res.send(JSON.stringify({"url": url}));
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
