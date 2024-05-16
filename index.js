@@ -122,7 +122,7 @@ app.get('/resource', async (req, res) => {
                                 
                                 // Display the first item of urlArr
                                 resultDiv.innerHTML = '<h2>URL received:</h2>';
-                                resultDiv.innerHTML += '<p>' + urlArr[0] + '</p>';
+                                resultDiv.innerHTML += '<p>' + urlArr[1] + '</p>';
                                 resultDiv.style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
