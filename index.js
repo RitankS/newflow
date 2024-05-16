@@ -123,17 +123,19 @@ app.get('/resource', async (req, res) => {
                     </div>
                     <script>
                         document.addEventListener('DOMContentLoaded', async () => {
+                            document.getElementById('status').style.display = 'block';
                             try {
-                                // Show the resource details immediately
-                                document.getElementById('status').style.display = 'block';
-
                                 // Wait for 30 seconds
                                 await new Promise(resolve => setTimeout(resolve, 30000));
 
                                 // Trigger the /open API
-                                const response = await fetch('https://newflow.vercel.app/open', {
+                                const response = await fetch('/open', {
                                     method: 'POST'
                                 });
+
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
+                                }
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
@@ -183,6 +185,7 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
