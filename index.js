@@ -141,7 +141,7 @@ app.post('/open', async (req, res) => {
             // Simulate processing time
             setTimeout(() => {
                 resolve();
-            }, 5000); // Simulate processing time of 5 seconds
+            }, 20000); // Simulate processing time of 5 seconds
         });
 
         // Sending the URL back as a response
