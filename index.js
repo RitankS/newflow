@@ -99,28 +99,6 @@ app.get('/resource', async (req, res) => {
 
                             // Perform multiple async operations using Promise.all
                             console.log("1st");
-                            setTimeout(() => {
-                                console.log("2nd");
-                            
-                                Promise.all([
-                                    fetch('https://newflow.vercel.app/open', {
-                                        method: 'POST'
-                                    })
-                                ]).then(async (responses) => {
-                            console.log("3rd=",responses);
-
-                                    for (const response of responses) {
-                                        if (!response.ok) {
-                                            throw new Error('Failed to fetch from /open');
-                                        }
-                                        const result = await response.json();
-                                        console.log('Response from /open:', result);
-                                        resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                                        resultDiv.style.display = 'block';
-                                    }
-                                });
-                            }, 20000)
-                            console.log("4th");
 
                         } catch (error) {
                             console.error('Error:', error);
@@ -130,6 +108,28 @@ app.get('/resource', async (req, res) => {
                             loader.style.display = 'none';
                         }
                     });
+
+                    setTimeout(() => {
+                        console.log("2nd");
+                        Promise.all([
+                            fetch('https://newflow.vercel.app/open', {
+                                method: 'POST'
+                            })
+                        ]).then(async (responses) => {
+                            console.log("3rd=", responses);
+
+                            for (const response of responses) {
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
+                                }
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
+                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                                resultDiv.style.display = 'block';
+                            }
+                        });
+                        console.log("4th");
+                    }, 20000);
                 </script>
             </body>
             </html>
