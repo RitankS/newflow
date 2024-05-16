@@ -60,65 +60,54 @@ app.get('/resource', async (req, res) => {
     console.log('Query parameters:', req.query);
 
     if (id) {
-        const payload = { quoteId: id };
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Resource Page</title>
+            </head>
+            <body>
+                <h1>Resource Details</h1>
+                <p>ID: ${id}</p>
+                <div id="status"></div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', async () => {
+                        try {
+                            const payload = { quoteId: '${id}' };
+                            console.log('Sending POST request to external service with payload:', payload);
 
-        try {
-            console.log('Sending POST request to external service with payload:', payload);
+                            const response = await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(payload)
+                            });
 
-            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook/autotask", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+                            const responseData = await response.json();
+                            console.log('Response from external service:', responseData);
 
-            const responseData = await response.json();
-            console.log('Response from external service:', responseData);
-
-            // Instead of sending JSON, render an HTML page with a button
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Resource Page</title>
-                </head>
-                <body>
-                    <h1>Resource Details</h1>
-                    <p>ID: ${id}</p>
-                    <button id="processButton">Process Data</button>
-                    <script>
-                        const button = document.getElementById('processButton');
-                        button.addEventListener('click', async () => {
-                            try {
-                                const response = await fetch('/open', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({ url: '${responseData.url}' })
-                                });
-
-                                const result = await response.text();
-                                alert(result);
-                            } catch (error) {
-                                console.error('Error:', error);
-                                alert('Failed to open URL');
+                            // Save the URL in localStorage
+                            if (responseData.url) {
+                                localStorage.setItem('resourceURL', responseData.url);
+                                document.getElementById('status').innerText = 'URL saved to local storage';
+                            } else {
+                                document.getElementById('status').innerText = 'Failed to retrieve URL';
                             }
-                        });
-                    </script>
-                </body>
-                </html>
-            `;
+                        } catch (error) {
+                            console.error('Error during fetch:', error);
+                            document.getElementById('status').innerText = 'Failed to process request';
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        `;
 
-            res.setHeader('Content-Type', 'text/html');
-            res.send(htmlContent);
-        } catch (error) {
-            console.error('Error during fetch:', error);
-            res.status(500).send('Failed to process request');
-        }
+        res.setHeader('Content-Type', 'text/html');
+        res.send(htmlContent);
     } else {
         res.send('No ID provided');
     }
@@ -140,8 +129,7 @@ app.post('/open', async (req, res) => {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
-})
-
+});
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
