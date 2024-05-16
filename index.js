@@ -137,12 +137,13 @@ app.post('/open', async (req, res) => {
         console.log(url);
         
         // Simulate a delayed response (replace with your actual logic)
-        await new Promise((resolve) => {
-            // Simulate processing time
-            setTimeout(() => {
-                resolve();
-            }, 20000); // Simulate processing time of 5 seconds
-        });
+        let responseReceived = false;
+        while (!responseReceived) {
+            // Check if the response is received
+            if (/* condition to check if response is received */) {
+                responseReceived = true;
+            }
+        }
 
         // Sending the URL back as a response
         res.status(200).json({ url });
@@ -151,6 +152,7 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
