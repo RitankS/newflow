@@ -126,7 +126,7 @@ app.get('/resource', async (req, res) => {
 
                                 // Trigger the /open API
                                 const response = await fetch('https://newflow.vercel.app/open', {
-                                    method: 'GET'
+                                    method: 'POST'
                                 });
 
                                 const result = await response.json();
@@ -169,7 +169,7 @@ app.get('/resource', async (req, res) => {
     }
 });
 
-app.get('/open', async (req, res) => {
+app.post('/open', async (req, res) => {
     try {
         const url = app.get('responseURL');
         console.log('Retrieved URL to open:', url);
