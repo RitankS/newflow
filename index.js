@@ -98,21 +98,30 @@ app.get('/resource', async (req, res) => {
                             });
 
                             // Perform multiple async operations using Promise.all
-                            Promise.all([
-                                fetch('https://newflow.vercel.app/open', {
-                                    method: 'POST'
-                                })
-                            ]).then(async (responses) => {
-                                for (const response of responses) {
-                                    if (!response.ok) {
-                                        throw new Error('Failed to fetch from /open');
+                            console.log("1st");
+                            setTimeout(() => {
+                                console.log("2nd");
+                            
+                                Promise.all([
+                                    fetch('https://newflow.vercel.app/open', {
+                                        method: 'POST'
+                                    })
+                                ]).then(async (responses) => {
+                            console.log("3rd");
+
+                                    for (const response of responses) {
+                                        if (!response.ok) {
+                                            throw new Error('Failed to fetch from /open');
+                                        }
+                                        const result = await response.json();
+                                        console.log('Response from /open:', result);
+                                        resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                                        resultDiv.style.display = 'block';
                                     }
-                                    const result = await response.json();
-                                    console.log('Response from /open:', result);
-                                    resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                                    resultDiv.style.display = 'block';
-                                }
-                            });
+                                });
+                            }, 15000)
+                            console.log("4th");
+
                         } catch (error) {
                             console.error('Error:', error);
                             resultDiv.innerText = 'Failed to fetch from /open';
