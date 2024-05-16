@@ -140,7 +140,7 @@ app.post('/open', async (req, res) => {
         // Simulate processing time (replace with your actual logic)
         // For demonstration, we'll simulate a delay using a Promise
         // You should replace this with your actual processing logic
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate a 5-second delay
+        await new Promise(resolve => setTimeout(resolve, 15000)); // Simulate a 5-second delay
 
         // Sending the URL back as a response
         res.status(200).json({ url });
