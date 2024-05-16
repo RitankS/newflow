@@ -118,12 +118,9 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
                                 
-                                // Clear previous results
-                                resultDiv.innerHTML = '';
-                                
-                                // Display each item of urlArr
-                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                ${urlArr.map(url => `resultDiv.innerHTML += '<p>${url}</p>';`).join('\n')}
+                                // Display the first item of urlArr
+                                resultDiv.innerHTML = '<h2>URL received:</h2>';
+                                resultDiv.innerHTML += '<p>' + urlArr[0] + '</p>';
                                 resultDiv.style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
@@ -160,6 +157,7 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
