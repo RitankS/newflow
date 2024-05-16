@@ -73,6 +73,10 @@ app.get('/resource', async (req, res) => {
                 body: JSON.stringify(payload)
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const responseData = await response.json();
             console.log('Response from external service:', responseData);
 
@@ -112,9 +116,10 @@ app.get('/resource', async (req, res) => {
             res.status(500).send('Failed to process request');
         }
     } else {
-        res.send('No ID provided');
+        res.status(400).send('No ID provided');
     }
 });
+
 
 app.post('/open', async (req, res) => {
     try {
