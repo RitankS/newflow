@@ -122,7 +122,7 @@ app.get('/resource', async (req, res) => {
                         document.addEventListener('DOMContentLoaded', async () => {
                             try {
                                 // Wait for 15 seconds
-                                await new Promise(resolve => setTimeout(resolve, 15000));
+                                await new Promise(resolve => setTimeout(resolve, 30000));
 
                                 // Trigger the /open API
                                 const response = await fetch('https://newflow.vercel.app/open', {
