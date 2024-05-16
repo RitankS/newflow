@@ -146,7 +146,9 @@ app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
         console.log('Received URLss:', url)
+        if(url !== 'undefined'){
         urlArr.push(url)
+        }
         console.log("urlArr is" , urlArr)
         // res.status(200).json({ url });
         res.send({"url": url});
