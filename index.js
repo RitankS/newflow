@@ -73,6 +73,10 @@ app.get('/resource', async (req, res) => {
                 body: JSON.stringify(payload)
             });
 
+            if (!response.ok) {
+                throw new Error(`Failed to fetch: ${response.statusText}`);
+            }
+
             const responseData = await response.json();
             console.log('Response from external service:', responseData);
 
@@ -122,11 +126,7 @@ app.get('/resource', async (req, res) => {
 
                                 // Trigger the /open API
                                 const response = await fetch('/open', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({ url: '${responseData.url}' })
+                                    method: 'GET'
                                 });
 
                                 const result = await response.json();
@@ -155,6 +155,9 @@ app.get('/resource', async (req, res) => {
                 </html>
             `;
 
+            // Store the URL on the server side for the /open endpoint to access later
+            app.set('responseURL', responseData.url);
+
             res.setHeader('Content-Type', 'text/html');
             res.send(htmlContent);
         } catch (error) {
@@ -166,15 +169,19 @@ app.get('/resource', async (req, res) => {
     }
 });
 
-app.post('/open', async (req, res) => {
+app.get('/open', async (req, res) => {
     try {
-        // Access the `url` property within `req.body`
-        const url = req.body.url;
-        console.log('Received URL to open:', url);
+        // Retrieve the stored URL
+        const url = app.get('responseURL');
+        console.log('Retrieved URL to open:', url);
 
         if (!url) {
-            return res.status(400).send('Missing URL parameter');
+            return res.status(400).send('No URL available to open');
         }
+
+        // Simulate opening the URL (for example, logging it)
+        console.log(`Simulating opening URL: ${url}`);
+
         // Send a success response
         res.status(200).json({ url: url });
     } catch (err) {
@@ -183,7 +190,6 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
