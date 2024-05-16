@@ -98,7 +98,7 @@ app.get('/resource', async (req, res) => {
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
 
-                            setTimeout(() => {
+                            setTimeout(async () => {
                                 console.log("looop enter");
                                 const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
