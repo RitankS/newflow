@@ -146,9 +146,9 @@ app.get('/resource', async (req, res) => {
 app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
-        console.log('Received URL:', url)
+        console.log('Received URL:', req.body)
         // res.status(200).json({ url });
-        res.send(JSON.stringify({"url": "output"}));
+        res.send({"url": req.body});
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
