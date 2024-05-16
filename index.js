@@ -87,7 +87,6 @@ app.get('/resource', async (req, res) => {
                     fetchButton.addEventListener('click', async () => {
                         loader.style.display = 'block';
                         fetchButton.style.display = 'none';
-
                         try {
                             // Send quoteId to N8N server
                             await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
@@ -97,8 +96,10 @@ app.get('/resource', async (req, res) => {
                                 },
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
-
+                            
+                            Promise.all(
                             setTimeout(async () => {
+                                console.log("1st flag enter");
                                 console.log("looop enter");
                                 const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
@@ -114,11 +115,12 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
                             }, 15000);
-                            console.log("2nd looop enter");
+                            console.log("2nd flag enter");
 
 
                             resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
                             resultDiv.style.display = 'block';
+                           )
                         } catch (error) {
                             console.error('Error:', error);
                             resultDiv.innerText = 'Failed to fetch from /open';
