@@ -98,19 +98,19 @@ app.get('/resource', async (req, res) => {
                             });
 
                             // Fetch the response from /open endpoint
-                            const response = await fetch('https://newflow.vercel.app/open', {
-                                method: 'POST'
-                            });
-                            
-                            if (response.ok) {
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                                resultDiv.style.display = 'block';
-                                loader.style.display = 'none';
-                            } else {
-                                throw new Error('Failed to fetch from /open');
+                            let response;
+                            while (!response || !response.ok) {
+                                response = await fetch('https://newflow.vercel.app/open', {
+                                    method: 'POST'
+                                });
+                                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second before retrying
                             }
+
+                            const result = await response.json();
+                            console.log('Response from /open:', result);
+                            resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                            resultDiv.style.display = 'block';
+                            loader.style.display = 'none';
                         } catch (error) {
                             console.error('Error:', error);
                             resultDiv.innerText = 'Failed to fetch from /open';
