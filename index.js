@@ -73,19 +73,10 @@ app.get('/resource', async (req, res) => {
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
             const responseData = await response.json();
             console.log('Response from external service:', responseData);
 
-            // Check if responseData contains the URL
-            if (!responseData.url) {
-                throw new Error('URL not found in the response');
-            }
-
-            // Render an HTML page with a button
+            // Instead of sending JSON, render an HTML page with a button
             const htmlContent = `
                 <!DOCTYPE html>
                 <html lang="en">
@@ -100,9 +91,22 @@ app.get('/resource', async (req, res) => {
                     <button id="processButton">Process Data</button>
                     <script>
                         const button = document.getElementById('processButton');
-                        button.addEventListener('click', () => {
-                            // Open the URL in a new tab
-                            window.open('${responseData.url}', '_blank');
+                        button.addEventListener('click', async () => {
+                            try {
+                                const response = await fetch('/open', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ url: '${responseData.url}' })
+                                });
+
+                                const result = await response.text();
+                                alert(result);
+                            } catch (error) {
+                                console.error('Error:', error);
+                                alert('Failed to open URL');
+                            }
                         });
                     </script>
                 </body>
@@ -116,10 +120,9 @@ app.get('/resource', async (req, res) => {
             res.status(500).send('Failed to process request');
         }
     } else {
-        res.status(400).send('No ID provided');
+        res.send('No ID provided');
     }
 });
-
 
 app.post('/open', async (req, res) => {
     try {
