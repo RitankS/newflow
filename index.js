@@ -106,6 +106,7 @@ app.get('/resource', async (req, res) => {
                             
                             loader.style.display = 'block';
                             try {
+                                // Fetch the response from /open endpoint
                                 const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
                                 });
@@ -116,14 +117,17 @@ app.get('/resource', async (req, res) => {
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
-                                
-                                // Display the urlArr
+
+                                // Push the url to urlArr if it's not undefined
+                                if (result.url !== undefined) {
+                                    urlArr.push(result.url);
+                                }
+
+                                // Display the contents of urlArr
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                resultDiv.innerHTML += '<ul>';
-                                urlArr.forEach(url => {
-                                    resultDiv.innerHTML += '<li>' + url + '</li>';
-                                });
-                                resultDiv.innerHTML += '</ul>';
+                                for (const url of urlArr) {
+                                    resultDiv.innerHTML += '<p>' + url + '</p>';
+                                }
                                 resultDiv.style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
@@ -152,10 +156,11 @@ app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
         console.log('Received URL:', url);
+        // Push the url to urlArr if it's not undefined
         if (url !== undefined) {
             urlArr.push(url);
-            console.log("urlArr is", urlArr);
         }
+        console.log("urlArr is", urlArr);
         res.send({ "url": url });
     } catch (err) {
         console.error(err);
