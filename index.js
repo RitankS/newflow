@@ -107,7 +107,7 @@ app.get('/resource', async (req, res) => {
                                         method: 'POST'
                                     })
                                 ]).then(async (responses) => {
-                            console.log("3rd");
+                            console.log("3rd=",responses);
 
                                     for (const response of responses) {
                                         if (!response.ok) {
