@@ -97,24 +97,29 @@ app.get('/resource', async (req, res) => {
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
 
-                            // Fetch data from /open endpoint
-                            const response = await fetch('https://newflow.vercel.app/open', {
-                                method: 'POST'
-                            });
-
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch from /open');
-                            }
-
-                            const result = await response.json();
-                            console.log('Response from /open:', result);
-                            resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                            resultDiv.style.display = 'block';
+                            // Poll the /open endpoint until response is received
+                            const poll = async () => {
+                                const response = await fetch('https://newflow.vercel.app/open', {
+                                    method: 'POST'
+                                });
+                                
+                                if (response.ok) {
+                                    const result = await response.json();
+                                    console.log('Response from /open:', result);
+                                    resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                                    resultDiv.style.display = 'block';
+                                    loader.style.display = 'none';
+                                    return;
+                                }
+                                
+                                setTimeout(poll, 1000); // Retry after 1 second
+                            };
+                            
+                            poll(); // Start polling
                         } catch (error) {
                             console.error('Error:', error);
                             resultDiv.innerText = 'Failed to fetch from /open';
                             resultDiv.style.display = 'block';
-                        } finally {
                             loader.style.display = 'none';
                         }
                     });
