@@ -102,7 +102,7 @@ app.get('/resource', async (req, res) => {
                                 console.log("looop enter");
                                 const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
-                                }).then((res) => {
+                                }).then(async (res) => {
                                     const results = await response.json();
                                     console.log('Responsesss from /open:', results);
                                 });
