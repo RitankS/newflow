@@ -132,21 +132,25 @@ app.get('/resource', async (req, res) => {
 });
 
 app.post('/open', async (req, res) => {
-    const {url} = req.body
+    const { url } = req.body;
     try {
-        console.log(url)
+        console.log(url);
         
-       // Simulate a delayed response (replace with your actual logic)
-        setTimeout(() => {
-            // Sending the quoteId back as a response
-            res.status(200).json({ url });
-        }, 12000); // Delaying the response by 5 seconds for demonstration
+        // Simulate a delayed response (replace with your actual logic)
+        await new Promise((resolve) => {
+            // Simulate processing time
+            setTimeout(() => {
+                resolve();
+            }, 5000); // Simulate processing time of 5 seconds
+        });
+
+        // Sending the URL back as a response
+        res.status(200).json({ url });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
-
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
