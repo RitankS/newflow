@@ -146,7 +146,7 @@ app.post('/open', async (req, res) => {
     try {
         console.log('Received URLss:', url)
         urlArr.push(url)
-        console.log(urlArr)
+        console.log("urlArr is" , urlArr)
         // res.status(200).json({ url });
         res.send({"url": url});
     } catch (err) {
