@@ -56,36 +56,16 @@ app.post("/pay", async (req, res) => {
 
 let urlArr = [];
 
-// Schedule a cron job to run every 10 seconds
-cron.schedule('*/10 * * * * *', async () => {
-    try {
-        // Fetch the response from /open endpoint
-        const response = await fetch('https://newflow.vercel.app/open', {
-            method: 'POST'
-        });
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch from /open');
-        }
-
-        const result = await response.json();
-        console.log('Response from /open:', result);
-
-        // Push the url to urlArr if it's not undefined
-        if (result.url !== undefined) {
-            urlArr.push(result.url);
-        }
-    } catch (error) {
-        console.error('Error fetching from /open:', error);
-    }
-});
-
+// Define the route for the resource
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
-    let quoteId; // Define the quoteId variable here
+    let quoteId;
 
     if (id) {
         quoteId = id;
@@ -105,7 +85,21 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    // Show the fetch button after 6 seconds
+                    window.addEventListener('DOMContentLoaded', async () => {
+                        try {
+                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ quoteId: '${quoteId}' })
+                            });
+                            console.log('Quote ID sent to N8N server successfully');
+                        } catch (error) {
+                            console.error('Error sending quote ID to N8N:', error);
+                        }
+                    });
+
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Fetch URL';
@@ -115,14 +109,28 @@ app.get('/resource', async (req, res) => {
                             
                             loader.style.display = 'block';
                             try {
-                                // Display the contents of urlArr
+                                const response = await fetch('https://newflow.vercel.app/open', {
+                                    method: 'POST'
+                                });
+                                
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
+                                }
+
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
+
+                                if (result.url !== undefined) {
+                                    urlArr.push(result.url);
+                                }
+
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
                                     resultDiv.innerHTML += '<p>' + url + '</p>';
                                 }
                                 resultDiv.style.display = 'block';
                             } catch (error) {
-                                console.error('Error fetching from /open:', error);
+                                console.error('Error fetching from /open:', error.message);
                                 resultDiv.innerText = 'Failed to fetch from /open';
                                 resultDiv.style.display = 'block';
                             } finally {
@@ -144,21 +152,22 @@ app.get('/resource', async (req, res) => {
     }
 });
 
+// Define the route for the /open endpoint
 app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
         console.log('Received URL:', url);
-        // Push the url to urlArr if it's not undefined
         if (url !== undefined) {
             urlArr.push(url);
         }
         console.log("urlArr is", urlArr);
-        res.send({ "url": url });
+        res.json({ "url": url });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
+
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
