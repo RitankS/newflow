@@ -119,7 +119,7 @@ app.get('/resource', async (req, res) => {
                                         resultDiv.style.display = 'block';
                                     }
                                 });
-                            }, 25000)
+                            }, 20000)
                             console.log("4th");
 
                         } catch (error) {
