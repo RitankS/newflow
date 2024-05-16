@@ -96,31 +96,23 @@ app.get('/resource', async (req, res) => {
                                 },
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
-                            
-                            Promise.all(
-                            setTimeout(async () => {
-                                console.log("1st flag enter");
-                                console.log("looop enter");
-                                const response = await fetch('https://newflow.vercel.app/open', {
+
+                            // Perform multiple async operations using Promise.all
+                            Promise.all([
+                                fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
-                                }).then(async (res) => {
-                                    const results = await response.json();
-                                    console.log('Responsesss from /open:', results);
-                                });
-    
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
+                                })
+                            ]).then(async (responses) => {
+                                for (const response of responses) {
+                                    if (!response.ok) {
+                                        throw new Error('Failed to fetch from /open');
+                                    }
+                                    const result = await response.json();
+                                    console.log('Response from /open:', result);
+                                    resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                                    resultDiv.style.display = 'block';
                                 }
-    
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-                            }, 15000);
-                            console.log("2nd flag enter");
-
-
-                            resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
-                            resultDiv.style.display = 'block';
-                           )
+                            });
                         } catch (error) {
                             console.error('Error:', error);
                             resultDiv.innerText = 'Failed to fetch from /open';
