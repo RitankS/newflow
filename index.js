@@ -54,119 +54,80 @@ app.post("/pay", async (req, res) => {
 });
 
 
+// Global variable to store quoteId
+let quoteId;
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
     if (id) {
-        const payload = { quoteId: id };
+        quoteId = id;
 
-        try {
-            console.log('Sending POST request to external service with payload:', payload);
+        // Render an HTML page with quoteId and a placeholder for the button
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Resource Page</title>
+            </head>
+            <body>
+                <h1>Resource Details</h1>
+                <p>quoteId: ${quoteId}</p>
+                <div id="loader" style="display: none;">Loading...</div>
+                <div id="buttonContainer"></div>
+                <div id="result" style="display: none;"></div>
+                <script>
+                    const loader = document.getElementById('loader');
+                    const buttonContainer = document.getElementById('buttonContainer');
+                    const resultDiv = document.getElementById('result');
 
-            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook/autotask", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
+                    async function fetchData() {
+                        loader.style.display = 'block';
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch: ${response.statusText}`);
-            }
+                        try {
+                            const response = await fetch('/open', {
+                                method: 'POST'
+                            });
 
-            const responseData = await response.json();
-            console.log('Response from external service:', responseData);
-
-            // Check if responseData contains the URL
-            if (!responseData.url) {
-                throw new Error('URL not found in the response');
-            }
-
-            // Store the URL on the server side for the /open endpoint to access later
-            app.set('responseURL', responseData.url);
-
-            // Render an HTML page with a loader and delayed API call
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Resource Page</title>
-                    <style>
-                        #loader {
-                            border: 16px solid #f3f3f3;
-                            border-radius: 50%;
-                            border-top: 16px solid #3498db;
-                            width: 120px;
-                            height: 120px;
-                            animation: spin 2s linear infinite;
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                        }
-                        @keyframes spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div id="loader"></div>
-                    <div id="status" style="display: none;">
-                        <h1>Resource Details</h1>
-                        <p>ID: ${id}</p>
-                    </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', async () => {
-                            document.getElementById('status').style.display = 'block';
-                            try {
-                                // Wait for 30 seconds
-                                await new Promise(resolve => setTimeout(resolve, 30000));
-
-                                // Trigger the /open API
-                                const response = await fetch('/open', {
-                                    method: 'POST'
-                                });
-
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
-                                }
-
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-
-                                // Save the URL in localStorage
-                                if (result.url) {
-                                    localStorage.setItem('resourceURL', result.url);
-                                    document.getElementById('status').innerText += '\\nURL saved to local storage';
-                                } else {
-                                    document.getElementById('status').innerText += '\\nFailed to retrieve URL';
-                                }
-
-                                // Hide loader and show status
-                                document.getElementById('loader').style.display = 'none';
-                            } catch (error) {
-                                console.error('Error:', error);
-                                document.getElementById('status').innerText += '\\nFailed to process request';
-                                document.getElementById('loader').style.display = 'none';
+                            if (!response.ok) {
+                                throw new Error('Failed to fetch from /open');
                             }
-                        });
-                    </script>
-                </body>
-                </html>
-            `;
 
-            res.setHeader('Content-Type', 'text/html');
-            res.send(htmlContent);
-        } catch (error) {
-            console.error('Error during fetch:', error);
-            res.status(500).send('Failed to process request');
-        }
+                            const result = await response.json();
+                            console.log('Response from /open:', result);
+
+                            const button = document.createElement('button');
+                            button.textContent = 'Open URL';
+                            button.addEventListener('click', () => {
+                                // Handle opening the URL here
+                                alert('Opening URL: ' + result.url);
+                            });
+                            buttonContainer.appendChild(button);
+
+                            resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                            resultDiv.style.display = 'block';
+                        } catch (error) {
+                            console.error('Error:', error);
+                            resultDiv.innerText = 'Failed to fetch from /open';
+                            resultDiv.style.display = 'block';
+                        } finally {
+                            loader.style.display = 'none';
+                        }
+                    }
+
+                    // Call fetchData when the page loads
+                    window.addEventListener('load', fetchData);
+                </script>
+            </body>
+            </html>
+        `;
+
+        res.setHeader('Content-Type', 'text/html');
+        res.send(htmlContent);
     } else {
         res.send('No ID provided');
     }
@@ -174,12 +135,11 @@ app.get('/resource', async (req, res) => {
 
 app.post('/open', async (req, res) => {
     try {
-        const url = app.get('responseURL');
-        console.log('Retrieved URL to open:', url);
-        if (!url) {
-            return res.status(400).send('No URL available to open');
-        }
-        res.status(200).json({ url: url });
+        // Simulate a delayed response (replace with your actual logic)
+        setTimeout(() => {
+            // Sending the quoteId back as a response
+            res.status(200).json({ quoteId });
+        }, 5000); // Delaying the response by 5 seconds for demonstration
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
