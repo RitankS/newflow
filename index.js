@@ -98,16 +98,24 @@ app.get('/resource', async (req, res) => {
                                 body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
 
-                            const response = await fetch('https://newflow.vercel.app/open', {
-                                method: 'POST'
-                            });
+                            setTimeout(() => {
+                                console.log("looop enter");
+                                const response = await fetch('https://newflow.vercel.app/open', {
+                                    method: 'POST'
+                                }).then((res) => {
+                                    const results = await response.json();
+                                    console.log('Responsesss from /open:', results);
+                                });
+    
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
+                                }
+    
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
+                            }, 15000);
+                            console.log("2nd looop enter");
 
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch from /open');
-                            }
-
-                            const result = await response.json();
-                            console.log('Response from /open:', result);
 
                             resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
                             resultDiv.style.display = 'block';
@@ -140,7 +148,7 @@ app.post('/open', async (req, res) => {
         // Simulate processing time (replace with your actual logic)
         // For demonstration, we'll simulate a delay using a Promise
         // You should replace this with your actual processing logic
-        await new Promise(resolve => setTimeout(resolve, 8000)); // Simulate a 5-second delay
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate a 5-second delay
 
         // Sending the URL back as a response
         res.status(200).json({ url });
