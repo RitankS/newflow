@@ -135,16 +135,12 @@ app.get('/resource', async (req, res) => {
 app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
-        console.log(url);
+        console.log('Received URL:', url);
         
-        // Simulate a delayed response (replace with your actual logic)
-        let responseReceived = false;
-        while (!responseReceived) {
-            // Check if the response is received
-            if (url != {} || url != undefined) {
-                responseReceived = true;
-            }
-        }
+        // Simulate processing time (replace with your actual logic)
+        // For demonstration, we'll simulate a delay using a Promise
+        // You should replace this with your actual processing logic
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Simulate a 5-second delay
 
         // Sending the URL back as a response
         res.status(200).json({ url });
