@@ -132,11 +132,12 @@ app.get('/resource', async (req, res) => {
 });
 
 app.post('/open', async (req, res) => {
+    const {url} = req.body
     try {
         // Simulate a delayed response (replace with your actual logic)
         setTimeout(() => {
             // Sending the quoteId back as a response
-            res.status(200).json({ quoteId });
+            res.status(200).json({ url });
         }, 5000); // Delaying the response by 5 seconds for demonstration
     } catch (err) {
         console.error(err);
