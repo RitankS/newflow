@@ -60,54 +60,107 @@ app.get('/resource', async (req, res) => {
     console.log('Query parameters:', req.query);
 
     if (id) {
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Resource Page</title>
-            </head>
-            <body>
-                <h1>Resource Details</h1>
-                <p>ID: ${id}</p>
-                <div id="status"></div>
-                <script>
-                    document.addEventListener('DOMContentLoaded', async () => {
-                        try {
-                            const payload = { quoteId: '${id}' };
-                            console.log('Sending POST request to external service with payload:', payload);
+        const payload = { quoteId: id };
 
-                            const response = await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(payload)
-                            });
+        try {
+            console.log('Sending POST request to external service with payload:', payload);
 
-                            const responseData = await response.json();
-                            console.log('Response from external service:', responseData);
+            const response = await fetch("https://testingautotsk.app.n8n.cloud/webhook/autotask", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
 
-                            // Save the URL in localStorage
-                            if (responseData.url) {
-                                localStorage.setItem('resourceURL', responseData.url);
-                                document.getElementById('status').innerText = 'URL saved to local storage';
-                            } else {
-                                document.getElementById('status').innerText = 'Failed to retrieve URL';
-                            }
-                        } catch (error) {
-                            console.error('Error during fetch:', error);
-                            document.getElementById('status').innerText = 'Failed to process request';
+            const responseData = await response.json();
+            console.log('Response from external service:', responseData);
+
+            // Check if responseData contains the URL
+            if (!responseData.url) {
+                throw new Error('URL not found in the response');
+            }
+
+            // Render an HTML page with a loader and delayed API call
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Resource Page</title>
+                    <style>
+                        #loader {
+                            border: 16px solid #f3f3f3;
+                            border-radius: 50%;
+                            border-top: 16px solid #3498db;
+                            width: 120px;
+                            height: 120px;
+                            animation: spin 2s linear infinite;
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
                         }
-                    });
-                </script>
-            </body>
-            </html>
-        `;
+                        @keyframes spin {
+                            0% { transform: rotate(0deg); }
+                            100% { transform: rotate(360deg); }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="loader"></div>
+                    <div id="status" style="display: none;">
+                        <h1>Resource Details</h1>
+                        <p>ID: ${id}</p>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', async () => {
+                            try {
+                                // Wait for 15 seconds
+                                await new Promise(resolve => setTimeout(resolve, 15000));
 
-        res.setHeader('Content-Type', 'text/html');
-        res.send(htmlContent);
+                                // Trigger the /open API
+                                const response = await fetch('/open', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ url: '${responseData.url}' })
+                                });
+
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
+
+                                // Save the URL in localStorage
+                                if (result.url) {
+                                    localStorage.setItem('resourceURL', result.url);
+                                    document.getElementById('status').innerText = 'URL saved to local storage';
+                                } else {
+                                    document.getElementById('status').innerText = 'Failed to retrieve URL';
+                                }
+
+                                // Hide loader and show status
+                                document.getElementById('loader').style.display = 'none';
+                                document.getElementById('status').style.display = 'block';
+                            } catch (error) {
+                                console.error('Error:', error);
+                                document.getElementById('status').innerText = 'Failed to process request';
+                                document.getElementById('loader').style.display = 'none';
+                                document.getElementById('status').style.display = 'block';
+                            }
+                        });
+                    </script>
+                </body>
+                </html>
+            `;
+
+            res.setHeader('Content-Type', 'text/html');
+            res.send(htmlContent);
+        } catch (error) {
+            console.error('Error during fetch:', error);
+            res.status(500).send('Failed to process request');
+        }
     } else {
         res.send('No ID provided');
     }
