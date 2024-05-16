@@ -53,7 +53,8 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-let urlArr = []
+let urlArr = [];
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -95,7 +96,7 @@ app.get('/resource', async (req, res) => {
                         }
                     });
 
-                    // Show the fetch button after 10 seconds
+                    // Show the fetch button after 6 seconds
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Fetch URL';
@@ -116,7 +117,13 @@ app.get('/resource', async (req, res) => {
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
-                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+                                
+                                // Clear previous results
+                                resultDiv.innerHTML = '';
+                                
+                                // Display each item of urlArr
+                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                                ${urlArr.map(url => `resultDiv.innerHTML += '<p>${url}</p>';`).join('\n')}
                                 resultDiv.style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
@@ -128,7 +135,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 6000); // 10 seconds delay
+                    }, 6000); // 6 seconds delay
                 </script>
             </body>
             </html>
@@ -144,11 +151,10 @@ app.get('/resource', async (req, res) => {
 app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
-        console.log('Received URLss:', url)
-        urlArr.push(url)
-        console.log("urlArr is" , urlArr)
-        // res.status(200).json({ url });
-        res.send({"url": url});
+        console.log('Received URL:', url);
+        urlArr.push(url);
+        console.log("urlArr is", urlArr);
+        res.send({ "url": url });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
