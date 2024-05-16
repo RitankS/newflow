@@ -128,7 +128,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 7000); // 10 seconds delay
+                    }, 6000); // 10 seconds delay
                 </script>
             </body>
             </html>
