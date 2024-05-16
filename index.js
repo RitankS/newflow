@@ -89,7 +89,7 @@ app.get('/resource', async (req, res) => {
                         loader.style.display = 'block';
 
                         try {
-                            const response = await fetch('/open', {
+                            const response = await fetch('https://newflow.vercel.app/open', {
                                 method: 'POST'
                             });
 
