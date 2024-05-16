@@ -54,7 +54,6 @@ app.post("/pay", async (req, res) => {
 });
 
 
-// Global variable to store quoteId
 let quoteId;
 
 app.get('/resource', async (req, res) => {
@@ -65,7 +64,7 @@ app.get('/resource', async (req, res) => {
     if (id) {
         quoteId = id;
 
-        // Render an HTML page with quoteId and a placeholder for the button
+        // Render an HTML page with quoteId and a button
         const htmlContent = `
             <!DOCTYPE html>
             <html lang="en">
@@ -77,18 +76,28 @@ app.get('/resource', async (req, res) => {
             <body>
                 <h1>Resource Details</h1>
                 <p>quoteId: ${quoteId}</p>
+                <button id="fetchButton">Fetch URL</button>
                 <div id="loader" style="display: none;">Loading...</div>
-                <div id="buttonContainer"></div>
                 <div id="result" style="display: none;"></div>
                 <script>
+                    const fetchButton = document.getElementById('fetchButton');
                     const loader = document.getElementById('loader');
-                    const buttonContainer = document.getElementById('buttonContainer');
                     const resultDiv = document.getElementById('result');
 
-                    async function fetchData() {
+                    fetchButton.addEventListener('click', async () => {
                         loader.style.display = 'block';
+                        fetchButton.style.display = 'none';
 
                         try {
+                            // Send quoteId to N8N server
+                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ quoteId: '${quoteId}' })
+                            });
+
                             const response = await fetch('https://newflow.vercel.app/open', {
                                 method: 'POST'
                             });
@@ -100,14 +109,6 @@ app.get('/resource', async (req, res) => {
                             const result = await response.json();
                             console.log('Response from /open:', result);
 
-                            const button = document.createElement('button');
-                            button.textContent = 'Open URL';
-                            button.addEventListener('click', () => {
-                                // Handle opening the URL here
-                                alert('Opening URL: ' + result.url);
-                            });
-                            buttonContainer.appendChild(button);
-
                             resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
                             resultDiv.style.display = 'block';
                         } catch (error) {
@@ -117,10 +118,7 @@ app.get('/resource', async (req, res) => {
                         } finally {
                             loader.style.display = 'none';
                         }
-                    }
-
-                    // Call fetchData when the page loads
-                    window.addEventListener('load', fetchData);
+                    });
                 </script>
             </body>
             </html>
