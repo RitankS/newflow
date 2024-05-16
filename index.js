@@ -54,18 +54,13 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-let urlArr = [];
-
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-// Define the route for the resource
+let urlArr = []
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
-    let quoteId;
+    let quoteId; // Define the quoteId variable here
 
     if (id) {
         quoteId = id;
@@ -85,6 +80,7 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
+                    // Send quoteId to N8N server when the page loads
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
                             await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
@@ -100,6 +96,7 @@ app.get('/resource', async (req, res) => {
                         }
                     });
 
+                    // Show the fetch button after 10 seconds
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Fetch URL';
@@ -109,6 +106,7 @@ app.get('/resource', async (req, res) => {
                             
                             loader.style.display = 'block';
                             try {
+                                // Fetch the response from /open endpoint
                                 const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
                                 });
@@ -119,18 +117,10 @@ app.get('/resource', async (req, res) => {
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
-
-                                if (result.url !== undefined) {
-                                    urlArr.push(result.url);
-                                }
-
-                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                
-                                    resultDiv.innerHTML += '<p>' + urlArr[0] + <p>';
-                                
+                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
                                 resultDiv.style.display = 'block';
                             } catch (error) {
-                                console.error('Error fetching from /open:', error.message);
+                                console.error('Error fetching from /open:', error);
                                 resultDiv.innerText = 'Failed to fetch from /open';
                                 resultDiv.style.display = 'block';
                             } finally {
@@ -139,7 +129,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 6000); // 6 seconds delay
+                    }, 6000); // 10 seconds delay
                 </script>
             </body>
             </html>
@@ -152,22 +142,19 @@ app.get('/resource', async (req, res) => {
     }
 });
 
-// Define the route for the /open endpoint
 app.post('/open', async (req, res) => {
     const { url } = req.body;
     try {
-        console.log('Received URL:', url);
-        if (url !== undefined) {
-            urlArr.push(url);
-        }
-        console.log("urlArr is", urlArr);
-        res.json({ "url": url });
+        console.log('Received URLss:', url)
+        urlArr.push(url)
+        console.log("urlArr is" , urlArr)
+        // res.status(200).json({ url });
+        res.send({"url": url});
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
-
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
