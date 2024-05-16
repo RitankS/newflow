@@ -80,6 +80,9 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
+                    // Define urlArr in the client-side JavaScript code
+                    const urlArr = ${JSON.stringify(urlArr)};
+
                     // Send quoteId to N8N server when the page loads
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
@@ -156,6 +159,7 @@ app.post('/open', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
