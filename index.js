@@ -125,9 +125,9 @@ app.get('/resource', async (req, res) => {
                                 }
 
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                for (const url of urlArr) {
-                                    resultDiv.innerHTML += '<p>' + url + '</p>';
-                                }
+                                
+                                    resultDiv.innerHTML += '<p>' + urlArr[0] + <p>';
+                                
                                 resultDiv.style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching from /open:', error.message);
