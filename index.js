@@ -59,6 +59,8 @@ app.get('/resource', async (req, res) => {
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
+    let quoteId; // Define the quoteId variable here
+
     if (id) {
         quoteId = id;
 
@@ -138,7 +140,6 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-
 
 app.post('/open', async (req, res) => {
     const { url } = req.body;
