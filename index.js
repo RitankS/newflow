@@ -122,7 +122,7 @@ app.get('/resource', async (req, res) => {
         // Fetch quote details
         const fetchQuoteDetails = async () => {
             try {
-                const response = await fetch('/quoteDetails');
+                const response = await fetch('https://newflow.vercel.app/quoteDetails');
                 if (response.ok) {
                     quoteDetails = await response.json();
                     console.log("quoteDetails are", quoteDetails);
