@@ -120,23 +120,7 @@ app.get('/resource', async (req, res) => {
 
     if (id) {
         // Fetch quote details
-        const fetchQuoteDetails = async () => {
-            try {
-                const response = await fetch('https://newflow.vercel.app/quoteDetails');
-                if (response.ok) {
-                    quoteDetails = await response.json();
-                    console.log("quoteDetails are", quoteDetails);
-                    return quoteDetails;
-                } else {
-                    console.error('Failed to fetch quote details');
-                    return null;
-                }
-            } catch (error) {
-                console.error('Error fetching quote details:', error);
-                return null;
-            }
-        };
-
+       
         // Render an HTML page with quoteId and a button
         const htmlContent = `
             <!DOCTYPE html>
@@ -188,6 +172,23 @@ app.get('/resource', async (req, res) => {
                 <div id="loader">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
+                const fetchQuoteDetails = async () => {
+                    try {
+                        const response = await fetch('https://newflow.vercel.app/quoteDetails');
+                        if (response.ok) {
+                            quoteDetails = await response.json();
+                            console.log("quoteDetails are", quoteDetails);
+                            return quoteDetails;
+                        } else {
+                            console.error('Failed to fetch quote details');
+                            return null;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching quote details:', error);
+                        return null;
+                    }
+                };
+        
                     window.addEventListener('DOMContentLoaded', async () => {
                         const quoteDetails = await fetchQuoteDetails();
                         if (quoteDetails) {
