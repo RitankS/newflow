@@ -83,6 +83,7 @@ app.post('/open', async (req, res) => {
     }
 });
 
+
 let quoteDetails = [];
 
 app.post("/quoteDetails", async (req, res) => {
@@ -207,38 +208,89 @@ app.get('/resource', async (req, res) => {
                             '<p>Product Type: ' + (quoteData.Product_Type || 'N/A') + '</p>' +
                             '<p>Product Id: ' + (quoteData.Product_Id || 'N/A') + '</p>' +
                             '<p>Quantity: ' + (quoteData.quantity || 'N/A') + '</p>' +
-                            '<p>Unit Price: ' + (quoteData.Unit_Price || 'N/A') + '</p>';
-                        document.getElementById('loader').style.display = 'none';
-                        quoteDetailsDiv.classList.remove('hidden');
-                    };
+                            '<p>Unit Price: ' + (quoteData.Unit_Price || ' '<p>Unit Price: ' + (quoteData.Unit_Price || 'N/A') + '</p>';
+                            document.getElementById('loader').style.display = 'none';
+                            quoteDetailsDiv.classList.remove('hidden');
+                            addPayAndApproveButton();
+                        };
+    
+                        const addPayAndApproveButton = () => {
+                            const fetchButton = document.createElement('button');
+                            fetchButton.innerText = 'Pay and Approve';
+                            fetchButton.className = 'button';
+                            fetchButton.addEventListener('click', async () => {
+                                const loader = document.getElementById('loader');
+                                const resultDiv = document.getElementById('result');
+    
+                                loader.style.display = 'block';
+                                try {
+                                    const response = await fetch('/open', {
+                                        method: 'POST'
+                                    });
+    
+                                    if (!response.ok) {
+                                        throw new Error('Failed to fetch from /open');
+                                    }
+    
+                                    const result = await response.json();
+                                    console.log('Response from /open:', result);
+    
+                                    const urlsResponse = await fetch('/get-urls');
+                                    if (!urlsResponse.ok) {
+                                        throw new Error('Failed to fetch URL array');
+                                    }
+    
+                                    const urlsResult = await urlsResponse.json();
+                                    const urlArr = urlsResult.urls;
+    
+                                    localStorage.setItem('urlArr', JSON.stringify(urlArr));
+                                    console.log('urlArr saved to local storage:', urlArr);
+    
+                                    urlArr.forEach(url => {
+                                        window.open(url, '_blank');
+                                    });
+    
+                                    resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                                    for (const url of urlArr) {
+                                        const link = document.createElement('a');
+                                        link.href = url;
+                                        link.target = '_blank';
+                                        link.textContent = url;
+                                        link.style.display = 'block';
+                                        resultDiv.appendChild(link);
+                                    }
+                                    resultDiv.style.display = 'block';
+    
+                                } catch (error) {
+                                    console.error('Error fetching from /open:', error);
+                                    resultDiv.innerText = 'Failed to fetch from /open';
+                                    resultDiv.style.display = 'block';
+                                } finally {
+                                    loader.style.display = 'none';
+                                }
+                            });
+    
+                            document.body.appendChild(fetchButton);
+                        };
+                    </script>
+                </body>
+                </html>
+            `;
+    
+            res.setHeader('Content-Type', 'text/html');
+            res.send(htmlContent);
+        } else {
+            res.send('No ID provided');
+        }
+    });
+    
+    app.get('/quoteDetails', (req, res) => {
+        res.json(quoteDetails);
+    });
+    
 
-                    const fetchQuoteDetails = async () => {
-                        try {
-                            const response = await fetch('/quoteDetails');
-                            if (response.ok) {
-                                const quoteDetails = await response.json();
-                                console.log("quoteDetails are", quoteDetails);
-                                return quoteDetails;
-                            } else {
-                                console.error('Failed to fetch quote details');
-                                return null;
-                            }
-                        } catch (error) {
-                            console.error('Error fetching quote details:', error);
-                            return null;
-                        }
-                    };
-                </script>
-            </body>
-            </html>
-        `;
 
-        res.setHeader('Content-Type', 'text/html');
-        res.send(htmlContent);
-    } else {
-        res.send('No ID provided');
-    }
-});
+
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
