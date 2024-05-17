@@ -8,6 +8,11 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 
+
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
 app.get('/', (req, res) => {
     res.send('products api running new deploy');
 });
@@ -54,7 +59,31 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-let urlArr = []
+
+let urlArr = [];
+
+// Endpoint to retrieve urlArr
+app.get('/get-urls', (req, res) => {
+    res.json({ urls: urlArr });
+});
+
+// Endpoint to receive and store URLs
+app.post('/open', async (req, res) => {
+    const { url } = req.body;
+    try {
+        console.log('Received URL:', url);
+        if (url !== undefined) {
+            urlArr.push(url);
+        }
+        console.log("urlArr is", urlArr);
+        res.send({ "url": url });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Endpoint to serve the resource page
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -80,7 +109,6 @@ app.get('/resource', async (req, res) => {
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    // Send quoteId to N8N server when the page loads
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
                             await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
@@ -96,31 +124,37 @@ app.get('/resource', async (req, res) => {
                         }
                     });
 
-                    // Show the fetch button after 10 seconds
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Fetch URL';
                         fetchButton.addEventListener('click', async () => {
                             const loader = document.getElementById('loader');
                             const resultDiv = document.getElementById('result');
-                            
+
                             loader.style.display = 'block';
                             try {
-                                // Fetch the response from /open endpoint
                                 const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
                                 });
-                                
+
                                 if (!response.ok) {
                                     throw new Error('Failed to fetch from /open');
                                 }
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
-                                const myData = result[0]
-                                console.log("myData is", myData)
                                 resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
                                 resultDiv.style.display = 'block';
+
+                                // Fetch urlArr from the server and log it in the console
+                                const urlResponse = await fetch('/get-urls');
+                                if (!urlResponse.ok) {
+                                    throw new Error('Failed to fetch URL array');
+                                }
+
+                                const urlResult = await urlResponse.json();
+                                console.log('URL array:', urlResult.urls);
+
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
                                 resultDiv.innerText = 'Failed to fetch from /open';
@@ -131,7 +165,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 6000); // 10 seconds delay
+                    }, 6000); // 6 seconds delay
                 </script>
             </body>
             </html>
@@ -141,22 +175,6 @@ app.get('/resource', async (req, res) => {
         res.send(htmlContent);
     } else {
         res.send('No ID provided');
-    }
-});
-
-app.post('/open', async (req, res) => {
-    const { url } = req.body;
-    try {
-        console.log('Received URLss:', url)
-        if(url !== undefined){
-        urlArr.push(url)
-        }
-        console.log("urlArr is" , urlArr)
-        // res.status(200).json({ url });
-        res.send({"url": url});
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: err.message });
     }
 });
 
