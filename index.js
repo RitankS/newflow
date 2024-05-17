@@ -122,6 +122,15 @@ app.get('/resource', async (req, res) => {
                         } catch (error) {
                             console.error('Error sending quote ID to N8N:', error);
                         }
+
+                        // Load urlArr from local storage and display it
+                        const storedUrls = localStorage.getItem('urlArr');
+                        if (storedUrls) {
+                            const urlArr = JSON.parse(storedUrls);
+                            console.log('Loaded urlArr from local storage:', urlArr);
+                        } else {
+                            console.log('No urls in local storage.');
+                        }
                     });
 
                     setTimeout(() => {
@@ -143,7 +152,20 @@ app.get('/resource', async (req, res) => {
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
-                                resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
+
+                                // Push the url to urlArr if it's not undefined
+                                if (result.url !== undefined) {
+                                    urlArr.push(result.url);
+                                    // Save the updated urlArr to local storage
+                                    localStorage.setItem('urlArr', JSON.stringify(urlArr));
+                                    console.log('urlArr saved to local storage:', urlArr);
+                                }
+
+                                // Display the contents of urlArr
+                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                                for (const url of urlArr) {
+                                    resultDiv.innerHTML += '<p>' + url + '</p>';
+                                }
                                 resultDiv.style.display = 'block';
 
                                 // Fetch urlArr from the server and log it in the console
