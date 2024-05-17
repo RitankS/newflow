@@ -95,12 +95,11 @@ app.post("/quoteDetails", async (req, res) => {
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price
         );
-        quoteDetails.push({
-            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
-            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
-        });
-        console.log("quoteDetails array is", quoteDetails);
-
+       quoteDetails.push({
+           id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+           Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+       });
+       console.log("quoteDetails array is", quoteDetails)
         // Send the received data as a JSON response
         res.status(200).json({
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -117,13 +116,15 @@ app.get('/resource', async (req, res) => {
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
+    let quoteId; // Define the quoteId variable here
+
     if (id) {
-        const quoteId = id;
+        quoteId = id;
 
         // Fetch quote details
         let quoteDetails = {};
         try {
-            const response = await fetch('https://your-server-address/quoteDetails', {
+            const response = await fetch('https://https://newflow.vercel.app/quoteDetails', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -133,8 +134,6 @@ app.get('/resource', async (req, res) => {
 
             if (response.ok) {
                 quoteDetails = await response.json();
-                // Store the quote details in local storage
-                localStorage.setItem('quoteDetails', JSON.stringify(quoteDetails));
             } else {
                 console.error('Failed to fetch quote details');
             }
@@ -188,15 +187,15 @@ app.get('/resource', async (req, res) => {
             <body>
                 <h1>Quote Details</h1>
                 <div id="quote-details" class="hidden">
-                    <p>Description: <span id="description">N/A</span></p>
-                    <p>Heighest Cost: <span id="heighest-cost">N/A</span></p>
-                    <p>Internal Currency Unit Price: <span id="internal-currency-unit-price">N/A</span></p>
-                    <p>Is Taxable: <span id="is-taxable">N/A</span></p>
-                    <p>Product Name: <span id="product-name">N/A</span></p>
-                    <p>Product Type: <span id="product-type">N/A</span></p>
-                    <p>Product Id: <span id="product-id">N/A</span></p>
-                    <p>Quantity: <span id="quantity">N/A</span></p>
-                    <p>Unit Price: <span id="unit-price">N/A</span></p>
+                    <p>Description: ${quoteDetails.description || 'N/A'}</p>
+                    <p>Heighest Cost: ${quoteDetails.Heighest_Cost || 'N/A'}</p>
+                    <p>Internal Currency Unit Price: ${quoteDetails.Internal_Currency_Unit_Price || 'N/A'}</p>
+                    <p>Is Taxable: ${quoteDetails.isTaxable || 'N/A'}</p>
+                    <p>Product Name: ${quoteDetails.Product_Name || 'N/A'}</p>
+                    <p>Product Type: ${quoteDetails.Product_Type || 'N/A'}</p>
+                    <p>Product Id: ${quoteDetails.Product_Id || 'N/A'}</p>
+                    <p>Quantity: ${quoteDetails.quantity || 'N/A'}</p>
+                    <p>Unit Price: ${quoteDetails.Unit_Price || 'N/A'}</p>
                 </div>
                 <div id="loader">Loading...</div>
                 <div id="result" style="display: none;"></div>
@@ -224,22 +223,9 @@ app.get('/resource', async (req, res) => {
                         }
 
                         setTimeout(() => {
-                            const storedQuoteDetails = localStorage.getItem('quoteDetails');
-                            if (storedQuoteDetails) {
-                                const quoteDetails = JSON.parse(storedQuoteDetails);
-                                document.getElementById('description').innerText = quoteDetails.description || 'N/A';
-                                document.getElementById('heighest-cost').innerText = quoteDetails.Heighest_Cost || 'N/A';
-                                document.getElementById('internal-currency-unit-price').innerText = quoteDetails.Internal_Currency_Unit_Price || 'N/A';
-                                document.getElementById('is-taxable').innerText = quoteDetails.isTaxable || 'N/A';
-                                document.getElementById('product-name').innerText = quoteDetails.Product_Name || 'N/A';
-                                document.getElementById('product-type').innerText = quoteDetails.Product_Type || 'N/A';
-                                document.getElementById('product-id').innerText = quoteDetails.Product_Id || 'N/A';
-                                document.getElementById('quantity').innerText = quoteDetails.quantity || 'N/A';
-                                document.getElementById('unit-price').innerText = quoteDetails.Unit_Price || 'N/A';
-                            }
                             document.getElementById('quote-details').classList.remove('hidden');
                             document.getElementById('loader').style.display = 'none';
-                        }, 8000); 
+                        }, 15000); // 15 seconds delay
                     });
 
                     setTimeout(() => {
