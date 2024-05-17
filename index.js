@@ -83,6 +83,25 @@ app.post('/open', async (req, res) => {
     }
 });
 
+app.post("/quoteDetails", async (req, res) => {
+    const {
+        id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+        Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+    } = req.body;
+
+    try {
+        console.log(
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        );
+        res.status(200).json({ message: "Data received successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -105,15 +124,14 @@ app.get('/resource', async (req, res) => {
                     body {
                         display: flex;
                         flex-direction: column;
-                        justify-content: center;
                         align-items: center;
-                        height: 100vh;
                         margin: 0;
                         font-family: Arial, sans-serif;
                     }
                     h1 {
                         text-align: center;
                         text-decoration: underline;
+                        margin-top: 20px;
                     }
                     .hidden {
                         display: none;
@@ -126,9 +144,13 @@ app.get('/resource', async (req, res) => {
                         border-radius: 5px;
                         cursor: pointer;
                         font-size: 16px;
+                        margin-top: 20px;
                     }
                     .button:hover {
                         background-color: darkblue;
+                    }
+                    #result {
+                        margin-top: 20px;
                     }
                 </style>
             </head>
@@ -171,7 +193,7 @@ app.get('/resource', async (req, res) => {
 
                             loader.style.display = 'block';
                             try {
-                                const response = await fetch('/open', {
+                                const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
                                 });
 
@@ -182,7 +204,7 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
 
-                                const urlsResponse = await fetch('/get-urls');
+                                const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
                                 if (!urlsResponse.ok) {
                                     throw new Error('Failed to fetch URL array');
                                 }
