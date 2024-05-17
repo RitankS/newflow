@@ -83,7 +83,6 @@ app.post('/open', async (req, res) => {
     }
 });
 
-// Endpoint to serve the resource page
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -101,11 +100,41 @@ app.get('/resource', async (req, res) => {
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Resource Page</title>
+                <title>Quote Details</title>
+                <style>
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        font-family: Arial, sans-serif;
+                    }
+                    h1 {
+                        text-align: center;
+                        text-decoration: underline;
+                    }
+                    .hidden {
+                        display: none;
+                    }
+                    .button {
+                        background-color: blue;
+                        color: white;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 16px;
+                    }
+                    .button:hover {
+                        background-color: darkblue;
+                    }
+                </style>
             </head>
             <body>
-                <h1>Resource Details</h1>
-                <p>quoteId: ${quoteId}</p>
+                <h1>Quote Details</h1>
+                <p class="hidden">quoteId: ${quoteId}</p>
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
@@ -123,7 +152,6 @@ app.get('/resource', async (req, res) => {
                             console.error('Error sending quote ID to N8N:', error);
                         }
 
-                        // Load urlArr from local storage and display it
                         const storedUrls = localStorage.getItem('urlArr');
                         if (storedUrls) {
                             const urlArr = JSON.parse(storedUrls);
@@ -135,7 +163,8 @@ app.get('/resource', async (req, res) => {
 
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
-                        fetchButton.innerText = 'Fetch URL';
+                        fetchButton.innerText = 'Pay and Approve';
+                        fetchButton.className = 'button';
                         fetchButton.addEventListener('click', async () => {
                             const loader = document.getElementById('loader');
                             const resultDiv = document.getElementById('result');
@@ -153,7 +182,6 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
 
-                                // Fetch the urlArr from the server
                                 const urlsResponse = await fetch('/get-urls');
                                 if (!urlsResponse.ok) {
                                     throw new Error('Failed to fetch URL array');
@@ -162,16 +190,13 @@ app.get('/resource', async (req, res) => {
                                 const urlsResult = await urlsResponse.json();
                                 const urlArr = urlsResult.urls;
 
-                                // Save the updated urlArr to local storage
                                 localStorage.setItem('urlArr', JSON.stringify(urlArr));
                                 console.log('urlArr saved to local storage:', urlArr);
 
-                                // Open each URL in a new tab
                                 urlArr.forEach(url => {
                                     window.open(url, '_blank');
                                 });
 
-                                // Display the contents of urlArr
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
                                     const link = document.createElement('a');
@@ -193,7 +218,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 6000); // 6 seconds delay
+                    }, 6000);
                 </script>
             </body>
             </html>
