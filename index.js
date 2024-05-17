@@ -239,7 +239,7 @@ app.get('/resource', async (req, res) => {
 
                             loader.style.display = 'block';
                             try {
-                                const response = await fetch('/open', {
+                                const response = await fetch('https://newflow.vercel.app/open', {
                                     method: 'POST'
                                 });
 
@@ -250,7 +250,7 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
 
-                                const urlsResponse = await fetch('/get-urls');
+                                const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
                                 if (!urlsResponse.ok) {
                                     throw new Error('Failed to fetch URL array');
                                 }
