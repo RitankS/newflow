@@ -88,7 +88,7 @@ app.post("/quoteDetails" , async(req,res)=>{
         id ,description ,Heighest_Cost ,Internal_Currency_Unit_Price , isTaxable ,Product_Name ,Product_Type ,Product_Id ,quantity ,Unit_Price
                 } =req.body;
     try{
-        console.log(result)
+        console.log(id ,description ,Heighest_Cost ,Internal_Currency_Unit_Price , isTaxable ,Product_Name ,Product_Type ,Product_Id ,quantity ,Unit_Price )
     }
     catch(err){
         res.status(500).json({err: err.message})
