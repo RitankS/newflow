@@ -83,17 +83,24 @@ app.post('/open', async (req, res) => {
     }
 });
 
-app.post("/quoteDetails" , async(req,res)=>{
+app.post("/quoteDetails", async (req, res) => {
     const {
-        id ,description ,Heighest_Cost ,Internal_Currency_Unit_Price , isTaxable ,Product_Name ,Product_Type ,Product_Id ,quantity ,Unit_Price
-                } =req.body;
-    try{
-        console.log(id ,description ,Heighest_Cost ,Internal_Currency_Unit_Price , isTaxable ,Product_Name ,Product_Type ,Product_Id ,quantity ,Unit_Price )
+        id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+        Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+    } = req.body;
+
+    try {
+        console.log(
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        );
+        res.status(200).json({ message: "Data received successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
     }
-    catch(err){
-        res.status(500).json({err: err.message})
-    }
-})
+});
+
 
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
