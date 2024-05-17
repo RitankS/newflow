@@ -219,7 +219,7 @@ app.get('/resource', async (req, res) => {
                             fetchButton.innerText = 'Pay and Approve';
                             fetchButton.className = 'button';
                             fetchButton.addEventListener('click', async () => {
-                                const loader = document.getElementById('loaderconst loader = document.getElementById('loader');
+                                const loader = document.getElementById('loader');
                                 const resultDiv = document.getElementById('result');
     
                                 loader.style.display = 'block';
@@ -282,12 +282,11 @@ app.get('/resource', async (req, res) => {
         } else {
             res.send('No ID provided');
         }
-    });
-
-    app.get('/quoteDetails', (req, res) => {
+        });
+        
+        app.get('/quoteDetails', (req, res) => {
         res.json(quoteDetails);
-    })
-
+        });
 
 
 
