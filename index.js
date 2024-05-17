@@ -94,13 +94,15 @@ app.post("/quoteDetails", async (req, res) => {
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price
         );
-        res.status(200).json({ message: "Data received successfully" });
+        res.status(200).json({
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
-
 
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
@@ -111,6 +113,26 @@ app.get('/resource', async (req, res) => {
 
     if (id) {
         quoteId = id;
+
+        // Fetch quote details
+        let quoteDetails = {};
+        try {
+            const response = await fetch('https://your-server-address/quoteDetails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: quoteId })
+            });
+
+            if (response.ok) {
+                quoteDetails = await response.json();
+            } else {
+                console.error('Failed to fetch quote details');
+            }
+        } catch (error) {
+            console.error('Error fetching quote details:', error);
+        }
 
         // Render an HTML page with quoteId and a button
         const htmlContent = `
@@ -157,6 +179,17 @@ app.get('/resource', async (req, res) => {
             <body>
                 <h1>Quote Details</h1>
                 <p class="hidden">quoteId: ${quoteId}</p>
+                <div id="quote-details">
+                    <p>Description: ${quoteDetails.description || 'N/A'}</p>
+                    <p>Heighest Cost: ${quoteDetails.Heighest_Cost || 'N/A'}</p>
+                    <p>Internal Currency Unit Price: ${quoteDetails.Internal_Currency_Unit_Price || 'N/A'}</p>
+                    <p>Is Taxable: ${quoteDetails.isTaxable || 'N/A'}</p>
+                    <p>Product Name: ${quoteDetails.Product_Name || 'N/A'}</p>
+                    <p>Product Type: ${quoteDetails.Product_Type || 'N/A'}</p>
+                    <p>Product Id: ${quoteDetails.Product_Id || 'N/A'}</p>
+                    <p>Quantity: ${quoteDetails.quantity || 'N/A'}</p>
+                    <p>Unit Price: ${quoteDetails.Unit_Price || 'N/A'}</p>
+                </div>
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
