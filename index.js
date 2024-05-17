@@ -208,7 +208,7 @@ app.get('/resource', async (req, res) => {
                             '<p>Product Type: ' + (quoteData.Product_Type || 'N/A') + '</p>' +
                             '<p>Product Id: ' + (quoteData.Product_Id || 'N/A') + '</p>' +
                             '<p>Quantity: ' + (quoteData.quantity || 'N/A') + '</p>' +
-                            '<p>Unit Price: ' + (quoteData.Unit_Price || ' '<p>Unit Price: ' + (quoteData.Unit_Price || 'N/A') + '</p>';
+                            '<p>Unit Price: ' + (quoteData.Unit_Price || 'N/A') + '</p>';
                             document.getElementById('loader').style.display = 'none';
                             quoteDetailsDiv.classList.remove('hidden');
                             addPayAndApproveButton();
@@ -219,7 +219,7 @@ app.get('/resource', async (req, res) => {
                             fetchButton.innerText = 'Pay and Approve';
                             fetchButton.className = 'button';
                             fetchButton.addEventListener('click', async () => {
-                                const loader = document.getElementById('loader');
+                                const loader = document.getElementById('loaderconst loader = document.getElementById('loader');
                                 const resultDiv = document.getElementById('result');
     
                                 loader.style.display = 'block';
@@ -283,11 +283,10 @@ app.get('/resource', async (req, res) => {
             res.send('No ID provided');
         }
     });
-    
+
     app.get('/quoteDetails', (req, res) => {
         res.json(quoteDetails);
-    });
-    
+    })
 
 
 
