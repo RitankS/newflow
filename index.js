@@ -117,6 +117,8 @@ app.get('/resource', async (req, res) => {
 
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
+                                const myData = result[0]
+                                console.log("myData is", myData)
                                 resultDiv.innerText = 'Response received: ' + JSON.stringify(result);
                                 resultDiv.style.display = 'block';
                             } catch (error) {
