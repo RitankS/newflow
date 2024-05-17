@@ -105,15 +105,14 @@ app.get('/resource', async (req, res) => {
                     body {
                         display: flex;
                         flex-direction: column;
-                        justify-content: center;
                         align-items: center;
-                        height: 100vh;
                         margin: 0;
                         font-family: Arial, sans-serif;
                     }
                     h1 {
                         text-align: center;
                         text-decoration: underline;
+                        margin-top: 20px;
                     }
                     .hidden {
                         display: none;
@@ -126,9 +125,13 @@ app.get('/resource', async (req, res) => {
                         border-radius: 5px;
                         cursor: pointer;
                         font-size: 16px;
+                        margin-top: 20px;
                     }
                     .button:hover {
                         background-color: darkblue;
+                    }
+                    #result {
+                        margin-top: 20px;
                     }
                 </style>
             </head>
