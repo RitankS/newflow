@@ -166,7 +166,12 @@ app.get('/resource', async (req, res) => {
                                 localStorage.setItem('urlArr', JSON.stringify(urlArr));
                                 console.log('urlArr saved to local storage:', urlArr);
 
-                                // Display the contents of urlArr as clickable links
+                                // Open each URL in a new tab
+                                urlArr.forEach(url => {
+                                    window.open(url, '_blank');
+                                });
+
+                                // Display the contents of urlArr
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
                                     const link = document.createElement('a');
