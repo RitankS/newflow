@@ -187,15 +187,15 @@ app.get('/resource', async (req, res) => {
             <body>
                 <h1>Quote Details</h1>
                 <div id="quote-details" class="hidden">
-                    <p>Description: ${quoteDetails.description || 'N/A'}</p>
-                    <p>Heighest Cost: ${quoteDetails.Heighest_Cost || 'N/A'}</p>
-                    <p>Internal Currency Unit Price: ${quoteDetails.Internal_Currency_Unit_Price || 'N/A'}</p>
-                    <p>Is Taxable: ${quoteDetails.isTaxable || 'N/A'}</p>
-                    <p>Product Name: ${quoteDetails.Product_Name || 'N/A'}</p>
-                    <p>Product Type: ${quoteDetails.Product_Type || 'N/A'}</p>
-                    <p>Product Id: ${quoteDetails.Product_Id || 'N/A'}</p>
-                    <p>Quantity: ${quoteDetails.quantity || 'N/A'}</p>
-                    <p>Unit Price: ${quoteDetails.Unit_Price || 'N/A'}</p>
+                    <p>Description: ${quoteDetails[0]}</p>
+                    <p>Heighest Cost: ${quoteDetails[1]}</p>
+                    <p>Internal Currency Unit Price: ${quoteDetails[2]}</p>
+                    <p>Is Taxable: ${quoteDetails[3]}</p>
+                    <p>Product Name: ${quoteDetails[4]}</p>
+                    <p>Product Type: ${quoteDetails[5]}</p>
+                    <p>Product Id: ${quoteDetails[6]}</p>
+                    <p>Quantity: ${quoteDetails[7]}</p>
+                    <p>Unit Price: ${quoteDetails[8]}</p>
                 </div>
                 <div id="loader">Loading...</div>
                 <div id="result" style="display: none;"></div>
@@ -225,7 +225,7 @@ app.get('/resource', async (req, res) => {
                         setTimeout(() => {
                             document.getElementById('quote-details').classList.remove('hidden');
                             document.getElementById('loader').style.display = 'none';
-                        }, 15000); // 15 seconds delay
+                        }, 8000); // 15 seconds delay
                     });
 
                     setTimeout(() => {
