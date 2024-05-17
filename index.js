@@ -145,17 +145,47 @@ app.get('/resource', async (req, res) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Quote Details</title>
                 <style>
-                    /* Styles here */
+                    body {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        margin: 0;
+                        font-family: Arial, sans-serif;
+                    }
+                    h1 {
+                        text-align: center;
+                        text-decoration: underline;
+                        margin-top: 20px;
+                    }
+                    .hidden {
+                        display: none;
+                    }
+                    .button {
+                        background-color: blue;
+                        color: white;
+                        padding: 10px 20px;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        margin-top: 20px;
+                    }
+                    .button:hover {
+                        background-color: darkblue;
+                    }
+                    #quote-details {
+                        margin-top: 20px;
+                        text-align: left;
+                    }
                 </style>
             </head>
             <body>
                 <h1>Quote Details</h1>
-                <div id="quote-details">
+                <div id="quote-details" class="hidden">
                     <!-- Placeholder for quote details -->
                 </div>
                 <div id="loader">Loading...</div>
                 <div id="result" style="display: none;"></div>
-                <button id="fetch-button" class="button">Pay and Approve</button>
                 <script>
                     window.addEventListener('DOMContentLoaded', async () => {
                         const quoteDetails = await fetchQuoteDetails();
@@ -166,58 +196,38 @@ app.get('/resource', async (req, res) => {
                         }
                     });
 
-                    const fetchButton = document.getElementById('fetch-button');
-                    fetchButton.addEventListener('click', async () => {
-                        const loader = document.getElementById('loader');
-                        const resultDiv = document.getElementById('result');
+                    const renderQuoteDetails = (quoteData) => {
+                        const quoteDetailsDiv = document.getElementById('quote-details');
+                        quoteDetailsDiv.innerHTML = 
+                            '<p>Description: ' + (quoteData.description || 'N/A') + '</p>' +
+                            '<p>Heighest Cost: ' + (quoteData.Heighest_Cost || 'N/A') + '</p>' +
+                            '<p>Internal Currency Unit Price: ' + (quoteData.Internal_Currency_Unit_Price || 'N/A') + '</p>' +
+                            '<p>Is Taxable: ' + (quoteData.isTaxable || 'N/A') + '</p>' +
+                            '<p>Product Name: ' + (quoteData.Product_Name || 'N/A') + '</p>' +
+                            '<p>Product Type: ' + (quoteData.Product_Type || 'N/A') + '</p>' +
+                            '<p>Product Id: ' + (quoteData.Product_Id || 'N/A') + '</p>' +
+                            '<p>Quantity: ' + (quoteData.quantity || 'N/A') + '</p>' +
+                            '<p>Unit Price: ' + (quoteData.Unit_Price || 'N/A') + '</p>';
+                        document.getElementById('loader').style.display = 'none';
+                        quoteDetailsDiv.classList.remove('hidden');
+                    };
 
-                        loader.style.display = 'block';
+                    const fetchQuoteDetails = async () => {
                         try {
-                            const response = await fetch('/open', {
-                                method: 'POST'
-                            });
-
-                            if (!response.ok) {
-                                throw new Error('Failed to fetch from /open');
+                            const response = await fetch('/quoteDetails');
+                            if (response.ok) {
+                                const quoteDetails = await response.json();
+                                console.log("quoteDetails are", quoteDetails);
+                                return quoteDetails;
+                            } else {
+                                console.error('Failed to fetch quote details');
+                                return null;
                             }
-
-                            const result = await response.json();
-                            console.log('Response from /open:', result);
-
-                            const urlsResponse = await fetch('/get-urls');
-                            if (!urlsResponse.ok) {
-                                throw new Error('Failed to fetch URL array');
-                            }
-
-                            const urlsResult = await urlsResponse.json();
-                            const urlArr = urlsResult.urls;
-
-                            localStorage.setItem('urlArr', JSON.stringify(urlArr));
-                            console.log('urlArr saved to local storage:', urlArr);
-
-                            urlArr.forEach(url => {
-                                window.open(url, '_blank');
-                            });
-
-                            resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                            for (const url of urlArr) {
-                                const link = document.createElement('a');
-                                link.href = url;
-                                link.target = '_blank';
-                                link.textContent = url;
-                                link.style.display = 'block';
-                                resultDiv.appendChild(link);
-                            }
-                            resultDiv.style.display = 'block';
-
                         } catch (error) {
-                            console.error('Error fetching from /open:', error);
-                            resultDiv.innerText = 'Failed to fetch from /open';
-                            resultDiv.style.display = 'block';
-                        } finally {
-                            loader.style.display = 'none';
+                            console.error('Error fetching quote details:', error);
+                            return null;
                         }
-                    });
+                    };
                 </script>
             </body>
             </html>
