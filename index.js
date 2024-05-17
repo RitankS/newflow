@@ -84,7 +84,9 @@ app.post('/open', async (req, res) => {
 });
 
 app.post("/quoteDetails" , async(req,res)=>{
-    const {result} =req.body;
+    const {
+        id ,description ,Heighest_Cost ,Internal_Currency_Unit_Price , isTaxable ,Product_Name ,Product_Type ,Product_Id ,quantity ,Unit_Price
+                } =req.body;
     try{
         console.log(result)
     }
