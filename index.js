@@ -106,6 +106,7 @@ app.post("/quoteDetails", async (req, res) => {
     }
 });
 
+// Endpoint to render HTML page and fetch quote details after 10 seconds
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -116,27 +117,7 @@ app.get('/resource', async (req, res) => {
     if (id) {
         quoteId = id;
 
-        // Fetch quote details
-        let quoteDetails = {};
-        try {
-            const response = await fetch('https://your-server-address/quoteDetails', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: quoteId })
-            });
-
-            if (response.ok) {
-                quoteDetails = await response.json();
-            } else {
-                console.error('Failed to fetch quote details');
-            }
-        } catch (error) {
-            console.error('Error fetching quote details:', error);
-        }
-
-        // Render an HTML page with quoteId and a button
+        // Render an HTML page without quote details
         const htmlContent = `
             <!DOCTYPE html>
             <html lang="en">
@@ -182,100 +163,52 @@ app.get('/resource', async (req, res) => {
             <body>
                 <h1>Quote Details</h1>
                 <div id="quote-details">
-                    <p>Description: ${quoteDetails.description || 'N/A'}</p>
-                    <p>Heighest Cost: ${quoteDetails.Heighest_Cost || 'N/A'}</p>
-                    <p>Internal Currency Unit Price: ${quoteDetails.Internal_Currency_Unit_Price || 'N/A'}</p>
-                    <p>Is Taxable: ${quoteDetails.isTaxable || 'N/A'}</p>
-                    <p>Product Name: ${quoteDetails.Product_Name || 'N/A'}</p>
-                    <p>Product Type: ${quoteDetails.Product_Type || 'N/A'}</p>
-                    <p>Product Id: ${quoteDetails.Product_Id || 'N/A'}</p>
-                    <p>Quantity: ${quoteDetails.quantity || 'N/A'}</p>
-                    <p>Unit Price: ${quoteDetails.Unit_Price || 'N/A'}</p>
+                    <p>Description: N/A</p>
+                    <p>Heighest Cost: N/A</p>
+                    <p>Internal Currency Unit Price: N/A</p>
+                    <p>Is Taxable: N/A</p>
+                    <p>Product Name: N/A</p>
+                    <p>Product Type: N/A</p>
+                    <p>Product Id: N/A</p>
+                    <p>Quantity: N/A</p>
+                    <p>Unit Price: N/A</p>
                 </div>
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    window.addEventListener('DOMContentLoaded', async () => {
-                        try {
-                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ quoteId: '${quoteId}' })
-                            });
-                            console.log('Quote ID sent to N8N server successfully');
-                        } catch (error) {
-                            console.error('Error sending quote ID to N8N:', error);
-                        }
-
-                        const storedUrls = localStorage.getItem('urlArr');
-                        if (storedUrls) {
-                            const urlArr = JSON.parse(storedUrls);
-                            console.log('Loaded urlArr from local storage:', urlArr);
-                        } else {
-                            console.log('No urls in local storage.');
-                        }
-                    });
-
                     setTimeout(() => {
-                        const fetchButton = document.createElement('button');
-                        fetchButton.innerText = 'Pay and Approve';
-                        fetchButton.className = 'button';
-                        fetchButton.addEventListener('click', async () => {
-                            const loader = document.getElementById('loader');
-                            const resultDiv = document.getElementById('result');
+                        document.getElementById('loader').style.display = 'none';
+                        document.getElementById('result').style.display = 'block';
+                    }, 10000); // 10 seconds delay
 
-                            loader.style.display = 'block';
+                    window.addEventListener('DOMContentLoaded', async () => {
+                        // Fetch quote details after 10 seconds
+                        setTimeout(async () => {
                             try {
-                                const response = await fetch('/open', {
-                                    method: 'POST'
+                                const response = await fetch('https://your-server-address/quoteDetails', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ id: '${quoteId}' })
                                 });
 
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
+                                if (response.ok) {
+                                    const quoteDetails = await response.json();
+                                    document.getElementById('quote-details').innerHTML = '';
+                                    for (const key in quoteDetails) {
+                                        const p = document.createElement('p');
+                                        p.textContent = \`\${key}: \${quoteDetails[key]}\`;
+                                        document.getElementById('quote-details').appendChild(p);
+                                    }
+                                } else {
+                                    console.error('Failed to fetch quote details');
                                 }
-
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-
-                                const urlsResponse = await fetch('/get-urls');
-                                if (!urlsResponse.ok) {
-                                    throw new Error('Failed to fetch URL array');
-                                }
-
-                                const urlsResult = await urlsResponse.json();
-                                const urlArr = urlsResult.urls;
-
-                                localStorage.setItem('urlArr', JSON.stringify(urlArr));
-                                console.log('urlArr saved to local storage:', urlArr);
-
-                                urlArr.forEach(url => {
-                                    window.open(url, '_blank');
-                                });
-
-                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                for (const url of urlArr) {
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.target = '_blank';
-                                    link.textContent = url;
-                                    link.style.display = 'block';
-                                    resultDiv.appendChild(link);
-                                }
-                                resultDiv.style.display = 'block';
-
                             } catch (error) {
-                                console.error('Error fetching from /open:', error);
-                                resultDiv.innerText = 'Failed to fetch from /open';
-                                resultDiv.style.display = 'block';
-                            } finally {
-                                loader.style.display = 'none';
+                                console.error('Error fetching quote details:', error);
                             }
-                        });
-
-                        document.body.appendChild(fetchButton);
-                    }, 5000); // 5 seconds delay
+                        }, 10000); // 10 seconds delay
+                    });
                 </script>
             </body>
             </html>
@@ -287,6 +220,7 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
+
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
