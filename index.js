@@ -83,7 +83,6 @@ app.post('/open', async (req, res) => {
     }
 });
 
-
 let quoteDetails = [];
 
 app.post("/quoteDetails", async (req, res) => {
@@ -119,9 +118,10 @@ app.get('/resource', async (req, res) => {
     console.log('Query parameters:', req.query);
 
     if (id) {
-        // Fetch quote details
-       
-        // Render an HTML page with quoteId and a button
+        // Fetch quote details from the in-memory array
+        const quoteDetail = quoteDetails.find(q => q.id === id);
+
+        // Render an HTML page with quote details
         const htmlContent = `
             <!DOCTYPE html>
             <html lang="en">
@@ -166,130 +166,116 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <h1>Quote Details</h1>
-                <div id="quote-details" class="hidden">
-                    <!-- Placeholder for quote details -->
+                <div id="quote-details">
+                    <p>Description: ${quoteDetail ? quoteDetail.description : 'N/A'}</p>
+                    <p>Heighest Cost: ${quoteDetail ? quoteDetail.Heighest_Cost : 'N/A'}</p>
+                    <p>Internal Currency Unit Price: ${quoteDetail ? quoteDetail.Internal_Currency_Unit_Price : 'N/A'}</p>
+                    <p>Is Taxable: ${quoteDetail ? quoteDetail.isTaxable : 'N/A'}</p>
+                    <p>Product Name: ${quoteDetail ? quoteDetail.Product_Name : 'N/A'}</p>
+                    <p>Product Type: ${quoteDetail ? quoteDetail.Product_Type : 'N/A'}</p>
+                    <p>Product Id: ${quoteDetail ? quoteDetail.Product_Id : 'N/A'}</p>
+                    <p>Quantity: ${quoteDetail ? quoteDetail.quantity : 'N/A'}</p>
+                    <p>Unit Price: ${quoteDetail ? quoteDetail.Unit_Price : 'N/A'}</p>
                 </div>
                 <div id="loader">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                const fetchQuoteDetails = async () => {
-                    try {
-                        const response = await fetch('https://newflow.vercel.app/quoteDetails');
-                        if (response.ok) {
-                            quoteDetails = await response.json();
-                            console.log("quoteDetails are", quoteDetails);
-                            return quoteDetails;
-                        } else {
-                            console.error('Failed to fetch quote details');
-                            return null;
-                        }
-                    } catch (error) {
-                        console.error('Error fetching quote details:', error);
-                        return null;
-                    }
-                };
-        
                     window.addEventListener('DOMContentLoaded', async () => {
-                        const quoteDetails = await fetchQuoteDetails();
-                        if (quoteDetails) {
-                            renderQuoteDetails(quoteDetails);
-                        } else {
-                            console.log('Quote details not available');
+                        try {
+                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ quoteId: '${id}' })
+                            });
+                            console.log('Quote ID sent to N8N server successfully');
+                        } catch (error) {
+                            console.error('Error sending quote ID to N8N:', error);
                         }
+                       
+                        const storedUrls = localStorage.getItem('urlArr');
+                        if (storedUrls) {
+                            const urlArr = JSON.parse(storedUrls);
+                            console.log('Loaded urlArr from local storage:', urlArr);
+                        } else {
+                            console.log('No urls in local storage.');
+                        }
+
+                        setTimeout(() => {
+                            document.getElementById('loader').style.display = 'none';
+                        }, 8000); // 15 seconds delay
                     });
 
-                    const renderQuoteDetails = (quoteData) => {
-                        const quoteDetailsDiv = document.getElementById('quote-details');
-                        quoteDetailsDiv.innerHTML = 
-                            '<p>Description: ' + (quoteData.description || 'N/A') + '</p>' +
-                            '<p>Heighest Cost: ' + (quoteData.Heighest_Cost || 'N/A') + '</p>' +
-                            '<p>Internal Currency Unit Price: ' + (quoteData.Internal_Currency_Unit_Price || 'N/A') + '</p>' +
-                            '<p>Is Taxable: ' + (quoteData.isTaxable || 'N/A') + '</p>' +
-                            '<p>Product Name: ' + (quoteData.Product_Name || 'N/A') + '</p>' +
-                            '<p>Product Type: ' + (quoteData.Product_Type || 'N/A') + '</p>' +
-                            '<p>Product Id: ' + (quoteData.Product_Id || 'N/A') + '</p>' +
-                            '<p>Quantity: ' + (quoteData.quantity || 'N/A') + '</p>' +
-                            '<p>Unit Price: ' + (quoteData.Unit_Price || 'N/A') + '</p>';
-                            document.getElementById('loader').style.display = 'none';
-                            quoteDetailsDiv.classList.remove('hidden');
-                            addPayAndApproveButton();
-                        };
-    
-                        const addPayAndApproveButton = () => {
-                            const fetchButton = document.createElement('button');
-                            fetchButton.innerText = 'Pay and Approve';
-                            fetchButton.className = 'button';
-                            fetchButton.addEventListener('click', async () => {
-                                const loader = document.getElementById('loader');
-                                const resultDiv = document.getElementById('result');
-    
-                                loader.style.display = 'block';
-                                try {
-                                    const response = await fetch('/open', {
-                                        method: 'POST'
-                                    });
-    
-                                    if (!response.ok) {
-                                        throw new Error('Failed to fetch from /open');
-                                    }
-    
-                                    const result = await response.json();
-                                    console.log('Response from /open:', result);
-    
-                                    const urlsResponse = await fetch('/get-urls');
-                                    if (!urlsResponse.ok) {
-                                        throw new Error('Failed to fetch URL array');
-                                    }
-    
-                                    const urlsResult = await urlsResponse.json();
-                                    const urlArr = urlsResult.urls;
-    
-                                    localStorage.setItem('urlArr', JSON.stringify(urlArr));
-                                    console.log('urlArr saved to local storage:', urlArr);
-    
-                                    urlArr.forEach(url => {
-                                        window.open(url, '_blank');
-                                    });
-    
-                                    resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                    for (const url of urlArr) {
-                                        const link = document.createElement('a');
-                                        link.href = url;
-                                        link.target = '_blank';
-                                        link.textContent = url;
-                                        link.style.display = 'block';
-                                        resultDiv.appendChild(link);
-                                    }
-                                    resultDiv.style.display = 'block';
-    
-                                } catch (error) {
-                                    console.error('Error fetching from /open:', error);
-                                    resultDiv.innerText = 'Failed to fetch from /open';
-                                    resultDiv.style.display = 'block';
-                                } finally {
-                                    loader.style.display = 'none';
+                    setTimeout(() => {
+                        const fetchButton = document.createElement('button');
+                        fetchButton.innerText = 'Pay and Approve';
+                        fetchButton.className = 'button';
+                        fetchButton.addEventListener('click', async () => {
+                            const loader = document.getElementById('loader');
+                            const resultDiv = document.getElementById('result');
+
+                            loader.style.display = 'block';
+                            try {
+                                const response = await fetch('/open', {
+                                    method: 'POST'
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
                                 }
-                            });
-    
-                            document.body.appendChild(fetchButton);
-                        };
-                    </script>
-                </body>
-                </html>
-            `;
-    
-            res.setHeader('Content-Type', 'text/html');
-            res.send(htmlContent);
-        } else {
-            res.send('No ID provided');
-        }
-        });
-        
-        app.get('/quoteDetails', (req, res) => {
-        res.json(quoteDetails);
-        });
 
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
 
+                                const urlsResponse = await fetch('/get-urls');
+                                if (!urlsResponse.ok) {
+                                    throw new Error('Failed to fetch URL array');
+                                }
+
+                                const urlsResult = await urlsResponse.json();
+                                const urlArr = urlsResult.urls;
+
+                                localStorage.setItem('urlArr', JSON.stringify(urlArr));
+                                console.log('urlArr saved to local storage:', urlArr);
+
+                                urlArr.forEach(url => {
+                                    window.open(url, '_blank');
+                                });
+
+                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                                for (const url of urlArr) {
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.target = '_blank';
+                                    link.textContent = url;
+                                    link.style.display = 'block';
+                                    resultDiv.appendChild(link);
+                                }
+                                resultDiv.style.display = 'block';
+
+                            } catch (error) {
+                                console.error('Error fetching from /open:', error);
+                                resultDiv.innerText = 'Failed to fetch from /open';
+                                resultDiv.style.display = 'block';
+                            } finally {
+                                loader.style.display = 'none';
+                            }
+                        });
+
+                        document.body.appendChild(fetchButton);
+                    }, 15000); // 15 seconds delay
+                </script>
+            </body>
+            </html>
+        `;
+
+        res.setHeader('Content-Type', 'text/html');
+        res.send(htmlContent);
+    } else {
+        res.send('No ID provided');
+    }
+});
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
