@@ -134,6 +134,7 @@ app.get('/resource', async (req, res) => {
 
             if (response.ok) {
                 quoteDetails = await response.json();
+                console.log("quoteDetails are" , quoteDetails)
             } else {
                 console.error('Failed to fetch quote details');
             }
@@ -213,7 +214,7 @@ app.get('/resource', async (req, res) => {
                         } catch (error) {
                             console.error('Error sending quote ID to N8N:', error);
                         }
-                        const quoteSaves = localStorage.setItems('quoteDesils', JSON.stringify(quoteDetails))
+                       
                         const storedUrls = localStorage.getItem('urlArr');
                         if (storedUrls) {
                             const urlArr = JSON.parse(storedUrls);
