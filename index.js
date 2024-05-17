@@ -142,7 +142,7 @@ app.get('/resource', async (req, res) => {
 
                             loader.style.display = 'block';
                             try {
-                                const response = await fetch('https://newflow.vercel.app/open', {
+                                const response = await fetch('/open', {
                                     method: 'POST'
                                 });
 
@@ -153,13 +153,18 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
 
-                                // Push the url to urlArr if it's not undefined
-                                if (result.url !== undefined) {
-                                    urlArr.push(result.url);
-                                    // Save the updated urlArr to local storage
-                                    localStorage.setItem('urlArr', JSON.stringify(urlArr));
-                                    console.log('urlArr saved to local storage:', urlArr);
+                                // Fetch the urlArr from the server
+                                const urlsResponse = await fetch('/get-urls');
+                                if (!urlsResponse.ok) {
+                                    throw new Error('Failed to fetch URL array');
                                 }
+
+                                const urlsResult = await urlsResponse.json();
+                                const urlArr = urlsResult.urls;
+
+                                // Save the updated urlArr to local storage
+                                localStorage.setItem('urlArr', JSON.stringify(urlArr));
+                                console.log('urlArr saved to local storage:', urlArr);
 
                                 // Display the contents of urlArr
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
@@ -167,15 +172,6 @@ app.get('/resource', async (req, res) => {
                                     resultDiv.innerHTML += '<p>' + url + '</p>';
                                 }
                                 resultDiv.style.display = 'block';
-
-                                // Fetch urlArr from the server and log it in the console
-                                const urlResponse = await fetch('/get-urls');
-                                if (!urlResponse.ok) {
-                                    throw new Error('Failed to fetch URL array');
-                                }
-
-                                const urlResult = await urlResponse.json();
-                                console.log('URL array:', urlResult.urls);
 
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
