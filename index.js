@@ -84,6 +84,7 @@ app.post('/open', async (req, res) => {
 });
 
 let quoteDetails = [];
+
 app.post("/quoteDetails", async (req, res) => {
     const {
         id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -95,11 +96,11 @@ app.post("/quoteDetails", async (req, res) => {
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price
         );
-       quoteDetails.push({
-           id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
-           Product_Name, Product_Type, Product_Id, quantity, Unit_Price
-       });
-       console.log("quoteDetails array is", quoteDetails)
+        quoteDetails.push({
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        });
+        console.log("quoteDetails array is", quoteDetails);
         // Send the received data as a JSON response
         res.status(200).json({
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -116,33 +117,11 @@ app.get('/resource', async (req, res) => {
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
-    let quoteId; // Define the quoteId variable here
-
     if (id) {
-        quoteId = id;
+        // Fetch quote details from the in-memory array
+        const quoteDetail = quoteDetails.find(q => q.id === id);
 
-        // Fetch quote details
-        let quoteDetails = {};
-        try {
-            const response = await fetch('https://https://newflow.vercel.app/quoteDetails', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: quoteId , description: description, Heighest_Cost: Heighest_Cost, Internal_Currency_Unit_Price: Internal_Currency_Unit_Price, isTaxable: isTaxable,Product_Name: Product_Name, Product_Type: Product_Type, Product_Id: Product_Id, quantity: quantity, Unit_Price: Unit_Price })
-            });
-
-            if (response.ok) {
-                quoteDetails = await response.json();
-                console.log("quoteDetails are" , quoteDetails)
-            } else {
-                console.error('Failed to fetch quote details');
-            }
-        } catch (error) {
-            console.error('Error fetching quote details:', error);
-        }
-
-        // Render an HTML page with quoteId and a button
+        // Render an HTML page with quote details
         const htmlContent = `
             <!DOCTYPE html>
             <html lang="en">
@@ -187,16 +166,16 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <h1>Quote Details</h1>
-                <div id="quote-details" class="hidden">
-                    <p>Description: ${quoteDetails.description || 'N/A'}</p>
-                    <p>Heighest Cost: ${quoteDetails.Heighest_Cost || 'N/A'}</p>
-                    <p>Internal Currency Unit Price: ${quoteDetails.Internal_Currency_Unit_Price || 'N/A'}</p>
-                    <p>Is Taxable: ${quoteDetails.isTaxable || 'N/A'}</p>
-                    <p>Product Name: ${quoteDetails.Product_Name || 'N/A'}</p>
-                    <p>Product Type: ${quoteDetails.Product_Type || 'N/A'}</p>
-                    <p>Product Id: ${quoteDetails.Product_Id || 'N/A'}</p>
-                    <p>Quantity: ${quoteDetails.quantity || 'N/A'}</p>
-                    <p>Unit Price: ${quoteDetails.Unit_Price || 'N/A'}</p>
+                <div id="quote-details">
+                    <p>Description: ${quoteDetail ? quoteDetail.description : 'N/A'}</p>
+                    <p>Heighest Cost: ${quoteDetail ? quoteDetail.Heighest_Cost : 'N/A'}</p>
+                    <p>Internal Currency Unit Price: ${quoteDetail ? quoteDetail.Internal_Currency_Unit_Price : 'N/A'}</p>
+                    <p>Is Taxable: ${quoteDetail ? quoteDetail.isTaxable : 'N/A'}</p>
+                    <p>Product Name: ${quoteDetail ? quoteDetail.Product_Name : 'N/A'}</p>
+                    <p>Product Type: ${quoteDetail ? quoteDetail.Product_Type : 'N/A'}</p>
+                    <p>Product Id: ${quoteDetail ? quoteDetail.Product_Id : 'N/A'}</p>
+                    <p>Quantity: ${quoteDetail ? quoteDetail.quantity : 'N/A'}</p>
+                    <p>Unit Price: ${quoteDetail ? quoteDetail.Unit_Price : 'N/A'}</p>
                 </div>
                 <div id="loader">Loading...</div>
                 <div id="result" style="display: none;"></div>
@@ -208,7 +187,7 @@ app.get('/resource', async (req, res) => {
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ quoteId: '${quoteId}' })
+                                body: JSON.stringify({ quoteId: '${id}' })
                             });
                             console.log('Quote ID sent to N8N server successfully');
                         } catch (error) {
@@ -224,7 +203,6 @@ app.get('/resource', async (req, res) => {
                         }
 
                         setTimeout(() => {
-                            document.getElementById('quote-details').classList.remove('hidden');
                             document.getElementById('loader').style.display = 'none';
                         }, 15000); // 15 seconds delay
                     });
