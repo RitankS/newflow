@@ -129,7 +129,7 @@ app.get('/resource', async (req, res) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: quoteId })
+                body: JSON.stringify({ id: quoteId , description: description, Heighest_Cost: Heighest_Cost, Internal_Currency_Unit_Price: Internal_Currency_Unit_Price, isTaxable: isTaxable,Product_Name: Product_Name, Product_Type: Product_Type, Product_Id: Product_Id, quantity: quantity, Unit_Price: Unit_Price })
             });
 
             if (response.ok) {
