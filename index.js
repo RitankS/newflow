@@ -166,10 +166,10 @@ app.get('/resource', async (req, res) => {
                                 localStorage.setItem('urlArr', JSON.stringify(urlArr));
                                 console.log('urlArr saved to local storage:', urlArr);
 
-                                // Display the contents of urlArr
+                                // Display the contents of urlArr as clickable links
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
-                                    resultDiv.innerHTML += '<p>' + url + '</p>';
+                                    resultDiv.innerHTML += '<p><a href="' + url + '" target="_blank">' + url + '</a></p>';
                                 }
                                 resultDiv.style.display = 'block';
 
@@ -195,6 +195,7 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
+
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
