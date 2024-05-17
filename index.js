@@ -84,7 +84,6 @@ app.post('/open', async (req, res) => {
 });
 
 let quoteDetails = [];
-
 app.post("/quoteDetails", async (req, res) => {
     const {
         id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -113,12 +112,36 @@ app.post("/quoteDetails", async (req, res) => {
     }
 });
 
-app.get('/resource', (req, res) => {
+app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
     if (id) {
+        const quoteId = id;
+
+        // Fetch quote details
+        let quoteDetails = {};
+        try {
+            const response = await fetch('https://your-server-address/quoteDetails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: quoteId })
+            });
+
+            if (response.ok) {
+                quoteDetails = await response.json();
+                // Store the quote details in local storage
+                localStorage.setItem('quoteDetails', JSON.stringify(quoteDetails));
+            } else {
+                console.error('Failed to fetch quote details');
+            }
+        } catch (error) {
+            console.error('Error fetching quote details:', error);
+        }
+
         // Render an HTML page with quoteId and a button
         const htmlContent = `
             <!DOCTYPE html>
@@ -179,25 +202,25 @@ app.get('/resource', (req, res) => {
                 <div id="result" style="display: none;"></div>
                 <script>
                     window.addEventListener('DOMContentLoaded', async () => {
-                        const quoteId = '${id}';
-
                         try {
-                            const response = await fetch('https://your-server-address/quoteDetails', {
+                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ id: quoteId })
+                                body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
-
-                            if (response.ok) {
-                                const quoteDetails = await response.json();
-                                localStorage.setItem('quoteDetails', JSON.stringify(quoteDetails));
-                            } else {
-                                console.error('Failed to fetch quote details');
-                            }
+                            console.log('Quote ID sent to N8N server successfully');
                         } catch (error) {
-                            console.error('Error fetching quote details:', error);
+                            console.error('Error sending quote ID to N8N:', error);
+                        }
+
+                        const storedUrls = localStorage.getItem('urlArr');
+                        if (storedUrls) {
+                            const urlArr = JSON.parse(storedUrls);
+                            console.log('Loaded urlArr from local storage:', urlArr);
+                        } else {
+                            console.log('No urls in local storage.');
                         }
 
                         setTimeout(() => {
@@ -288,6 +311,7 @@ app.get('/resource', (req, res) => {
         res.send('No ID provided');
     }
 });
+
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
