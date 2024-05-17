@@ -116,6 +116,26 @@ app.get('/resource', async (req, res) => {
     if (id) {
         quoteId = id;
 
+        // Fetch quote details
+        let quoteDetails = {};
+        try {
+            const response = await fetch('https://your-server-address/quoteDetails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: quoteId })
+            });
+
+            if (response.ok) {
+                quoteDetails = await response.json();
+            } else {
+                console.error('Failed to fetch quote details');
+            }
+        } catch (error) {
+            console.error('Error fetching quote details:', error);
+        }
+
         // Render an HTML page with quoteId and a button
         const htmlContent = `
             <!DOCTYPE html>
@@ -153,60 +173,109 @@ app.get('/resource', async (req, res) => {
                     .button:hover {
                         background-color: darkblue;
                     }
-                    #result {
+                    #quote-details {
                         margin-top: 20px;
+                        text-align: left;
                     }
                 </style>
             </head>
             <body>
                 <h1>Quote Details</h1>
                 <div id="quote-details">
-                    <p>Description: <span id="description">N/A</span></p>
-                    <p>Heighest Cost: <span id="heighest-cost">N/A</span></p>
-                    <p>Internal Currency Unit Price: <span id="internal-currency">N/A</span></p>
-                    <p>Is Taxable: <span id="is-taxable">N/A</span></p>
-                    <p>Product Name: <span id="product-name">N/A</span></p>
-                    <p>Product Type: <span id="product-type">N/A</span></p>
-                    <p>Product Id: <span id="product-id">N/A</span></p>
-                    <p>Quantity: <span id="quantity">N/A</span></p>
-                    <p>Unit Price: <span id="unit-price">N/A</span></p>
+                    <p>Description: ${quoteDetails.description || 'N/A'}</p>
+                    <p>Heighest Cost: ${quoteDetails.Heighest_Cost || 'N/A'}</p>
+                    <p>Internal Currency Unit Price: ${quoteDetails.Internal_Currency_Unit_Price || 'N/A'}</p>
+                    <p>Is Taxable: ${quoteDetails.isTaxable || 'N/A'}</p>
+                    <p>Product Name: ${quoteDetails.Product_Name || 'N/A'}</p>
+                    <p>Product Type: ${quoteDetails.Product_Type || 'N/A'}</p>
+                    <p>Product Id: ${quoteDetails.Product_Id || 'N/A'}</p>
+                    <p>Quantity: ${quoteDetails.quantity || 'N/A'}</p>
+                    <p>Unit Price: ${quoteDetails.Unit_Price || 'N/A'}</p>
                 </div>
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    setTimeout(() => {
-                        document.getElementById('loader').style.display = 'none';
-                        document.getElementById('result').style.display = 'block';
-                    }, 10000); // 10 seconds delay
-
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
-                            const response = await fetch('https://your-server-address/quoteDetails', {
+                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ id: '${quoteId}' })
+                                body: JSON.stringify({ quoteId: '${quoteId}' })
                             });
-
-                            if (response.ok) {
-                                const data = await response.json();
-                                document.getElementById('description').textContent = data.description || 'N/A';
-                                document.getElementById('heighest-cost').textContent = data.Heighest_Cost || 'N/A';
-                                document.getElementById('internal-currency').textContent = data.Internal_Currency_Unit_Price || 'N/A';
-                                document.getElementById('is-taxable').textContent = data.isTaxable || 'N/A';
-                                document.getElementById('product-name').textContent = data.Product_Name || 'N/A';
-                                document.getElementById('product-type').textContent = data.Product_Type || 'N/A';
-                                document.getElementById('product-id').textContent = data.Product_Id || 'N/A';
-                                document.getElementById('quantity').textContent = data.quantity || 'N/A';
-                                document.getElementById('unit-price').textContent = data.Unit_Price || 'N/A';
-                            } else {
-                                console.error('Failed to fetch quote details');
-                            }
+                            console.log('Quote ID sent to N8N server successfully');
                         } catch (error) {
-                            console.error('Error fetching quote details:', error);
+                            console.error('Error sending quote ID to N8N:', error);
+                        }
+
+                        const storedUrls = localStorage.getItem('urlArr');
+                        if (storedUrls) {
+                            const urlArr = JSON.parse(storedUrls);
+                            console.log('Loaded urlArr from local storage:', urlArr);
+                        } else {
+                            console.log('No urls in local storage.');
                         }
                     });
+
+                    setTimeout(() => {
+                        const fetchButton = document.createElement('button');
+                        fetchButton.innerText = 'Pay and Approve';
+                        fetchButton.className = 'button';
+                        fetchButton.addEventListener('click', async () => {
+                            const loader = document.getElementById('loader');
+                            const resultDiv = document.getElementById('result');
+
+                            loader.style.display = 'block';
+                            try {
+                                const response = await fetch('/open', {
+                                    method: 'POST'
+                                });
+
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch from /open');
+                                }
+
+                                const result = await response.json();
+                                console.log('Response from /open:', result);
+
+                                const urlsResponse = await fetch('/get-urls');
+                                if (!urlsResponse.ok) {
+                                    throw new Error('Failed to fetch URL array');
+                                }
+
+                                const urlsResult = await urlsResponse.json();
+                                const urlArr = urlsResult.urls;
+
+                                localStorage.setItem('urlArr', JSON.stringify(urlArr));
+                                console.log('urlArr saved to local storage:', urlArr);
+
+                                urlArr.forEach(url => {
+                                    window.open(url, '_blank');
+                                });
+
+                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
+                                for (const url of urlArr) {
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.target = '_blank';
+                                    link.textContent = url;
+                                    link.style.display = 'block';
+                                    resultDiv.appendChild(link);
+                                }
+                                resultDiv.style.display = 'block';
+
+                            } catch (error) {
+                                console.error('Error fetching from /open:', error);
+                                resultDiv.innerText = 'Failed to fetch from /open';
+                                resultDiv.style.display = 'block';
+                            } finally {
+                                loader.style.display = 'none';
+                            }
+                        });
+
+                        document.body.appendChild(fetchButton);
+                    }, 5000); // 5 seconds delay
                 </script>
             </body>
             </html>
