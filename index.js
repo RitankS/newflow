@@ -134,7 +134,6 @@ app.get('/resource', async (req, res) => {
 
             if (response.ok) {
                 quoteDetails = await response.json();
-                console.log("quoteDetails are" , quoteDetails)
             } else {
                 console.error('Failed to fetch quote details');
             }
@@ -214,7 +213,7 @@ app.get('/resource', async (req, res) => {
                         } catch (error) {
                             console.error('Error sending quote ID to N8N:', error);
                         }
-                       
+
                         const storedUrls = localStorage.getItem('urlArr');
                         if (storedUrls) {
                             const urlArr = JSON.parse(storedUrls);
@@ -239,7 +238,7 @@ app.get('/resource', async (req, res) => {
 
                             loader.style.display = 'block';
                             try {
-                                const response = await fetch('https://newflow.vercel.app/open', {
+                                const response = await fetch('/open', {
                                     method: 'POST'
                                 });
 
@@ -250,7 +249,7 @@ app.get('/resource', async (req, res) => {
                                 const result = await response.json();
                                 console.log('Response from /open:', result);
 
-                                const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
+                                const urlsResponse = await fetch('/get-urls');
                                 if (!urlsResponse.ok) {
                                     throw new Error('Failed to fetch URL array');
                                 }
