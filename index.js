@@ -83,6 +83,16 @@ app.post('/open', async (req, res) => {
     }
 });
 
+app.post("/quoteDetails" , async(req,res)=>{
+    const {result} =req.body;
+    try{
+        console.log(result)
+    }
+    catch(err){
+        res.status(500).json({err: err.message})
+    }
+})
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
