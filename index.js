@@ -289,7 +289,7 @@ app.get('/resource', async (req, res) => {
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
-                        }, 5000);
+                        }, 6000);
                     });
 
                     setTimeout(() => {
@@ -349,7 +349,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 6000);
+                    }, 8000);
                 </script>
             </body>
             </html>
