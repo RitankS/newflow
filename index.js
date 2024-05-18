@@ -411,7 +411,9 @@ app.post("/monthly", async (req, res) => {
 });
 
 app.post("/sendPaymentTicket", async (req, res) => {
-    const {subssessionsId , nextDate} = req.body
+    console.log("Received request at /sendPaymentTicket:", req.body);
+
+    const { subssessionsId, nextDate } = req.body;
     try {
         const payload = {
             subssessionsId,
@@ -437,7 +439,6 @@ app.post("/sendPaymentTicket", async (req, res) => {
         res.status(500).send(err.message);
     }
 });
-
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
