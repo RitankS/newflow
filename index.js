@@ -361,6 +361,35 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
+app.post("/sendPaymentTicket", async (req, res) => {
+    console.log("Received request at /sendPaymentTicket:", req.body);
+
+    const { subssessionsId, nextDate } = req.body;
+    try {
+        const payload = {
+            subssessionsId,
+            nextDate
+        };
+        const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (sendSubsId.ok) {
+            res.send("Ticket Created");
+        } else {
+            const errorText = await sendSubsId.text();
+            console.error("Error from webhook:", errorText);
+            res.status(sendSubsId.status).send("Please Contact Admin !!!");
+        }
+    } catch (err) {
+        console.error("Error in /sendPaymentTicket:", err);
+        res.status(500).send(err.message);
+    }
+});
 
 let subssessionsId;
 let nextDate;
@@ -410,35 +439,7 @@ app.post("/monthly", async (req, res) => {
     }
 });
 
-app.post("/sendPaymentTicket", async (req, res) => {
-    console.log("Received request at /sendPaymentTicket:", req.body);
 
-    const { subssessionsId, nextDate } = req.body;
-    try {
-        const payload = {
-            subssessionsId,
-            nextDate
-        };
-        const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (sendSubsId.ok) {
-            res.send("Ticket Created");
-        } else {
-            const errorText = await sendSubsId.text();
-            console.error("Error from webhook:", errorText);
-            res.status(sendSubsId.status).send("Please Contact Admin !!!");
-        }
-    } catch (err) {
-        console.error("Error in /sendPaymentTicket:", err);
-        res.status(500).send(err.message);
-    }
-});
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
