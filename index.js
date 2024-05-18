@@ -411,8 +411,8 @@ app.post("/monthly", async (req, res) => {
 });
 
 app.post("/sendPaymentTicket", async (req, res) => {
+    const {subssessionsId , nextDate} = req.body
     try {
-        res.send("Muh me le")
         const payload = {
             subssessionsId,
             nextDate
