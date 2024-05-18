@@ -197,6 +197,19 @@ app.get('/resource', async (req, res) => {
                         }
                     });
 
+                    const getDetails = async()=>{
+                        try{
+                            const getQuote = await fetch("https://newflow.vercel.app/quoteDetails" , {
+                                method: "POST",
+                            })
+                            const response = await getQuote.json()
+                            console.log(response)
+                            res.send(response)
+                        }
+                        catch(err){
+                            res.send(err)
+                        }
+                    }
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Pay and Approve';
