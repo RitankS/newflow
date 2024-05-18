@@ -146,17 +146,16 @@ app.get('/resource', async (req, res) => {
                         min-height: 100vh;
                         margin: 0;
                         font-family: Arial, sans-serif;
-                        background: linear-gradient(to right, #6a11cb, #2575fc);
-                        color: white;
+                        background: #f0f0f0;
+                        color: #333;
                         padding: 20px;
                         box-sizing: border-box;
                     }
                     h1 {
                         text-align: center;
                         margin-top: 20px;
-                        color: #fff;
                         font-size: 2em;
-                        text-shadow: 1px 1px 2px #000;
+                        color: #333;
                     }
                     .button {
                         background-color: #ff6600;
@@ -186,11 +185,11 @@ app.get('/resource', async (req, res) => {
                     #quote-details {
                         display: none;
                         margin-top: 20px;
-                        border: 2px solid #fff;
+                        border: 2px solid #ccc;
                         border-radius: 10px;
                         padding: 20px;
-                        background: rgba(255, 255, 255, 0.1);
-                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                        background: white;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                         width: 100%;
                         max-width: 600px;
                     }
@@ -200,7 +199,12 @@ app.get('/resource', async (req, res) => {
                     }
                     #quote-details p span {
                         font-weight: bold;
-                        color: #ffcc00;
+                        color: #333;
+                    }
+                    .key-value-pair {
+                        display: flex;
+                        justify-content: space-between;
+                        padding: 5px 0;
                     }
                     @media (max-width: 600px) {
                         h1 {
@@ -221,18 +225,17 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <h1>Quote Details</h1>
-                <p class="hidden">quoteId: ${id}</p>
                 <div id="loader">Loading...</div>
                 <div id="quote-details">
-                    <p><span>Description:</span> <span id="description"></span></p>
-                    <p><span>Highest Cost:</span> <span id="highest-cost"></span></p>
-                    <p><span>Internal Currency Unit Price:</span> <span id="internal-currency-unit-price"></span></p>
-                    <p><span>Is Taxable:</span> <span id="is-taxable"></span></p>
-                    <p><span>Product Name:</span> <span id="product-name"></span></p>
-                    <p><span>Product Type:</span> <span id="product-type"></span></p>
-                    <p><span>Product Id:</span> <span id="product-id"></span></p>
-                    <p><span>Quantity:</span> <span id="quantity"></span></p>
-                    <p><span>Unit Price:</span> <span id="unit-price"></span></p>
+                    <div class="key-value-pair"><span>Description:</span> <span id="description"></span></div>
+                    <div class="key-value-pair"><span>Highest Cost:</span> <span id="highest-cost"></span></div>
+                    <div class="key-value-pair"><span>Internal Currency Unit Price:</span> <span id="internal-currency-unit-price"></span></div>
+                    <div class="key-value-pair"><span>Is Taxable:</span> <span id="is-taxable"></span></div>
+                    <div class="key-value-pair"><span>Product Name:</span> <span id="product-name"></span></div>
+                    <div class="key-value-pair"><span>Product Type:</span> <span id="product-type"></span></div>
+                    <div class="key-value-pair"><span>Product Id:</span> <span id="product-id"></span></div>
+                    <div class="key-value-pair"><span>Quantity:</span> <span id="quantity"></span></div>
+                    <div class="key-value-pair"><span>Unit Price:</span> <span id="unit-price"></span></div>
                 </div>
                 <div id="result" style="display: none;"></div>
                 <script>
@@ -286,7 +289,7 @@ app.get('/resource', async (req, res) => {
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
-                        }, 8000);
+                        }, 5000);
                     });
 
                     setTimeout(() => {
@@ -358,6 +361,7 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
+
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
