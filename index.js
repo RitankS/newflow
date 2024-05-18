@@ -126,6 +126,11 @@ app.post("/quoteDetails", async (req, res) => {
     }
 });
 
+app.post('/clear-urls', (req, res) => {
+    urlArr = [];
+    res.json({ message: 'URL array cleared' });
+});
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -296,9 +301,20 @@ app.get('/resource', async (req, res) => {
 
                     function clearUrls() {
                         // Clear the urlArr array and localStorage
-                        urlArr = [];
                         localStorage.removeItem('urlArr');
-                        console.log('Cleared urlArr and local storage');
+                        console.log('Cleared urlArr from local storage');
+
+                        // Clear the URL array on the server
+                        fetch('https://newflow.vercel.app/clear-urls', {
+                            method: 'POST'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(data.message);
+                        })
+                        .catch(error => {
+                            console.error('Error clearing URL array on the server:', error);
+                        });
                     }
 
                     setTimeout(() => {
@@ -372,7 +388,6 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-
 app.get("/sendticket", async (req, res) => {
     try {
         // Send the /send API request
