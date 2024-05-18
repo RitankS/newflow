@@ -142,19 +142,24 @@ app.get('/resource', async (req, res) => {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
+                        justify-content: center;
+                        min-height: 100vh;
                         margin: 0;
                         font-family: Arial, sans-serif;
+                        background: linear-gradient(to right, #6a11cb, #2575fc);
+                        color: white;
+                        padding: 20px;
+                        box-sizing: border-box;
                     }
                     h1 {
                         text-align: center;
-                        text-decoration: underline;
                         margin-top: 20px;
-                    }
-                    .hidden {
-                        display: none;
+                        color: #fff;
+                        font-size: 2em;
+                        text-shadow: 1px 1px 2px #000;
                     }
                     .button {
-                        background-color: blue;
+                        background-color: #ff6600;
                         color: white;
                         padding: 10px 20px;
                         border: none;
@@ -162,9 +167,10 @@ app.get('/resource', async (req, res) => {
                         cursor: pointer;
                         font-size: 16px;
                         margin-top: 20px;
+                        transition: background-color 0.3s ease;
                     }
                     .button:hover {
-                        background-color: darkblue;
+                        background-color: #e65c00;
                     }
                     #result {
                         margin-top: 20px;
@@ -174,10 +180,42 @@ app.get('/resource', async (req, res) => {
                         margin-top: 20px;
                         font-size: 18px;
                         font-weight: bold;
+                        color: #ffcc00;
+                        text-align: center;
                     }
                     #quote-details {
                         display: none;
                         margin-top: 20px;
+                        border: 2px solid #fff;
+                        border-radius: 10px;
+                        padding: 20px;
+                        background: rgba(255, 255, 255, 0.1);
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+                        width: 100%;
+                        max-width: 600px;
+                    }
+                    #quote-details p {
+                        margin: 10px 0;
+                        font-size: 1.1em;
+                    }
+                    #quote-details p span {
+                        font-weight: bold;
+                        color: #ffcc00;
+                    }
+                    @media (max-width: 600px) {
+                        h1 {
+                            font-size: 1.5em;
+                        }
+                        .button {
+                            font-size: 14px;
+                            padding: 8px 16px;
+                        }
+                        #quote-details {
+                            padding: 15px;
+                        }
+                        #quote-details p {
+                            font-size: 1em;
+                        }
                     }
                 </style>
             </head>
@@ -186,15 +224,15 @@ app.get('/resource', async (req, res) => {
                 <p class="hidden">quoteId: ${id}</p>
                 <div id="loader">Loading...</div>
                 <div id="quote-details">
-                    <p id="description"></p>
-                    <p id="highest-cost"></p>
-                    <p id="internal-currency-unit-price"></p>
-                    <p id="is-taxable"></p>
-                    <p id="product-name"></p>
-                    <p id="product-type"></p>
-                    <p id="product-id"></p>
-                    <p id="quantity"></p>
-                    <p id="unit-price"></p>
+                    <p><span>Description:</span> <span id="description"></span></p>
+                    <p><span>Highest Cost:</span> <span id="highest-cost"></span></p>
+                    <p><span>Internal Currency Unit Price:</span> <span id="internal-currency-unit-price"></span></p>
+                    <p><span>Is Taxable:</span> <span id="is-taxable"></span></p>
+                    <p><span>Product Name:</span> <span id="product-name"></span></p>
+                    <p><span>Product Type:</span> <span id="product-type"></span></p>
+                    <p><span>Product Id:</span> <span id="product-id"></span></p>
+                    <p><span>Quantity:</span> <span id="quantity"></span></p>
+                    <p><span>Unit Price:</span> <span id="unit-price"></span></p>
                 </div>
                 <div id="result" style="display: none;"></div>
                 <script>
@@ -233,22 +271,22 @@ app.get('/resource', async (req, res) => {
 
                                 const details = detailsResult.details;
 
-                                document.getElementById('description').textContent = 'Description: ' + (details.description || 'N/A');
-                                document.getElementById('highest-cost').textContent = 'Highest Cost: ' + (details.Heighest_Cost || 'N/A');
-                                document.getElementById('internal-currency-unit-price').textContent = 'Internal Currency Unit Price: ' + (details.Internal_Currency_Unit_Price || 'N/A');
-                                document.getElementById('is-taxable').textContent = 'Is Taxable: ' + (details.isTaxable || 'N/A');
-                                document.getElementById('product-name').textContent = 'Product Name: ' + (details.Product_Name || 'N/A');
-                                document.getElementById('product-type').textContent = 'Product Type: ' + (details.Product_Type || 'N/A');
-                                document.getElementById('product-id').textContent = 'Product Id: ' + (details.Product_Id || 'N/A');
-                                document.getElementById('quantity').textContent = 'Quantity: ' + (details.quantity || 'N/A');
-                                document.getElementById('unit-price').textContent = 'Unit Price: ' + (details.Unit_Price || 'N/A');
+                                document.getElementById('description').textContent = details.description || 'N/A';
+                                document.getElementById('highest-cost').textContent = details.Heighest_Cost || 'N/A';
+                                document.getElementById('internal-currency-unit-price').textContent = details.Internal_Currency_Unit_Price || 'N/A';
+                                document.getElementById('is-taxable').textContent = details.isTaxable || 'N/A';
+                                document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
+                                document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
+                                document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
+                                document.getElementById('quantity').textContent = details.quantity || 'N/A';
+                                document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
 
                                 document.getElementById('loader').style.display = 'none';
                                 document.getElementById('quote-details').style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
-                        }, 5000);
+                        }, 8000);
                     });
 
                     setTimeout(() => {
@@ -320,7 +358,6 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-
 
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
