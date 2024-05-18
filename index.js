@@ -94,7 +94,8 @@ app.post("/quoteDetails", async (req, res) => {
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price
         );
-        res.status(200).json({ message: "Data received successfully" });
+        res.send(id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price)
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
