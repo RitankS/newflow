@@ -61,10 +61,16 @@ app.post("/pay", async (req, res) => {
 
 
 let urlArr = [];
+let quoteDetails = {};
 
 // Endpoint to retrieve urlArr
 app.get('/get-urls', (req, res) => {
     res.json({ urls: urlArr });
+});
+
+// Endpoint to retrieve quoteDetails
+app.get('/get-details', (req, res) => {
+    res.json({ details: quoteDetails });
 });
 
 // Endpoint to receive and store URLs
@@ -83,8 +89,6 @@ app.post('/open', async (req, res) => {
     }
 });
 
-let quoteDetails = {}
-
 app.post("/quoteDetails", async (req, res) => {
     const {
         id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -97,36 +101,34 @@ app.post("/quoteDetails", async (req, res) => {
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price
         );
 
-        quoteDetails.id = id,
-        quoteDetails.heighest_cost = Heighest_Cost , 
-        quoteDetails.internalCurrency = Internal_Currency_Unit_Price,
-        quoteDetails.isTaxable = isTaxable,
-        quoteDetails.prodName = Product_Name,
-        quoteDetails.prodType = Product_Type , 
-        quoteDetails.prodId = Product_Id ,
-        quoteDetails.quant = quantity , 
-        quoteDetails.unitCost = Unit_Price
-        console.log(quoteDetails)
-        res.send(id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
-            Product_Name, Product_Type, Product_Id, quantity, Unit_Price)
+        quoteDetails.id = id;
+        quoteDetails.description = description;
+        quoteDetails.Heighest_Cost = Heighest_Cost;
+        quoteDetails.Internal_Currency_Unit_Price = Internal_Currency_Unit_Price;
+        quoteDetails.isTaxable = isTaxable;
+        quoteDetails.Product_Name = Product_Name;
+        quoteDetails.Product_Type = Product_Type;
+        quoteDetails.Product_Id = Product_Id;
+        quoteDetails.quantity = quantity;
+        quoteDetails.Unit_Price = Unit_Price;
+
+        console.log(quoteDetails);
+        res.json({
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
 
-
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
-    let quoteId; // Define the quoteId variable here
-
     if (id) {
-        quoteId = id;
-
-        // Render an HTML page with quoteId and a button
         const htmlContent = `
             <!DOCTYPE html>
             <html lang="en">
@@ -170,7 +172,7 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <h1>Quote Details</h1>
-                <p class="hidden">quoteId: ${quoteId}</p>
+                <p class="hidden">quoteId: ${id}</p>
                 <div id="loader" style="display: none;">Loading...</div>
                 <div id="result" style="display: none;"></div>
                 <script>
@@ -181,7 +183,7 @@ app.get('/resource', async (req, res) => {
                                 headers: {
                                     'Content-Type': 'application/json'
                                 },
-                                body: JSON.stringify({ quoteId: '${quoteId}' })
+                                body: JSON.stringify({ quoteId: '${id}' })
                             });
                             console.log('Quote ID sent to N8N server successfully');
                         } catch (error) {
@@ -195,21 +197,16 @@ app.get('/resource', async (req, res) => {
                         } else {
                             console.log('No urls in local storage.');
                         }
+
+                        const storedDetails = localStorage.getItem('details');
+                        if (storedDetails) {
+                            const detailsObj = JSON.parse(storedDetails);
+                            console.log('Loaded details from local storage:', detailsObj);
+                        } else {
+                            console.log('No details found in local storage.');
+                        }
                     });
 
-                    const getDetails = async()=>{
-                        try{
-                            const getQuote = await fetch("https://newflow.vercel.app/quoteDetails" , {
-                                method: "POST",
-                            })
-                            const response = await getQuote.json()
-                            console.log("response is " , response)
-                            res.send(response)
-                        }
-                        catch(err){
-                            res.send(err)
-                        }
-                    }
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Pay and Approve';
@@ -246,6 +243,15 @@ app.get('/resource', async (req, res) => {
                                     window.open(url, '_blank');
                                 });
 
+                                const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
+                                if (!detailsResponse.ok) {
+                                    throw new Error('Failed to fetch details');
+                                }
+
+                                const detailsResult = await detailsResponse.json();
+                                localStorage.setItem('details', JSON.stringify(detailsResult.details));
+                                console.log('details saved to local storage:', detailsResult.details);
+
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
                                     const link = document.createElement('a');
@@ -279,7 +285,6 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
