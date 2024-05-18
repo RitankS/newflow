@@ -59,7 +59,6 @@ app.post("/pay", async (req, res) => {
     }
 });
 
-
 let urlArr = [];
 let quoteDetails = {};
 
@@ -198,13 +197,20 @@ app.get('/resource', async (req, res) => {
                             console.log('No urls in local storage.');
                         }
 
-                        const storedDetails = localStorage.getItem('details');
-                        if (storedDetails) {
-                            const detailsObj = JSON.parse(storedDetails);
-                            console.log('Loaded details from local storage:', detailsObj);
-                        } else {
-                            console.log('No details found in local storage.');
-                        }
+                        setTimeout(async () => {
+                            try {
+                                const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
+                                if (!detailsResponse.ok) {
+                                    throw new Error('Failed to fetch details');
+                                }
+
+                                const detailsResult = await detailsResponse.json();
+                                localStorage.setItem('details', JSON.stringify(detailsResult.details));
+                                console.log('details saved to local storage:', detailsResult.details);
+                            } catch (error) {
+                                console.error('Error fetching details:', error);
+                            }
+                        }, 8000);
                     });
 
                     setTimeout(() => {
@@ -243,15 +249,6 @@ app.get('/resource', async (req, res) => {
                                     window.open(url, '_blank');
                                 });
 
-                                const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
-                                if (!detailsResponse.ok) {
-                                    throw new Error('Failed to fetch details');
-                                }
-
-                                const detailsResult = await detailsResponse.json();
-                                localStorage.setItem('details', JSON.stringify(detailsResult.details));
-                                console.log('details saved to local storage:', detailsResult.details);
-
                                 resultDiv.innerHTML = '<h2>URLs received:</h2>';
                                 for (const url of urlArr) {
                                     const link = document.createElement('a');
@@ -285,6 +282,9 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
+
+
+
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
