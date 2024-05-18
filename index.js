@@ -364,74 +364,78 @@ app.get('/resource', async (req, res) => {
 
 let subssessionsId;
 let nextDate;
-app.post("/monthly" , async(req,res)=>{
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
-    const Stripe = new stripe(STRIPE_KEY)
-    const { custName, price, name } = req.body
-    const newPrice = Math.ceil(parseFloat(price))
-  
-    try {
-      const customer = await Stripe.customers.create({
-        name: custName,
-      });
-      const custId = customer.id
-      console.log(custId)
-      const newprice = await Stripe.prices.create({
-        currency: 'inr',
-        unit_amount: newPrice * 100,
-        recurring: {
-          interval: 'month',
-        },
-        product_data: {
-          name: name,
-        },
-      });
-      const  priceId = newprice.id
-      const session = await Stripe.checkout.sessions.create({
-        customer: custId,
-        success_url: 'https://newflow.vercel.app/sendPaymentTicket',
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
-        mode: 'subscription',
-      });
-      subssessionsId = session.id
-      nextDate = session.days_until_due
-      console.log(subssessionsId)
-      res.status(200).json(({ session  , nextDate , subssessionsId}))
-    }
-    catch(err){
-        res.status(500).json({err: err.message})
-    }
-})
 
-app.post("/sendPaymentTicket" , async(req,res)=>{
-    try{
+app.post("/monthly", async (req, res) => {
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const Stripe = stripe(STRIPE_KEY);
+    const { custName, price, name } = req.body;
+    const newPrice = Math.ceil(parseFloat(price));
+
+    try {
+        const customer = await Stripe.customers.create({ name: custName });
+        const custId = customer.id;
+        console.log("Customer ID:", custId);
+
+        const newprice = await Stripe.prices.create({
+            currency: 'inr',
+            unit_amount: newPrice * 100,
+            recurring: {
+                interval: 'month',
+            },
+            product_data: {
+                name: name,
+            },
+        });
+        const priceId = newprice.id;
+
+        const session = await Stripe.checkout.sessions.create({
+            customer: custId,
+            success_url: 'https://newflow.vercel.app/sendPaymentTicket',
+            line_items: [
+                {
+                    price: priceId,
+                    quantity: 1,
+                },
+            ],
+            mode: 'subscription',
+        });
+        subssessionsId = session.id;
+        nextDate = session.days_until_due;
+
+        console.log("Subscription Session ID:", subssessionsId);
+        res.status(200).json({ session, nextDate, subssessionsId });
+    } catch (err) {
+        console.error("Error in /monthly:", err);
+        res.status(500).json({ err: err.message });
+    }
+});
+
+app.post("/sendPaymentTicket", async (req, res) => {
+    try {
         const payload = {
             subssessionsId,
             nextDate
+        };
+        const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (sendSubsId.ok) {
+            res.send("Ticket Created");
+        } else {
+            const errorText = await sendSubsId.text();
+            console.error("Error from webhook:", errorText);
+            res.status(sendSubsId.status).send("Please Contact Admin !!!");
         }
-         const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment' , {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(payload)
-         })
-         if(sendSubsId.ok){
-            res.send("Ticket Created")
-         }
-         else{
-            res.send("Please Contact Admin !!!")
-         }
+    } catch (err) {
+        console.error("Error in /sendPaymentTicket:", err);
+        res.status(500).send(err.message);
     }
-    catch(err){
-        res.send(err)
-    }
-})
+});
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
