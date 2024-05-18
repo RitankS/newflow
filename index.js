@@ -74,11 +74,13 @@ app.get('/get-details', (req, res) => {
     res.json({ details: quoteDetails });
 });
 
+let cId ;
 // Endpoint to receive and store URLs
 app.post('/open', async (req, res) => {
-    const { url } = req.body;
+    const { url , companyId } = req.body;
     try {
         console.log('Received URL:', url);
+        cId = companyId 
         if (url !== undefined) {
             urlArr.push(url);
         }
@@ -399,7 +401,7 @@ app.get("/sendticket", async (req, res) => {
 async function sendTicket() {
     const payload = {
         subssessionsId,
-        nextDate
+        cId
     };
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
         method: 'POST',
