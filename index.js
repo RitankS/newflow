@@ -210,7 +210,7 @@ app.get('/resource', async (req, res) => {
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
-                        }, 4000);
+                        }, 5000);
                     });
 
                     setTimeout(() => {
