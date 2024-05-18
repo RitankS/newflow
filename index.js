@@ -361,7 +361,33 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-app.post("/sendticket", async (req, res) => {
+
+app.post("/sendticket" , (req,res)=>{
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Success</title>
+            <style>
+                /* Your CSS styles here */
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="success-icon">&#10004;</div>
+                <div class="message">Payment Successful</div>
+                <div class="success-animation"></div>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    res.send(htmlContent);
+})
+
+app.post("/send", async (req, res) => {
     console.log("Received request at /sendPaymentTicket:", req.body);
 
     const { subssessionsId, nextDate } = req.body;
