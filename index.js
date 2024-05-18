@@ -203,7 +203,7 @@ app.get('/resource', async (req, res) => {
                                 method: "POST",
                             })
                             const response = await getQuote.json()
-                            console.log(response)
+                            console.log("response is " , response)
                             res.send(response)
                         }
                         catch(err){
