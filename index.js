@@ -83,6 +83,8 @@ app.post('/open', async (req, res) => {
     }
 });
 
+let quoteDetails = {}
+
 app.post("/quoteDetails", async (req, res) => {
     const {
         id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -94,6 +96,17 @@ app.post("/quoteDetails", async (req, res) => {
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price
         );
+
+        quoteDetails.id = id,
+        quoteDetails.heighest_cost = Heighest_Cost , 
+        quoteDetails.internalCurrency = Internal_Currency_Unit_Price,
+        quoteDetails.isTaxable = isTaxable,
+        quoteDetails.prodName = Product_Name,
+        quoteDetails.prodType = Product_Type , 
+        quoteDetails.prodId = Product_Id ,
+        quoteDetails.quant = quantity , 
+        quoteDetails.unitCost = Unit_Price
+        console.log(quoteDetails)
         res.send(id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
             Product_Name, Product_Type, Product_Id, quantity, Unit_Price)
     } catch (err) {
