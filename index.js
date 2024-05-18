@@ -362,55 +362,68 @@ app.get('/resource', async (req, res) => {
     }
 });
 
-app.post("/sendticket" , (req,res)=>{
-    const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Payment Success</title>
-            <style>
-                /* Your CSS styles here */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="success-icon">&#10004;</div>
-                <div class="message">Payment Successful</div>
-                <div class="success-animation"></div>
-            </div>
-        </body>
-        </html>
-    `;
-    
-    res.send(htmlContent);
-})
+app.get("/sendticket", async (req, res) => {
+    try {
+        // Send the /send API request
+        await sendTicket();
 
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Payment Success</title>
+                <style>
+                    /* Your CSS styles here */
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="success-icon">&#10004;</div>
+                    <div class="message">Payment Successful</div>
+                    <div class="success-animation"></div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        res.send(htmlContent);
+    } catch (err) {
+        console.error("Error in /sendticket:", err);
+        res.status(500).json({ err: err.message });
+    }
+});
+
+// Function to send the /send API request
+async function sendTicket() {
+    const payload = {
+        subssessionsId,
+        nextDate
+    };
+    const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!sendSubsId.ok) {
+        const errorText = await sendSubsId.text();
+        throw new Error("Error from webhook: " + errorText);
+    }
+}
+
+// Your existing /send API endpoint
 app.post("/send", async (req, res) => {
     console.log("Received request at /sendPaymentTicket:", req.body);
 
     const { subssessionsId, nextDate } = req.body;
     try {
-        const payload = {
-            subssessionsId,
-            nextDate
-        };
-        const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
+        await sendTicket(); // Call the sendTicket function
 
-        if (sendSubsId.ok) {
-            res.send("Ticket Created");
-        } else {
-            const errorText = await sendSubsId.text();
-            console.error("Error from webhook:", errorText);
-            res.status(sendSubsId.status).send("Please Contact Admin !!!");
-        }
+        res.send("Ticket Created");
     } catch (err) {
         console.error("Error in /sendPaymentTicket:", err);
         res.status(500).send(err.message);
