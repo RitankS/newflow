@@ -349,7 +349,7 @@ app.get('/resource', async (req, res) => {
                         });
 
                         document.body.appendChild(fetchButton);
-                    }, 8000);
+                    }, 10000);
                 </script>
             </body>
             </html>
@@ -362,7 +362,8 @@ app.get('/resource', async (req, res) => {
     }
 });
 
-
+let subssessionsId;
+let nextDate;
 app.post("/monthly" , async(req,res)=>{
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = new stripe(STRIPE_KEY)
@@ -388,7 +389,7 @@ app.post("/monthly" , async(req,res)=>{
       const  priceId = newprice.id
       const session = await Stripe.checkout.sessions.create({
         customer: custId,
-        success_url: 'http://localhost:3110/payments/sessionstatus',
+        success_url: 'https://newflow.vercel.app/sendPaymentTicket',
         line_items: [
           {
             price: priceId,
@@ -397,13 +398,38 @@ app.post("/monthly" , async(req,res)=>{
         ],
         mode: 'subscription',
       });
-      const subssessionsId = session.id
-      const nextDate = session.days_until_due
+      subssessionsId = session.id
+      nextDate = session.days_until_due
       console.log(subssessionsId)
       res.status(200).json(({ session  , nextDate , subssessionsId}))
     }
     catch(err){
         res.status(500).json({err: err.message})
+    }
+})
+
+app.post("/sendPaymentTicket" , async(req,res)=>{
+    try{
+        const payload = {
+            subssessionsId,
+            nextDate
+        }
+         const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment' , {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(payload)
+         })
+         if(sendSubsId.ok){
+            res.send("Ticket Created")
+         }
+         else{
+            res.send("Please Contact Admin !!!")
+         }
+    }
+    catch(err){
+        res.send(err)
     }
 })
 
