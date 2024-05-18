@@ -74,13 +74,13 @@ app.get('/get-details', (req, res) => {
     res.json({ details: quoteDetails });
 });
 
-let cId;
+let cId ;
 // Endpoint to receive and store URLs
 app.post('/open', async (req, res) => {
-    const { url, companyId } = req.body;
+    const { url , companyId } = req.body;
     try {
         console.log('Received URL:', url);
-        cId = companyId;
+        cId = companyId 
         if (url !== undefined) {
             urlArr.push(url);
         }
@@ -124,11 +124,6 @@ app.post("/quoteDetails", async (req, res) => {
         console.error(err);
         res.status(500).json({ error: err.message });
     }
-});
-
-app.post('/clear-urls', (req, res) => {
-    urlArr = [];
-    res.json({ message: 'URL array cleared' });
 });
 
 app.get('/resource', async (req, res) => {
@@ -299,24 +294,6 @@ app.get('/resource', async (req, res) => {
                         }, 6000);
                     });
 
-                    function clearUrls() {
-                        // Clear the urlArr array and localStorage
-                        localStorage.removeItem('urlArr');
-                        console.log('Cleared urlArr from local storage');
-
-                        // Clear the URL array on the server
-                        fetch('https://newflow.vercel.app/clear-urls', {
-                            method: 'POST'
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log(data.message);
-                        })
-                        .catch(error => {
-                            console.error('Error clearing URL array on the server:', error);
-                        });
-                    }
-
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Pay and Approve';
@@ -364,8 +341,6 @@ app.get('/resource', async (req, res) => {
                                 }
                                 resultDiv.style.display = 'block';
 
-                                clearUrls(); // Clear URLs after opening them
-
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
                                 resultDiv.innerText = 'Failed to fetch from /open';
@@ -388,6 +363,7 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
+
 app.get("/sendticket", async (req, res) => {
     try {
         // Send the /send API request
