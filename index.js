@@ -59,6 +59,8 @@ app.post("/pay", async (req, res) => {
     }
 });
 
+
+
 let urlArr = [];
 let quoteDetails = {};
 
@@ -167,12 +169,33 @@ app.get('/resource', async (req, res) => {
                     #result {
                         margin-top: 20px;
                     }
+                    #loader {
+                        display: block;
+                        margin-top: 20px;
+                        font-size: 18px;
+                        font-weight: bold;
+                    }
+                    #quote-details {
+                        display: none;
+                        margin-top: 20px;
+                    }
                 </style>
             </head>
             <body>
                 <h1>Quote Details</h1>
                 <p class="hidden">quoteId: ${id}</p>
-                <div id="loader" style="display: none;">Loading...</div>
+                <div id="loader">Loading...</div>
+                <div id="quote-details">
+                    <p id="description"></p>
+                    <p id="highest-cost"></p>
+                    <p id="internal-currency-unit-price"></p>
+                    <p id="is-taxable"></p>
+                    <p id="product-name"></p>
+                    <p id="product-type"></p>
+                    <p id="product-id"></p>
+                    <p id="quantity"></p>
+                    <p id="unit-price"></p>
+                </div>
                 <div id="result" style="display: none;"></div>
                 <script>
                     window.addEventListener('DOMContentLoaded', async () => {
@@ -207,10 +230,25 @@ app.get('/resource', async (req, res) => {
                                 const detailsResult = await detailsResponse.json();
                                 localStorage.setItem('details', JSON.stringify(detailsResult.details));
                                 console.log('details saved to local storage:', detailsResult.details);
+
+                                const details = detailsResult.details;
+
+                                document.getElementById('description').textContent = 'Description: ' + (details.description || 'N/A');
+                                document.getElementById('highest-cost').textContent = 'Highest Cost: ' + (details.Heighest_Cost || 'N/A');
+                                document.getElementById('internal-currency-unit-price').textContent = 'Internal Currency Unit Price: ' + (details.Internal_Currency_Unit_Price || 'N/A');
+                                document.getElementById('is-taxable').textContent = 'Is Taxable: ' + (details.isTaxable || 'N/A');
+                                document.getElementById('product-name').textContent = 'Product Name: ' + (details.Product_Name || 'N/A');
+                                document.getElementById('product-type').textContent = 'Product Type: ' + (details.Product_Type || 'N/A');
+                                document.getElementById('product-id').textContent = 'Product Id: ' + (details.Product_Id || 'N/A');
+                                document.getElementById('quantity').textContent = 'Quantity: ' + (details.quantity || 'N/A');
+                                document.getElementById('unit-price').textContent = 'Unit Price: ' + (details.Unit_Price || 'N/A');
+
+                                document.getElementById('loader').style.display = 'none';
+                                document.getElementById('quote-details').style.display = 'block';
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
-                        }, 5000);
+                        }, 8000);
                     });
 
                     setTimeout(() => {
@@ -282,7 +320,6 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-
 
 
 app.post("/monthly" , async(req,res)=>{
