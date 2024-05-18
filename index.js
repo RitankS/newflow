@@ -74,13 +74,13 @@ app.get('/get-details', (req, res) => {
     res.json({ details: quoteDetails });
 });
 
-let cId ;
+let cId;
 // Endpoint to receive and store URLs
 app.post('/open', async (req, res) => {
-    const { url , companyId } = req.body;
+    const { url, companyId } = req.body;
     try {
         console.log('Received URL:', url);
-        cId = companyId 
+        cId = companyId;
         if (url !== undefined) {
             urlArr.push(url);
         }
@@ -294,6 +294,13 @@ app.get('/resource', async (req, res) => {
                         }, 6000);
                     });
 
+                    function clearUrls() {
+                        // Clear the urlArr array and localStorage
+                        urlArr = [];
+                        localStorage.removeItem('urlArr');
+                        console.log('Cleared urlArr and local storage');
+                    }
+
                     setTimeout(() => {
                         const fetchButton = document.createElement('button');
                         fetchButton.innerText = 'Pay and Approve';
@@ -340,6 +347,8 @@ app.get('/resource', async (req, res) => {
                                     resultDiv.appendChild(link);
                                 }
                                 resultDiv.style.display = 'block';
+
+                                clearUrls(); // Clear URLs after opening them
 
                             } catch (error) {
                                 console.error('Error fetching from /open:', error);
@@ -401,7 +410,7 @@ app.get("/sendticket", async (req, res) => {
 async function sendTicket() {
     const payload = {
         subssessionsId,
-        nextDate
+        cId
     };
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
         method: 'POST',
