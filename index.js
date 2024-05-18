@@ -361,7 +361,7 @@ app.get('/resource', async (req, res) => {
         res.send('No ID provided');
     }
 });
-app.post("/sendPaymentTicket", async (req, res) => {
+app.post("/sendticket", async (req, res) => {
     console.log("Received request at /sendPaymentTicket:", req.body);
 
     const { subssessionsId, nextDate } = req.body;
