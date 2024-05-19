@@ -74,7 +74,8 @@ app.get('/get-details', (req, res) => {
     res.json({ details: quoteDetails });
 });
 
-let cId ;
+let cId;
+
 // Endpoint to receive and store URLs
 app.post('/open', async (req, res) => {
     const { url, companyId } = req.body;
@@ -297,66 +298,36 @@ app.get('/resource', async (req, res) => {
                                 console.error('Error fetching details:', error);
                             }
                         }, 6000);
+
+                        setTimeout(() => {
+                            const fetchButton = document.createElement('button');
+                            fetchButton.textContent = 'Fetch URLs';
+                            fetchButton.className = 'button';
+                            fetchButton.addEventListener('click', async () => {
+                                try {
+                                    const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
+                                    if (!urlsResponse.ok) {
+                                        throw new Error('Failed to fetch URLs');
+                                    }
+
+                                    const urlsResult = await urlsResponse.json();
+                                    localStorage.setItem('urlArr', JSON.stringify(urlsResult.urls));
+                                    console.log('urlArr saved to local storage:', urlsResult.urls);
+
+                                    const resultElement = document.getElementById('result');
+                                    resultElement.style.display = 'block';
+                                    resultElement.textContent = 'URLs fetched and opened in new tabs successfully!';
+
+                                    urlsResult.urls.forEach(url => {
+                                        window.open(url, '_blank');
+                                    });
+                                } catch (error) {
+                                    console.error('Error fetching URLs:', error);
+                                }
+                            });
+                            document.body.appendChild(fetchButton);
+                        }, 10000);
                     });
-
-                    setTimeout(() => {
-                        const fetchButton = document.createElement('button');
-                        fetchButton.innerText = 'Pay and Approve';
-                        fetchButton.className = 'button';
-                        fetchButton.addEventListener('click', async () => {
-                            const loader = document.getElementById('loader');
-                            const resultDiv = document.getElementById('result');
-
-                            loader.style.display = 'block';
-                            try {
-                                const response = await fetch('https://newflow.vercel.app/open', {
-                                    method: 'POST'
-                                });
-
-                                if (!response.ok) {
-                                    throw new Error('Failed to fetch from /open');
-                                }
-
-                                const result = await response.json();
-                                console.log('Response from /open:', result);
-
-                                const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
-                                if (!urlsResponse.ok) {
-                                    throw new Error('Failed to fetch URL array');
-                                }
-
-                                const urlsResult = await urlsResponse.json();
-                                const urlArr = urlsResult.urls;
-
-                                localStorage.setItem('urlArr', JSON.stringify(urlArr));
-                                console.log('urlArr saved to local storage:', urlArr);
-
-                                urlArr.forEach(url => {
-                                    window.open(url, '_blank');
-                                });
-
-                                resultDiv.innerHTML = '<h2>URLs received:</h2>';
-                                for (const url of urlArr) {
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.target = '_blank';
-                                    link.textContent = url;
-                                    link.style.display = 'block';
-                                    resultDiv.appendChild(link);
-                                }
-                                resultDiv.style.display = 'block';
-
-                            } catch (error) {
-                                console.error('Error fetching from /open:', error);
-                                resultDiv.innerText = 'Failed to fetch from /open';
-                                resultDiv.style.display = 'block';
-                            } finally {
-                                loader.style.display = 'none';
-                            }
-                        });
-
-                        document.body.appendChild(fetchButton);
-                    }, 10000);
                 </script>
             </body>
             </html>
@@ -365,7 +336,7 @@ app.get('/resource', async (req, res) => {
         res.setHeader('Content-Type', 'text/html');
         res.send(htmlContent);
     } else {
-        res.send('No ID provided');
+        res.status(400).json({ error: 'Missing id parameter in query string' });
     }
 });
 
@@ -408,7 +379,7 @@ async function sendTicket() {
         subssessionsId,
         cId
     };
-    console.log("payload" , payload)
+    console.log("payload" ,payload)
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
         method: 'POST',
         headers: {
