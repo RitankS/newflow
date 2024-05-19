@@ -81,7 +81,7 @@ app.post('/open', async (req, res) => {
     try {
         console.log('Received URL:', url);
         cId = companyId 
-        if (url !== undefined && urlArr < 2) {
+        if (url !== undefined) {
             urlArr.push(url);
         }
         console.log("urlArr is", urlArr);
@@ -403,6 +403,7 @@ async function sendTicket() {
         subssessionsId,
         cId
     };
+    console.log("payload" , payload)
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
         method: 'POST',
         headers: {
