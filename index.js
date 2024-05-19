@@ -308,7 +308,7 @@ app.get("/sendticket", async (req, res) => {
     try {
         // Simulate sending the ticket, replace with your actual sendTicket function
         await new Promise(resolve => setTimeout(resolve, 1000));
-
+        await sendTicket()
         const htmlContent = `
             <!DOCTYPE html>
             <html lang="en">
