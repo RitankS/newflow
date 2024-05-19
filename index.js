@@ -21,43 +21,7 @@ app.get('/ping', (req, res) => {
     res.send('PONG');
 });
 
-app.post("/pay", async (req, res) => {
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
-    const { price, name, custName, email } = req.body;
-    const Stripe = new stripe(STRIPE_KEY);
 
-    try {
-        const newPrice = Math.ceil(parseFloat(price));
-
-        const customer = await Stripe.customers.create({
-            name: custName,
-        });
-        const custId = customer.id
-        const myPrice = await Stripe.prices.create({
-            currency: 'INR',
-            unit_amount: newPrice,
-            product_data: {
-                name: name,
-            },
-        });
-
-        const priceId = myPrice.id;
-        const session = await Stripe.checkout.sessions.create({
-            success_url: 'https://example.com/success',
-            line_items: [
-                {
-                    price: priceId,
-                    quantity: 10,
-                },
-            ],
-            mode: 'payment',
-        });
-        res.status(200).json(({ priceId, email, session }));
-    }
-    catch (err) {
-        res.status(500).json(err.message)
-    }
-});
 
 
 
@@ -376,7 +340,7 @@ app.get("/sendticket", async (req, res) => {
 // Function to send the /send API request
 async function sendTicket() {
     const payload = {
-        subssessionsId,
+        custId,
         cId
     };
     console.log("payload" ,payload)
@@ -398,7 +362,7 @@ async function sendTicket() {
 app.post("/send", async (req, res) => {
     console.log("Received request at /sendPaymentTicket:", req.body);
 
-    const { subssessionsId, nextDate } = req.body;
+    const { custId, nextDate } = req.body;
     try {
         await sendTicket(); // Call the sendTicket function
 
@@ -412,6 +376,46 @@ app.post("/send", async (req, res) => {
 let subssessionsId;
 let nextDate;
 
+let custId
+app.post("/pay", async (req, res) => {
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const { price, name, custName, email } = req.body;
+    const Stripe = new stripe(STRIPE_KEY);
+
+    try {
+        const newPrice = Math.ceil(parseFloat(price));
+
+        const customer = await Stripe.customers.create({
+            name: custName,
+        });
+        custId = customer.id
+        const myPrice = await Stripe.prices.create({
+            currency: 'INR',
+            unit_amount: newPrice,
+            product_data: {
+                name: name,
+            },
+        });
+
+        const priceId = myPrice.id;
+        const session = await Stripe.checkout.sessions.create({
+            success_url: 'https://newflow.vercel.app/sendticket',
+            line_items: [
+                {
+                    price: priceId,
+                    quantity: 10,
+                },
+            ],
+            mode: 'payment',
+        });
+        res.status(200).json({ session, custId })
+    }
+    catch (err) {
+        res.status(500).json(err.message)
+    }
+});
+
+
 app.post("/monthly", async (req, res) => {
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = stripe(STRIPE_KEY);
@@ -420,7 +424,7 @@ app.post("/monthly", async (req, res) => {
 
     try {
         const customer = await Stripe.customers.create({ name: custName });
-        const custId = customer.id;
+        custId = customer.id;
         console.log("Customer ID:", custId);
 
         const newprice = await Stripe.prices.create({
@@ -449,8 +453,8 @@ app.post("/monthly", async (req, res) => {
         subssessionsId = session.id;
         nextDate = session.days_until_due;
 
-        console.log("Subscription Session ID:", subssessionsId);
-        res.status(200).json({ session, nextDate, subssessionsId });
+        console.log("Subscription Session ID:", custId);
+        res.status(200).json({ session, nextDate, custId });
     } catch (err) {
         console.error("Error in /monthly:", err);
         res.status(500).json({ err: err.message });
