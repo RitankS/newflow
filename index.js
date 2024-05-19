@@ -60,57 +60,66 @@ app.post("/pay", async (req, res) => {
 });
 
 
-
 let urlArr = [];
 let quoteDetails = {};
-let cId;
 
+// Endpoint to retrieve urlArr
 app.get('/get-urls', (req, res) => {
   res.json({ urls: urlArr });
 });
 
+// Endpoint to retrieve quoteDetails
 app.get('/get-details', (req, res) => {
   res.json({ details: quoteDetails });
 });
 
+let cId;
+// Endpoint to receive and store URLs
 app.post('/open', async (req, res) => {
   const { url, companyId } = req.body;
   try {
     console.log('Received URL:', url);
     cId = companyId;
-    if (url) {
-      urlArr = [url];  // Clear the array and add the new URL
+    urlArr = []; // Clear the array
+    if (url !== undefined) {
+      urlArr.push(url);
     }
-    console.log('urlArr is', urlArr);
-    res.json({ url });
+    console.log("urlArr is", urlArr);
+    res.send({ "url": url });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-app.post('/quoteDetails', async (req, res) => {
+app.post("/quoteDetails", async (req, res) => {
   const {
     id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
     Product_Name, Product_Type, Product_Id, quantity, Unit_Price
   } = req.body;
 
   try {
-    quoteDetails = {
-      id,
-      description,
-      Heighest_Cost,
-      Internal_Currency_Unit_Price,
-      isTaxable,
-      Product_Name,
-      Product_Type,
-      Product_Id,
-      quantity,
-      Unit_Price
-    };
+    console.log(
+      id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+      Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+    );
+
+    quoteDetails.id = id;
+    quoteDetails.description = description;
+    quoteDetails.Heighest_Cost = Heighest_Cost;
+    quoteDetails.Internal_Currency_Unit_Price = Internal_Currency_Unit_Price;
+    quoteDetails.isTaxable = isTaxable;
+    quoteDetails.Product_Name = Product_Name;
+    quoteDetails.Product_Type = Product_Type;
+    quoteDetails.Product_Id = Product_Id;
+    quoteDetails.quantity = quantity;
+    quoteDetails.Unit_Price = Unit_Price;
 
     console.log(quoteDetails);
-    res.json(quoteDetails);
+    res.json({
+      id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+      Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -244,18 +253,6 @@ app.get('/resource', async (req, res) => {
               console.log('Quote ID sent to N8N server successfully');
             } catch (error) {
               console.error('Error sending quote ID to N8N:', error);
-            }
-
-            const storedUrls = localStorage.getItem('urlArr');
-            if (storedUrls) {
-              const urlArr = JSON.parse(storedUrls);
-              console.log('Loaded urlArr from local storage:', urlArr);
-              if (urlArr.length > 0) {
-                window.location.href = urlArr[0];
-                localStorage.removeItem('urlArr');
-              }
-            } else {
-              console.log('No urls in local storage.');
             }
 
             setTimeout(async () => {
