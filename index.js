@@ -306,8 +306,8 @@ app.get('/resource', async (req, res) => {
 
 app.get("/sendticket", async (req, res) => {
     try {
-        // Send the /send API request
-        await sendTicket();
+        // Simulate sending the ticket, replace with your actual sendTicket function
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         const htmlContent = `
             <!DOCTYPE html>
@@ -317,14 +317,38 @@ app.get("/sendticket", async (req, res) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Payment Success</title>
                 <style>
-                    /* Your CSS styles here */
+                    body {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        font-family: Arial, sans-serif;
+                        background-color: #f0f0f0;
+                    }
+                    .container {
+                        text-align: center;
+                    }
+                    .success-icon {
+                        font-size: 100px;
+                        color: green;
+                        animation: rotate 2s linear infinite;
+                    }
+                    .message {
+                        font-size: 24px;
+                        color: #333;
+                        margin-top: 20px;
+                    }
+                    @keyframes rotate {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
                 </style>
             </head>
             <body>
                 <div class="container">
                     <div class="success-icon">&#10004;</div>
                     <div class="message">Payment Successful</div>
-                    <div class="success-animation"></div>
                 </div>
             </body>
             </html>
@@ -336,7 +360,6 @@ app.get("/sendticket", async (req, res) => {
         res.status(500).json({ err: err.message });
     }
 });
-
 // Function to send the /send API request
 async function sendTicket() {
     const payload = {
@@ -497,6 +520,30 @@ app.post("/createTicket" , async(req,res)=>{
         res.status(500).json(err)
     }
 })
+
+app.post("/getsubscription" , async(req,res)=>{
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const Stripe = stripe(STRIPE_KEY);
+    try{
+        const { custId } = req.body;
+        console.log("the cust id is", custId)
+        const subscriptions = await Stripe.subscriptions.list({
+          customer: custId,
+          limit: 1,
+        });
+    
+        // Check if there is any data in the subscriptions response
+        if (subscriptions.data && subscriptions.data.length > 0) {
+          subsId = subscriptions.data[0].id; // Accessing the id from the first element
+          console.log("the subscriber's ID is:", subsId);
+          res.status(200).json({ id: subsId }); 
+    }
+}
+    catch(err){
+        res.status(500).json(err)
+    }
+})
+
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
