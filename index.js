@@ -81,7 +81,7 @@ app.post('/open', async (req, res) => {
     try {
         console.log('Received URL:', url);
         cId = companyId 
-        if (url !== undefined) {
+        if (url !== undefined && !urlArr.length > 1) {
             urlArr.push(url);
         }
         console.log("urlArr is", urlArr);
