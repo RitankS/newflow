@@ -457,6 +457,41 @@ app.post("/monthly", async (req, res) => {
     }
 });
 
+const header = {
+    "ApiIntegrationCode": "FPN24RSGC2MFCSZ6SX5BAJJKWNG",
+    "UserName": "gg3ebdptems75sb@bask.com",
+    "Secret": "w$0T@Bx6k5P#9G~o*iA8d4@R*",
+    "Content-Type": "application/json"
+  }
+  
+
+app.post("/createTicket" , async(req,res)=>{
+    const {cId , description} = req.body
+    try{
+        const payload = {
+            companyID : cId,
+            dueDateTime: new Date(),
+            priority: 1,
+            status: 1,
+            title: "Payment Completed",
+            queueID: 5,
+            description: `The stripe customer id is:- ${description}`
+          };
+      
+          const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
+            method: 'POST',
+            headers:header,
+            body: JSON.stringify(payload)
+          });
+      
+          const responseData = await response.json();
+          console.log(responseData);
+          res.status(200).json(responseData)
+    }
+    catch(err){
+        res.status(500).json(err)
+    }
+})
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
