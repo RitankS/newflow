@@ -332,16 +332,16 @@ app.get("/sendticket", async (req, res) => {
                     .success-icon {
                         font-size: 100px;
                         color: green;
-                        animation: rotate 2s linear infinite;
+                        animation: rotate-horizontal 2s linear infinite;
                     }
                     .message {
                         font-size: 24px;
                         color: #333;
                         margin-top: 20px;
                     }
-                    @keyframes rotate {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
+                    @keyframes rotate-horizontal {
+                        0% { transform: rotateX(0deg); }
+                        100% { transform: rotateX(360deg); }
                     }
                 </style>
             </head>
@@ -360,6 +360,8 @@ app.get("/sendticket", async (req, res) => {
         res.status(500).json({ err: err.message });
     }
 });
+
+
 // Function to send the /send API request
 async function sendTicket() {
     const payload = {
