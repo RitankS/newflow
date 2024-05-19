@@ -85,7 +85,7 @@ app.post('/open', async (req, res) => {
             urlArr.push(url);
         }
         console.log("urlArr is", urlArr);
-        res.send({ "url": url });
+        res.send({ "url": url , "cId": companyId});
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: err.message });
