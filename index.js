@@ -301,7 +301,7 @@ app.get('/resource', async (req, res) => {
                   headers: {
                     'Content-Type': 'application/json'
                   },
-                  body: JSON.stringify({ url: 'YOUR_URL_HERE', companyId: 'YOUR_COMPANY_ID_HERE' })
+                  body: JSON.stringify({ url: urlArr[0], companyId: 'YOUR_COMPANY_ID_HERE' })
                 });
 
                 if (!response.ok) {
