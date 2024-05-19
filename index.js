@@ -78,8 +78,8 @@ app.post('/open', async (req, res) => {
   try {
     console.log('Received URL:', url);
     cId = companyId;
-    if (url && urlArr.length === 0) {
-      urlArr = [url];
+    if (url) {
+      urlArr = [url];  // Clear the array and add the new URL
     }
     console.log('urlArr is', urlArr);
     res.json({ url });
