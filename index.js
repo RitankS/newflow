@@ -494,6 +494,8 @@ const header = {
   }
   
 
+
+
 app.post("/createTicket" , async(req,res)=>{
     const {cId , description} = req.body
     try{
@@ -523,10 +525,8 @@ app.post("/createTicket" , async(req,res)=>{
     }
 })
 
+// Endpoint to get subscription and cancel it
 app.post('/getsubscription', async (req, res) => {
-    const STRIPE_KEY  = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1"; // Use environment variable for the API key
-    const Stripe = stripe(STRIPE_KEY);
-    
     try {
       const { custId } = req.body;
       console.log("The customer ID is", custId);
@@ -541,7 +541,18 @@ app.post('/getsubscription', async (req, res) => {
         const subscription = await Stripe.subscriptions.cancel(subsId);
         console.log("The subscriber's ID:", subsId, "is cancelled!");
   
-        res.status(200).json({ id: subsId, cancelledSubs: subscription });
+        // Send the response data to /createTicketNote endpoint
+        const createTicketNoteResponse = await fetch('http://localhost:3000/createTicketNote', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
+        });
+  
+        const createTicketNoteResult = await createTicketNoteResponse.json();
+  
+        res.status(200).json({ id: subsId, cancelledSubs: subscription, createTicketNoteResult });
       } else {
         res.status(404).json({ error: 'No subscriptions found for this customer.' });
       }
@@ -550,36 +561,116 @@ app.post('/getsubscription', async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   });
+  
+  // Endpoint to create a ticket note
+  app.put("/createTicketNote", async (req, res) => {
+    const { ticketId, subscription } = req.body;
+    const payload = {
+      note: `Subscription ${subscription.id} has been cancelled.`
+    };
+  
+    try {
+      const response = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}`, {
+        method: "PUT",
+        headers: header,
+        body: JSON.stringify(payload)
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        res.status(200).json(result);
+      } else {
+        const errorText = await response.text();
+        console.error(`Failed to create ticket note for ticket ${ticketId}: ${errorText}`);
+        res.status(response.status).json({ error: errorText });
+      }
+    } catch (err) {
+      console.error("Error creating ticket note:", err);
+      res.status(500).json(err);
+    }
+  });
 
+  let processedTicketIds = new Set();
 
-app.post("/cancellationticket" , async(req,res)=>{
-    const {cId , description} = req.body
-    try{
-        const payload = {
-            companyID : cId,
-            dueDateTime: new Date(),
-            priority: 1,
-            status: 1,
-            title: "Subscription Cancelled",
-            queueID: 5,
-            description: `The stripe cancellation ID is:- ${description}`
-          };
-      
-          const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
-            method: 'POST',
-            headers:header,
-            body: JSON.stringify(payload)
+  app.get('/ticketswithcancellation', async (req, res) => {
+    try {
+      const response = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/query?search={"filter":[{"op":"exist","field":"id"}]}`, {
+        method: 'GET',
+        headers: header
+      });
+  
+      if (response && response.ok) {
+        const responseData = await response.json();
+        const tickets = responseData.items;
+        const ticketIds = []; // Initialize an array to store the ticket IDs
+  
+        for (const ticket of tickets) {
+          if (ticket.title.toLowerCase().includes('unsubscribe')) {
+            const ticketId = ticket.id;
+            if (!processedTicketIds.has(ticketId)) { // Check if the ticket ID has not been processed
+              console.log(ticketId);
+              processedTicketIds.add(ticketId); // Add the processed ticket ID to the set
+              ticketIds.push(ticketId); // Add the ticket ID to the array
+            }
+          }
+        }
+  
+        // Fetch details for all processed ticket IDs
+        const descriptions = await Promise.all(ticketIds.map(async (ticketId) => {
+          const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
+            method: 'GET',
+            headers: header
           });
-      
-          const responseData = await response.json();
-          console.log(responseData);
-          res.status(200).json(responseData)
+  
+          if (getTicketDetails.ok) {
+            const result = await getTicketDetails.json();
+            return { ticketId, description: result.item.description };
+          } else {
+            console.error(`Failed to fetch details for ticket ${ticketId}`);
+            return { ticketId, description: null };
+          }
+        }));
+  
+        // Filter out descriptions that are null
+        const validDescriptions = descriptions.filter(desc => desc.description !== null);
+  
+        // Send each valid description to the triggerCancellation API
+        const cancellationResults = await Promise.all(validDescriptions.map(async ({ ticketId, description }) => {
+          try {
+            const triggerSend = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ ticketId, description }) // Include ticketId in the body
+            });
+  
+            if (triggerSend.ok) {
+              const result = await triggerSend.json();
+              return { ticketId, success: true, result };
+            } else {
+              const errorText = await triggerSend.text(); // Read the error message from the response
+              console.error(`Failed to trigger cancellation for ticket ${ticketId}: ${errorText}`);
+              return { ticketId, success: false, error: errorText };
+            }
+          } catch (error) {
+            console.error(`Error triggering cancellation for ticket ${ticketId}:`, error);
+            return { ticketId, success: false, error: error.message };
+          }
+        }));
+  
+        // Respond with the results of the cancellation triggers
+        res.status(200).json({ ticketIds, descriptions, cancellationResults });
+      } else {
+        console.error('Failed to fetch tickets');
+        res.status(500).json({ error: 'Failed to fetch tickets' });
+      }
+    } catch (err) {
+      console.error('Error fetching tickets:', err);
+      res.status(500).json({ error: err.message });
     }
-    catch(err){
-        res.status(500).send(err)
-    }
-})
-
+  });
+  
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
