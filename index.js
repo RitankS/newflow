@@ -554,7 +554,7 @@ app.post('/getsubscription', async (req, res) => {
   
         const createTicketNoteResult = await createTicketNoteResponse.json();
   
-        res.status(200).json({ id: subsId, cancelledSubs: subscription, createTicketNoteResult });
+        res.status(200).json({ createTicketNoteResponse, subscriptions });
       } else {
         res.status(404).json({ error: 'No subscriptions found for this customer.' });
       }
