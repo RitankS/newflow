@@ -523,31 +523,33 @@ app.post("/createTicket" , async(req,res)=>{
     }
 })
 
-app.post("/getsubscription" , async(req,res)=>{
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+app.post('/getsubscription', async (req, res) => {
+    const STRIPE_KEY  = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1"; // Use environment variable for the API key
     const Stripe = stripe(STRIPE_KEY);
-    try{
-        const { custId } = req.body;
-        console.log("the cust id is", custId)
-        const subscriptions = await Stripe.subscriptions.list({
-          customer: custId,
-          limit: 1,
-        });
     
-        // Check if there is any data in the subscriptions response
-        if (subscriptions.data && subscriptions.data.length > 0) {
-          subsId = subscriptions.data[0].id; // Accessing the id from the first element
-          const subscription = await stripe.subscriptions.cancel(
-            subsId
-          );
-          console.log("the subscriber's ID is:", subsId , "is cancelled  !!! ");
-          res.status(200).json({ id: subsId , cancelledSubs: subscription}); 
+    try {
+      const { custId } = req.body;
+      console.log("The customer ID is", custId);
+      
+      const subscriptions = await Stripe.subscriptions.list({
+        customer: custId,
+        limit: 1,
+      });
+  
+      if (subscriptions.data && subscriptions.data.length > 0) {
+        const subsId = subscriptions.data[0].id; // Accessing the ID from the first element
+        const subscription = await Stripe.subscriptions.cancel(subsId);
+        console.log("The subscriber's ID:", subsId, "is cancelled!");
+  
+        res.status(200).json({ id: subsId, cancelledSubs: subscription });
+      } else {
+        res.status(404).json({ error: 'No subscriptions found for this customer.' });
+      }
+    } catch (err) {
+      console.error("Error cancelling subscription:", err);
+      res.status(500).json({ error: err.message });
     }
-}
-    catch(err){
-        res.status(500).json(err)
-    }
-})
+  });
 
 
 app.post("/cancellationticket" , async(req,res)=>{
