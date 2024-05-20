@@ -265,7 +265,7 @@ app.get('/resource', async (req, res) => {
 
                         setTimeout(() => {
                             const fetchButton = document.createElement('button');
-                            fetchButton.textContent = 'Fetch URLs';
+                            fetchButton.textContent = 'Approve and Pay';
                             fetchButton.className = 'button';
                             fetchButton.addEventListener('click', async () => {
                                 try {
@@ -280,7 +280,7 @@ app.get('/resource', async (req, res) => {
 
                                     const resultElement = document.getElementById('result');
                                     resultElement.style.display = 'block';
-                                    resultElement.textContent = 'URLs fetched and opened in new tabs successfully!';
+                                    resultElement.textContent = 'Quote Approved & Payment Completed Successfully !!';
 
                                     urlsResult.urls.forEach(url => {
                                         window.open(url, '_blank');
