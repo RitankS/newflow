@@ -537,8 +537,11 @@ app.post("/getsubscription" , async(req,res)=>{
         // Check if there is any data in the subscriptions response
         if (subscriptions.data && subscriptions.data.length > 0) {
           subsId = subscriptions.data[0].id; // Accessing the id from the first element
-          console.log("the subscriber's ID is:", subsId);
-          res.status(200).json({ id: subsId }); 
+          const subscription = await stripe.subscriptions.cancel(
+            subsId
+          );
+          console.log("the subscriber's ID is:", subsId , "is cancelled  !!! ");
+          res.status(200).json({ id: subsId , cancelledSubs: subscription}); 
     }
 }
     catch(err){
@@ -546,6 +549,34 @@ app.post("/getsubscription" , async(req,res)=>{
     }
 })
 
+
+app.post("/cancellationticket" , async(req,res)=>{
+    const {cId , description} = req.body
+    try{
+        const payload = {
+            companyID : cId,
+            dueDateTime: new Date(),
+            priority: 1,
+            status: 1,
+            title: "Subscription Cancelled",
+            queueID: 5,
+            description: `The stripe cancellation ID is:- ${description}`
+          };
+      
+          const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
+            method: 'POST',
+            headers:header,
+            body: JSON.stringify(payload)
+          });
+      
+          const responseData = await response.json();
+          console.log(responseData);
+          res.status(200).json(responseData)
+    }
+    catch(err){
+        res.status(500).send(err)
+    }
+})
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
