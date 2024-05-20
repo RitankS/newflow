@@ -528,7 +528,7 @@ app.post("/createTicket" , async(req,res)=>{
 // Endpoint to get subscription and cancel it
 app.post('/getsubscription', async (req, res) => {
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
-    const Stripe = stripe(STRIPE_KEY);
+    const Stripe = stripe(STRIPE_KEY)
     try {
       const { custId } = req.body;
       console.log("The customer ID is", custId);
