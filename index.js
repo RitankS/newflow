@@ -544,7 +544,7 @@ app.post('/getsubscription', async (req, res) => {
         console.log("The subscriber's ID:", subsId, "is cancelled!");
   
         // Send the response data to /createTicketNote endpoint
-        const createTicketNoteResponse = await fetch('http://localhost:3000/createTicketNote', {
+        const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
