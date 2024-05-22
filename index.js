@@ -211,27 +211,6 @@ app.get('/resource', async (req, res) => {
                 </div>
                 <div id="result" style="display: none;"></div>
                 <script>
-                    async function sendTicket(payload) {
-                        try {
-                            const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify(payload)
-                            });
-
-                            if (!sendSubsId.ok) {
-                                const errorText = await sendSubsId.text();
-                                throw new Error("Error from webhook: " + errorText);
-                            }
-
-                            console.log('Ticket sent successfully');
-                        } catch (error) {
-                            console.error('Error sending ticket:', error);
-                        }
-                    }
-
                     window.addEventListener('DOMContentLoaded', async () => {
                         try {
                             await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
@@ -263,7 +242,7 @@ app.get('/resource', async (req, res) => {
 
                                 const detailsResult = await detailsResponse.json();
                                 localStorage.setItem('details', JSON.stringify(detailsResult.details));
-                                console.log('Details saved to local storage:', detailsResult.details);
+                                console.log('details saved to local storage:', detailsResult.details);
 
                                 const details = detailsResult.details;
 
@@ -306,19 +285,8 @@ app.get('/resource', async (req, res) => {
                                     urlsResult.urls.forEach(url => {
                                         window.open(url, '_blank');
                                     });
-
-                                    // After successful approval, call sendTicket function with details from localStorage
-                                    const details = JSON.parse(localStorage.getItem('details'));
-                                    const payload = {
-                                        id: '${id}',
-                                        description: details.description,
-                                        unitCost: details.Unit_Price,
-                                        quantity: details.quantity
-                                    };
-                                    await sendTicket(payload);
-
                                 } catch (error) {
-                                    console.error('Error fetching URLs or sending ticket:', error);
+                                    console.error('Error fetching URLs:', error);
                                 }
                             });
                             document.body.appendChild(fetchButton);
@@ -395,24 +363,23 @@ app.get("/sendticket", async (req, res) => {
 
 
 // Function to send the /send API request
-async function sendTicket(payload , custID) {
-    try {
-        const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload , custID)
-        });
+async function sendTicket() {
+    const payload = {
+        custId,
+        cId
+    };
+    console.log("payload" ,payload)
+    const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
 
-        if (!sendSubsId.ok) {
-            const errorText = await sendSubsId.text();
-            throw new Error("Error from webhook: " + errorText);
-        }
-
-        console.log('Ticket sent successfully');
-    } catch (error) {
-        console.error('Error sending ticket:', error);
+    if (!sendSubsId.ok) {
+        const errorText = await sendSubsId.text();
+        throw new Error("Error from webhook: " + errorText);
     }
 }
 
