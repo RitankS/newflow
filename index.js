@@ -62,6 +62,9 @@ app.post('/open', async (req, res) => {
     }
 });
 
+
+
+let detailsArr = []
 app.post("/quoteDetails", async (req, res) => {
     const {
         id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -84,7 +87,10 @@ app.post("/quoteDetails", async (req, res) => {
         quoteDetails.Product_Id = Product_Id;
         quoteDetails.quantity = quantity;
         quoteDetails.Unit_Price = Unit_Price;
+        
 
+        detailsArr.push(description , quantity , Unit_Price)
+        console.log("detailsArr is" , detailsArr)
         console.log(quoteDetails);
         res.json({
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -258,6 +264,8 @@ app.get('/resource', async (req, res) => {
 
                                 document.getElementById('loader').style.display = 'none';
                                 document.getElementById('quote-details').style.display = 'block';
+
+                               
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
@@ -379,9 +387,7 @@ async function sendTicket() {
             const payload = {
                 custId,
                 cId,
-                description,
-                quantity,
-                Unit_Price
+                
             };
 
             console.log("payload", payload);
