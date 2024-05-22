@@ -707,7 +707,7 @@ app.get('/getsubscription', async (req, res) => {
   }
   
   // Start the orchestration process
- orchestrateCancellation();
+ //orchestrateCancellation();
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
