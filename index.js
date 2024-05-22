@@ -364,24 +364,49 @@ app.get("/sendticket", async (req, res) => {
 
 // Function to send the /send API request
 async function sendTicket() {
-    const payload = {
-        custId,
-        cId
-    };
-    console.log("payload" ,payload)
-    const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    });
+    try {
+        const getDetails = await fetch('https://newflow.vercel.app/quoteDetails', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-    if (!sendSubsId.ok) {
-        const errorText = await sendSubsId.text();
-        throw new Error("Error from webhook: " + errorText);
+        if (getDetails.ok) {
+            const reqData = await getDetails.json();
+            const { description, quantity, Unit_Price } = reqData;
+
+            const payload = {
+                custId,
+                cId,
+                description,
+                quantity,
+                Unit_Price
+            };
+
+            console.log("payload", payload);
+
+            const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!sendSubsId.ok) {
+                const errorText = await sendSubsId.text();
+                throw new Error("Error from webhook: " + errorText);
+            }
+        } else {
+            const errorText = await getDetails.text();
+            throw new Error("Error from quoteDetails: " + errorText);
+        }
+    } catch (error) {
+        console.error("Error in sendTicket:", error);
     }
 }
+
 
 // Your existing /send API endpoint
 app.post("/send", async (req, res) => {
