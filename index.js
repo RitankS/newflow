@@ -89,7 +89,7 @@ app.post("/quoteDetails", async (req, res) => {
         quoteDetails.Unit_Price = Unit_Price;
         
 
-        detailsArr.push(description , quantity , Unit_Price)
+        detailsArr.push(description , quantity , Unit_Price , Product_Name , id)
         console.log("detailsArr is" , detailsArr)
         console.log(quoteDetails);
         res.json({
