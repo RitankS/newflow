@@ -89,7 +89,7 @@ app.post("/quoteDetails", async (req, res) => {
         quoteDetails.Unit_Price = Unit_Price;
         
 
-        detailsArr.push(description , quantity , Unit_Price)
+        detailsArr.push(description , quantity , Unit_Price , Product_Name)
         console.log("detailsArr is" , detailsArr)
         console.log(quoteDetails);
         res.json({
@@ -506,7 +506,7 @@ const header = {
 
 
 app.post("/createTicket" , async(req,res)=>{
-    const {cId , description , desc , quant , unit} = req.body
+    const {cId , description , desc , quant , unit , pName} = req.body
     try{
         const payload = {
             companyID : cId,
@@ -515,7 +515,7 @@ app.post("/createTicket" , async(req,res)=>{
             status: 1,
             title: "Payment Completed",
             queueID: 5,
-            description: `The stripe customer id is:- ${description} & the company Name is ${desc} , qunantity of product is ${quant} & unit price is ${unit}`
+            description: `The stripe customer id is:- ${description} & the company Name is ${desc} , Product Name is ${pName} ,qunantity of product is ${quant} & unit price is ${unit}`
           };
       
           const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
