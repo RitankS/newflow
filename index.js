@@ -374,7 +374,8 @@ app.get("/sendticket", async (req, res) => {
 async function sendTicket() {
     const payload = {
         custId,
-        cId
+        cId,
+        detailsArr
     };
     console.log("payload" ,payload)
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
