@@ -374,8 +374,7 @@ app.get("/sendticket", async (req, res) => {
 async function sendTicket() {
     const payload = {
         custId,
-        cId,
-        detailsArr
+        cId
     };
     console.log("payload" ,payload)
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
@@ -506,7 +505,7 @@ const header = {
 
 
 app.post("/createTicket" , async(req,res)=>{
-    const {cId , description} = req.body
+    const {cId , description , desc , qunat , unit} = req.body
     try{
         const payload = {
             companyID : cId,
@@ -515,7 +514,7 @@ app.post("/createTicket" , async(req,res)=>{
             status: 1,
             title: "Payment Completed",
             queueID: 5,
-            description: `The stripe customer id is:- ${description}`
+            description: `The stripe customer id is:- ${description} & the company Name is ${desc} , qunantity of product is ${qunat} & unit price is ${unit}`
           };
       
           const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
