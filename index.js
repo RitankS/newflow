@@ -143,7 +143,7 @@ app.get('/resource', async (req, res) => {
                         color: #333;
                         margin: 0;
                         flex: 1;
-                        margin-left: -10px; /* Move the heading 10px to the left */
+                        margin-left: -30px; /* Move the heading 10px to the left */
                     }
                     .logo {
                         margin-right: 10px;
