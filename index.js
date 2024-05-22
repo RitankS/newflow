@@ -146,8 +146,8 @@ app.get('/resource', async (req, res) => {
                     }
                     .logo {
                         margin-right: 10px;
-                        height: 20px;
-                        width: 22px;
+                        height: 50px; /* Adjust the height as needed */
+                        width: auto;  /* Maintain aspect ratio */
                     }
                     .button {
                         background-color: #ff6600;
@@ -179,7 +179,7 @@ app.get('/resource', async (req, res) => {
                         border-radius: 10px;
                         padding: 20px;
                         background: white;
-                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        box-shadow: 0 0 10px rgba(0, 0, 0,0.1);
                         width: 100%;
                         max-width: 600px;
                     }
@@ -215,7 +215,7 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <div class="header">
-                    <img src='https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg' alt="Logo" />
+                    <img src='https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg' alt="Logo" class="logo"/>
                     <h1>Quote Details</h1>
                 </div>
                 <div id="loader">Please Wait Loading Quote Details for you .......</div>
@@ -325,6 +325,7 @@ app.get('/resource', async (req, res) => {
         res.status(400).json({ error: 'Missing id parameter in query string' });
     }
 });
+
 
 app.get("/sendticket", async (req, res) => {
     try {
