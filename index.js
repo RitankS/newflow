@@ -129,10 +129,21 @@ app.get('/resource', async (req, res) => {
                         padding: 20px;
                         box-sizing: border-box;
                     }
+                    .header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 20px;
+                    }
                     h1 {
                         text-align: center;
-                        margin-top: 20px;
                         font-size: 2em;
+                        color: #333;
+                        margin: 0;
+                    }
+                    .logo {
+                        margin-left: 10px;
+                        font-size: 1em;
                         color: #333;
                     }
                     .button {
@@ -154,7 +165,6 @@ app.get('/resource', async (req, res) => {
                     }
                     #loader {
                         display: block;
-                        margin-top: 20px;
                         font-size: 18px;
                         font-weight: bold;
                         color: #ffcc00;
@@ -162,7 +172,6 @@ app.get('/resource', async (req, res) => {
                     }
                     #quote-details {
                         display: none;
-                        margin-top: 20px;
                         border: 2px solid #ccc;
                         border-radius: 10px;
                         padding: 20px;
@@ -202,7 +211,10 @@ app.get('/resource', async (req, res) => {
                 </style>
             </head>
             <body>
-                <h1>Quote Details</h1>
+                <div class="header">
+                    <h1>Quote Details</h1>
+                    <span class="logo">./Bask-logo.jpg</span>
+                </div>
                 <div id="loader">Loading...</div>
                 <div id="quote-details">
                     <div class="key-value-pair"><span>Description:</span> <span id="description"></span></div>
@@ -265,7 +277,6 @@ app.get('/resource', async (req, res) => {
                                 document.getElementById('loader').style.display = 'none';
                                 document.getElementById('quote-details').style.display = 'block';
 
-                               
                             } catch (error) {
                                 console.error('Error fetching details:', error);
                             }
