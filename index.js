@@ -146,7 +146,8 @@ app.get('/resource', async (req, res) => {
                     }
                     .logo {
                         margin-right: 10px;
-                        height: 50px;
+                        height: 20px;
+                        width: 22px;
                     }
                     .button {
                         background-color: #ff6600;
