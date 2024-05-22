@@ -146,7 +146,7 @@ app.get('/resource', async (req, res) => {
                     }
                     .logo {
                         margin-right: 10px;
-                        height: 50px; /* Adjust the height as needed */
+                        height: 30px; /* Adjust the height as needed */
                         width: auto;  /* Maintain aspect ratio */
                     }
                     .button {
