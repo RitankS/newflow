@@ -544,17 +544,17 @@ app.get('/getsubscription', async (req, res) => {
         console.log("The subscriber's ID:", subsId, "is cancelled!");
   
         // Send the response data to /createTicketNote endpoint
-        const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
-        });
+        // const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
+        //   method: 'PUT',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
+        // });
   
-        const createTicketNoteResult = await createTicketNoteResponse.json();
+        // const createTicketNoteResult = await createTicketNoteResponse.json();
   
-        res.status(200).json({ createTicketNoteResponse, subscriptions });
+        res.status(200).json({ subscriptions });
       } else {
         res.status(404).json({ error: 'No subscriptions found for this customer.' });
       }
