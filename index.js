@@ -1,8 +1,7 @@
 import express from 'express';
 import stripe from 'stripe';
 import open from 'open';
-import cron from 'node-cron'
-import {Logo} from "./Bask-logo.jpg";
+import cron from 'node-cron';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -215,7 +214,7 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <div class="header">
-                    <img src={Logo} alt="Logo" class="logo">
+                    <img src="./Bask-logo.jpg" alt="Logo" class="logo"/>
                     <h1>Quote Details</h1>
                 </div>
                 <div id="loader">Please Wait Loading Quote Details for you .......</div>
