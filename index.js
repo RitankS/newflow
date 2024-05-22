@@ -120,7 +120,7 @@ app.get('/resource', async (req, res) => {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
-                        justify-content: center;
+                        justify-content: flex-start;
                         min-height: 100vh;
                         margin: 0;
                         font-family: Arial, sans-serif;
@@ -134,17 +134,19 @@ app.get('/resource', async (req, res) => {
                         align-items: center;
                         justify-content: center;
                         margin-bottom: 20px;
+                        width: 100%;
+                        max-width: 600px;
                     }
                     h1 {
                         text-align: center;
                         font-size: 2em;
                         color: #333;
                         margin: 0;
+                        flex: 1;
                     }
                     .logo {
-                        margin-left: 10px;
-                        font-size: 1em;
-                        color: #333;
+                        margin-right: 10px;
+                        height: 50px;
                     }
                     .button {
                         background-color: #ff6600;
@@ -212,8 +214,8 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <div class="header">
+                    <img src="Bask-logo.jpg" alt="Logo" class="logo">
                     <h1>Quote Details</h1>
-                    <span class="logo">./Bask-logo.jpg</span>
                 </div>
                 <div id="loader">Loading...</div>
                 <div id="quote-details">
@@ -322,6 +324,7 @@ app.get('/resource', async (req, res) => {
         res.status(400).json({ error: 'Missing id parameter in query string' });
     }
 });
+
 
 app.get("/sendticket", async (req, res) => {
     try {
