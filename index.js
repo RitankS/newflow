@@ -214,7 +214,7 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <div class="header">
-                    <img src="./Bask-logo.jpg" alt="Logo" ></img>
+                    <img src='https://dynamic.brandcrowd.com/asset/logo/937e0eec-eebf-4294-9029-41619d6c3786/logo-search-grid-1x?logoTemplateVersion=1&v=638369310055500000' alt="Logo" />
                     <h1>Quote Details</h1>
                 </div>
                 <div id="loader">Please Wait Loading Quote Details for you .......</div>
