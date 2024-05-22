@@ -526,7 +526,7 @@ app.post("/createTicket" , async(req,res)=>{
 })
 
 // Endpoint to get subscription and cancel it
-app.post('/getsubscription', async (req, res) => {
+app.get('/getsubscription', async (req, res) => {
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = stripe(STRIPE_KEY)
     try {
@@ -610,59 +610,13 @@ app.post('/getsubscription', async (req, res) => {
           if (ticket.title.toLowerCase().includes('unsubscribe')) {
             const ticketId = ticket.id;
             if (!processedTicketIds.has(ticketId)) { // Check if the ticket ID has not been processed
-              console.log(ticketId);
               processedTicketIds.add(ticketId); // Add the processed ticket ID to the set
               ticketIds.push(ticketId); // Add the ticket ID to the array
             }
           }
         }
   
-        // Fetch details for all processed ticket IDs
-        const descriptions = await Promise.all(ticketIds.map(async (ticketId) => {
-          const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
-            method: 'GET',
-            headers: header
-          });
-  
-          if (getTicketDetails.ok) {
-            const result = await getTicketDetails.json();
-            return { ticketId, description: result.item.description };
-          } else {
-            console.error(`Failed to fetch details for ticket ${ticketId}`);
-            return { ticketId, description: null };
-          }
-        }));
-  
-        // Filter out descriptions that are null
-        const validDescriptions = descriptions.filter(desc => desc.description !== null);
-  
-        // Send each valid description to the triggerCancellation API
-        const cancellationResults = await Promise.all(validDescriptions.map(async ({ ticketId, description }) => {
-          try {
-            const triggerSend = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ ticketId, description }) // Include ticketId in the body
-            });
-  
-            if (triggerSend.ok) {
-              const result = await triggerSend.json();
-              return { ticketId, success: true, result };
-            } else {
-              const errorText = await triggerSend.text(); // Read the error message from the response
-              console.error(`Failed to trigger cancellation for ticket ${ticketId}: ${errorText}`);
-              return { ticketId, success: false, error: errorText };
-            }
-          } catch (error) {
-            console.error(`Error triggering cancellation for ticket ${ticketId}:`, error);
-            return { ticketId, success: false, error: error.message };
-          }
-        }));
-  
-        // Respond with the results of the cancellation triggers
-        res.status(200).json({ ticketIds, descriptions, cancellationResults });
+        res.status(200).json({ ticketIds });
       } else {
         console.error('Failed to fetch tickets');
         res.status(500).json({ error: 'Failed to fetch tickets' });
@@ -673,6 +627,94 @@ app.post('/getsubscription', async (req, res) => {
     }
   });
 
+  app.get('/getsubscription/:ticketId', async (req, res) => {
+    const ticketId = req.params.ticketId;
+  
+    try {
+      const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
+        method: 'GET',
+        headers: header
+      });
+  
+      if (getTicketDetails.ok) {
+        const result = await getTicketDetails.json();
+        const description = result.item.description;
+        res.status(200).json({ ticketId, description });
+      } else {
+        console.error(`Failed to fetch details for ticket ${ticketId}`);
+        res.status(500).json({ error: `Failed to fetch details for ticket ${ticketId}` });
+      }
+    } catch (err) {
+      console.error(`Error fetching details for ticket ${ticketId}:`, err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+
+  app.post('/triggercancellation', async (req, res) => {
+    const { ticketId, description } = req.body;
+  
+    try {
+      const triggerSend = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ticketId, description })
+      });
+  
+      if (triggerSend.ok) {
+        const result = await triggerSend.json();
+        res.status(200).json({ ticketId, success: true, result });
+      } else {
+        const errorText = await triggerSend.text(); // Read the error message from the response
+        console.error(`Failed to trigger cancellation for ticket ${ticketId}: ${errorText}`);
+        res.status(500).json({ ticketId, success: false, error: errorText });
+      }
+    } catch (error) {
+      console.error(`Error triggering cancellation for ticket ${ticketId}:`, error);
+      res.status(500).json({ ticketId, success: false, error: error.message });
+    }
+  });
+
+  async function orchestrateCancellation() {
+    try {
+      // Step 1: Fetch tickets with 'unsubscribe'
+      const ticketsResponse = await fetch('https://newflow.vercel.app/ticketswithcancellation');
+      const { ticketIds } = await ticketsResponse.json();
+  
+      for (const ticketId of ticketIds) {
+        // Step 2: Get subscription details for each ticketId
+        const subscriptionResponse = await fetch(`https://newflow.vercel.app/getsubscription/${ticketId}`);
+        const { description } = await subscriptionResponse.json();
+  
+        // Step 3: Trigger cancellation for each ticketId with its description
+        const cancellationResponse = await fetch('https://newflow.vercel.app/triggercancellation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ ticketId, description })
+        });
+  
+        const cancellationResult = await cancellationResponse.json();
+        console.log(`Cancellation result for ticket ${ticketId}:`, cancellationResult);
+      }
+  
+    } catch (error) {
+      console.error('Error in orchestrating cancellation:', error);
+    }
+  }
+  
+  // Start the orchestration process
+ orchestrateCancellation();
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
+
+
+
+
+
+
+// custId->ticket update->new ticket with custId -> cron at 12 hr ->process ticket description -> read custID ->send to stripe -> get subscription -> process subscription details - > send this to stripe for cancellation - > update autotask ticket with subscription cancellation ID.
