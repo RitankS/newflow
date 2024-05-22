@@ -515,7 +515,7 @@ app.post("/createTicket" , async(req,res)=>{
             status: 1,
             title: "Payment Completed",
             queueID: 5,
-            description: `The stripe customer id is:- ${description} & the company Name is ${desc} , qunantity of product is ${qunat} & unit price is ${unit}`
+            description: `The payment for Quote ${id}is done , Stripe customer id is ${description} & the company Name is ${desc} , qunantity of product is ${qunat} & unit price is ${unit}`
           };
       
           const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
