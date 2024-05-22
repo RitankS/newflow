@@ -506,7 +506,7 @@ const header = {
 
 
 app.post("/createTicket" , async(req,res)=>{
-    const {cId , description , desc , qunat , unit} = req.body
+    const {cId , description , desc , qunat , unit , id} = req.body
     try{
         const payload = {
             companyID : cId,
