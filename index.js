@@ -214,7 +214,7 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <div class="header">
-                    <img src="./Bask-logo.jpg" alt="Logo" class="logo"/>
+                    <img src="./Bask-logo.jpg" alt="Logo" ></img>
                     <h1>Quote Details</h1>
                 </div>
                 <div id="loader">Please Wait Loading Quote Details for you .......</div>
