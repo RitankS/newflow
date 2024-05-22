@@ -125,7 +125,7 @@ app.get('/resource', async (req, res) => {
                         margin: 0;
                         font-family: Arial, sans-serif;
                         background: #f0f0f0;
-                        color: #333;
+                        color: #FFFFFF;
                         padding: 20px;
                         box-sizing: border-box;
                     }
