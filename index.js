@@ -214,10 +214,10 @@ app.get('/resource', async (req, res) => {
             </head>
             <body>
                 <div class="header">
-                    <img src="./Bask-logo.jpg" alt="Logo" class="logo">
+                    <img src="/Bask-logo.jpg" alt="Logo" class="logo">
                     <h1>Quote Details</h1>
                 </div>
-                <div id="loader">Loading...</div>
+                <div id="loader">Please Wait Loading Quote Details for you .......</div>
                 <div id="quote-details">
                     <div class="key-value-pair"><span>Description:</span> <span id="description"></span></div>
                     <div class="key-value-pair"><span>Highest Cost:</span> <span id="highest-cost"></span></div>
@@ -324,7 +324,6 @@ app.get('/resource', async (req, res) => {
         res.status(400).json({ error: 'Missing id parameter in query string' });
     }
 });
-
 
 app.get("/sendticket", async (req, res) => {
     try {
