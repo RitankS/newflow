@@ -658,7 +658,13 @@ app.post("/cancellationUpdate", async (req, res) => {
     }
 
     try {
-        const payload = { cancellationDetails };
+        const payload = { 
+            
+    Description: `The subscription is Cancelled and the cancellation id is ${cancellationDetails}`,
+	NoteType: 1,
+	Publish: 1,
+	Title: "Subscription Cancellation Update"
+         };
         const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,
             {
                 method: 'POST',
