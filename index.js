@@ -635,10 +635,10 @@ app.get('/getsubscription', async (req, res) => {
         limit: 1,
       });
   
-      if (subscriptions.data && subscriptions.data.length > 0) {
-        const subsId = subscriptions.data[0].id; // Accessing the ID from the first element
-        const subscription = await Stripe.subscriptions.cancel(subsId);
-        console.log("The subscriber's ID:", subsId, "is cancelled!");
+       if (subscriptions.data && subscriptions.data.length > 0) {
+    //     const subsId = subscriptions.data[0].id; // Accessing the ID from the first element
+    //     const subscription = await Stripe.subscriptions.cancel(subsId);
+    //     console.log("The subscriber's ID:", subsId, "is cancelled!");
         res.status(200).json({ subscriptions });
       } else {
         res.status(404).json({ error: 'No subscriptions found for this customer.' });
