@@ -555,187 +555,7 @@ app.post("/createTicket" , async(req,res)=>{
     }
 })
 
-// Endpoint to get subscription and cancel it
-app.get('/getsubscription', async (req, res) => {
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
-    const Stripe = stripe(STRIPE_KEY)
-    try {
-      const { custId } = req.body;
-      console.log("The customer ID is", custId);
-      
-      const subscriptions = await Stripe.subscriptions.list({
-        customer: custId,
-        limit: 1,
-      });
-  
-      if (subscriptions.data && subscriptions.data.length > 0) {
-        const subsId = subscriptions.data[0].id; // Accessing the ID from the first element
-        const subscription = await Stripe.subscriptions.cancel(subsId);
-        console.log("The subscriber's ID:", subsId, "is cancelled!");
-  
-        // Send the response data to /createTicketNote endpoint
-        // const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
-        //   method: 'PUT',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
-        // });
-  
-        // const createTicketNoteResult = await createTicketNoteResponse.json();
-  
-        res.status(200).json({ subscriptions });
-      } else {
-        res.status(404).json({ error: 'No subscriptions found for this customer.' });
-      }
-    } catch (err) {
-      console.error("Error cancelling subscription:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-  
-  // Endpoint to create a ticket note
-  app.put("/createTicketNote", async (req, res) => {
-    const { ticketId, subscription } = req.body;
-    const payload = {
-      note: `Subscription ${subscription.id} has been cancelled.`
-    };
-  
-    try {
-      const response = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}`, {
-        method: "PUT",
-        headers: header,
-        body: JSON.stringify(payload)
-      });
-  
-      if (response.ok) {
-        const result = await response.json();
-        res.status(200).json(result);
-      } else {
-        const errorText = await response.text();
-        console.error(`Failed to create ticket note for ticket ${ticketId}: ${errorText}`);
-        res.status(response.status).json({ error: errorText });
-      }
-    } catch (err) {
-      console.error("Error creating ticket note:", err);
-      res.status(500).json(err);
-    }
-  });
-
-  let processedTicketIds = new Set();
-
-  app.get('/ticketswithcancellation', async (req, res) => {
-    try {
-      const response = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/query?search={"filter":[{"op":"exist","field":"id"}]}`, {
-        method: 'GET',
-        headers: header
-      });
-  
-      if (response && response.ok) {
-        const responseData = await response.json();
-        const tickets = responseData.items;
-        const ticketIds = []; // Initialize an array to store the ticket IDs
-  
-        for (const ticket of tickets) {
-          if (ticket.title.toLowerCase().includes('unsubscribe')) {
-            const ticketId = ticket.id;
-            if (!processedTicketIds.has(ticketId)) { // Check if the ticket ID has not been processed
-              processedTicketIds.add(ticketId); // Add the processed ticket ID to the set
-              ticketIds.push(ticketId); // Add the ticket ID to the array
-            }
-          }
-        }
-  
-        res.status(200).json({ ticketIds });
-      } else {
-        console.error('Failed to fetch tickets');
-        res.status(500).json({ error: 'Failed to fetch tickets' });
-      }
-    } catch (err) {
-      console.error('Error fetching tickets:', err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-  app.get('/getsubscription/:ticketId', async (req, res) => {
-    const ticketId = req.params.ticketId;
-  
-    try {
-      const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
-        method: 'GET',
-        headers: header
-      });
-  
-      if (getTicketDetails.ok) {
-        const result = await getTicketDetails.json();
-        const description = result.item.description;
-        res.status(200).json({ ticketId, description });
-      } else {
-        console.error(`Failed to fetch details for ticket ${ticketId}`);
-        res.status(500).json({ error: `Failed to fetch details for ticket ${ticketId}` });
-      }
-    } catch (err) {
-      console.error(`Error fetching details for ticket ${ticketId}:`, err);
-      res.status(500).json({ error: err.message });
-    }
-  });
-
-
-  app.post('/triggercancellation', async (req, res) => {
-    const { ticketId, description } = req.body;
-  
-    try {
-      const triggerSend = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ticketId, description })
-      });
-  
-      if (triggerSend.ok) {
-        const result = await triggerSend.json();
-        res.status(200).json({ ticketId, success: true, result });
-      } else {
-        const errorText = await triggerSend.text(); // Read the error message from the response
-        console.error(`Failed to trigger cancellation for ticket ${ticketId}: ${errorText}`);
-        res.status(500).json({ ticketId, success: false, error: errorText });
-      }
-    } catch (error) {
-      console.error(`Error triggering cancellation for ticket ${ticketId}:`, error);
-      res.status(500).json({ ticketId, success: false, error: error.message });
-    }
-  });
-
-  async function orchestrateCancellation() {
-    try {
-      // Step 1: Fetch tickets with 'unsubscribe'
-      const ticketsResponse = await fetch('https://newflow.vercel.app/ticketswithcancellation');
-      const { ticketIds } = await ticketsResponse.json();
-  
-      for (const ticketId of ticketIds) {
-        // Step 2: Get subscription details for each ticketId
-        const subscriptionResponse = await fetch(`https://newflow.vercel.app/getsubscription/${ticketId}`);
-        const { description } = await subscriptionResponse.json();
-  
-        // Step 3: Trigger cancellation for each ticketId with its description
-        const cancellationResponse = await fetch('https://newflow.vercel.app/triggercancellation', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ ticketId, description })
-        });
-  
-        const cancellationResult = await cancellationResponse.json();
-        console.log(`Cancellation result for ticket ${ticketId}:`, cancellationResult);
-      }
-  
-    } catch (error) {
-      console.error('Error in orchestrating cancellation:', error);
-    }
-  }
-  
+    
 // handle cancellation through email
 
 app.get("/ticketDetails", async(req, res) => {
@@ -767,6 +587,67 @@ app.get("/ticketDetails", async(req, res) => {
        
     }
 });
+
+app.get('/getsubscription/:ticketId', async (req, res) => {
+    const ticketId = req.params.ticketId;
+  
+    try {
+      const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
+        method: 'GET',
+        headers: header
+      });
+  
+      if (getTicketDetails.ok) {
+        const result = await getTicketDetails.json();
+        const description = result.item.description;
+        res.status(200).json({ ticketId, description });
+      } else {
+        console.error(`Failed to fetch details for ticket ${ticketId}`);
+        res.status(500).json({ error: `Failed to fetch details for ticket ${ticketId}` });
+      }
+    } catch (err) {
+      console.error(`Error fetching details for ticket ${ticketId}:`, err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+let newCid;
+app.post("/getCustId" , async(req,res)=>{
+        const {custId} = req.body
+        try{
+           newCid = custId
+           res.status(200).json({newCid})
+        }
+        catch(err){
+            res.status(500).json({err})
+        }
+})
+// Endpoint to get subscription and cancel it
+app.get('/getsubscription', async (req, res) => {
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const Stripe = stripe(STRIPE_KEY)
+    try {
+      console.log("The customer ID is", custId);
+      
+      const subscriptions = await Stripe.subscriptions.list({
+        customer: newCid,
+        limit: 1,
+      });
+  
+      if (subscriptions.data && subscriptions.data.length > 0) {
+        const subsId = subscriptions.data[0].id; // Accessing the ID from the first element
+        const subscription = await Stripe.subscriptions.cancel(subsId);
+        console.log("The subscriber's ID:", subsId, "is cancelled!");
+        res.status(200).json({ subscriptions });
+      } else {
+        res.status(404).json({ error: 'No subscriptions found for this customer.' });
+      }
+    } catch (err) {
+      console.error("Error cancelling subscription:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
