@@ -650,7 +650,7 @@ app.delete("/cancelSubs", async (req, res) => {
     }
 });
 
-app.put("/cancellationUpdate", async (req, res) => {
+app.post("/cancellationUpdate", async (req, res) => {
     const { cancellationDetails, ticketId } = req.body;
 
     if (!cancellationDetails || !ticketId) {
