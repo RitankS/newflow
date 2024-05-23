@@ -736,8 +736,16 @@ app.get('/getsubscription', async (req, res) => {
     }
   }
   
-  // Start the orchestration process
- //orchestrateCancellation();
+// handle cancellation through email
+
+app.get("/ticketDetails" , (req,res)=>{
+    const {id} = req.query.id
+    console.log(id)
+    res.status(200).json(id)
+})
+
+
+
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
