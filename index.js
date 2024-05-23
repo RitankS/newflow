@@ -107,226 +107,231 @@ app.get('/resource', async (req, res) => {
     console.log('Received request for /resource');
     console.log('Query parameters:', req.query);
 
-    if (id) {
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Quote Details</title>
-                <style>
-                    body {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: flex-start;
-                        min-height: 100vh;
-                        margin: 0;
-                        font-family: Arial, sans-serif;
-                        background: #FFFFFF;
-                        color: #333;
-                        padding: 20px;
-                        box-sizing: border-box;
-                    }
-                    .header {
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        margin-bottom: 20px;
-                        width: 100%;
-                        max-width: 600px;
-                    }
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
+    }
+
+    const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Quote Details</title>
+            <style>
+                body {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-start;
+                    min-height: 100vh;
+                    margin: 0;
+                    font-family: Arial, sans-serif;
+                    background: #FFFFFF;
+                    color: #333;
+                    padding: 20px;
+                    box-sizing: border-box;
+                }
+                .header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 20px;
+                    width: 100%;
+                    max-width: 600px;
+                }
+                h1 {
+                    text-align: center;
+                    font-size: 2em;
+                    color: #333;
+                    margin: 0;
+                    flex: 1;
+                    margin-left: -30px; /* Move the heading 10px to the left */
+                }
+                .logo {
+                    margin-right: 10px;
+                    height: 30px; /* Adjust the height as needed */
+                    width: auto;  /* Maintain aspect ratio */
+                }
+                .button {
+                    background-color: #ff6600;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    margin-top: 20px;
+                    transition: background-color 0.3s ease;
+                }
+                .button:hover {
+                    background-color: #e65c00;
+                }
+                #result {
+                    margin-top: 20px;
+                }
+                #loader {
+                    display: block;
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #ffcc00;
+                    text-align: center;
+                }
+                #quote-details {
+                    display: none;
+                    border: 2px solid #ccc;
+                    border-radius: 10px;
+                    padding: 20px;
+                    background: white;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    width: 100%;
+                    max-width: 600px;
+                }
+                #quote-details p {
+                    margin: 10px 0;
+                    font-size: 1.1em;
+                }
+                #quote-details p span {
+                    font-weight: bold;
+                    color: #333;
+                }
+                .key-value-pair {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 5px 0;
+                }
+                .product-name {
+                    display: flex;
+                    justify-content: flex-start;
+                    font-size: 1.2em;
+                    font-weight: bold;
+                }
+                @media (max-width: 600px) {
                     h1 {
-                        text-align: center;
-                        font-size: 2em;
-                        color: #333;
-                        margin: 0;
-                        flex: 1;
-                        margin-left: -30px; /* Move the heading 10px to the left */
-                    }
-                    .logo {
-                        margin-right: 10px;
-                        height: 30px; /* Adjust the height as needed */
-                        width: auto;  /* Maintain aspect ratio */
+                        font-size: 1.5em;
                     }
                     .button {
-                        background-color: #ff6600;
-                        color: white;
-                        padding: 10px 20px;
-                        border: none;
-                        border-radius: 5px;
-                        cursor: pointer;
-                        font-size: 16px;
-                        margin-top: 20px;
-                        transition: background-color 0.3s ease;
-                    }
-                    .button:hover {
-                        background-color: #e65c00;
-                    }
-                    #result {
-                        margin-top: 20px;
-                    }
-                    #loader {
-                        display: block;
-                        font-size: 18px;
-                        font-weight: bold;
-                        color: #ffcc00;
-                        text-align: center;
+                        font-size: 14px;
+                        padding: 8px 16px;
                     }
                     #quote-details {
-                        display: none;
-                        border: 2px solid #ccc;
-                        border-radius: 10px;
-                        padding: 20px;
-                        background: white;
-                        box-shadow: 0 0 10px rgba(0, 0, 0,0.1);
-                        width: 100%;
-                        max-width: 600px;
+                        padding: 15px;
                     }
                     #quote-details p {
-                        margin: 10px 0;
-                        font-size: 1.1em;
+                        font-size: 1em;
                     }
-                    #quote-details p span {
-                        font-weight: bold;
-                        color: #333;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <img src='https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg' alt="Logo" class="logo"/>
+                <h1>Quote Details</h1>
+            </div>
+            <div id="loader">Please Wait Loading Quote Details for you .......</div>
+            <div id="quote-details">
+                <div class="product-name" id="product-name"></div>
+                <div class="key-value-pair"><span>Description:</span> <span id="description"></span></div>
+                <div class="key-value-pair"><span>Highest Cost:</span> <span id="highest-cost"></span></div>
+                <div class="key-value-pair"><span>Internal Currency Unit Price:</span> <span id="internal-currency-unit-price"></span></div>
+                <div class="key-value-pair"><span>Is Taxable:</span> <span id="is-taxable"></span></div>
+                <div class="key-value-pair"><span>Product Type:</span> <span id="product-type"></span></div>
+                <div class="key-value-pair"><span>Product Id:</span> <span id="product-id"></span></div>
+                <div class="key-value-pair"><span>Quantity:</span> <span id="quantity"></span></div>
+                <div class="key-value-pair"><span>Unit Price:</span> <span id="unit-price"></span></div>
+            </div>
+            <div id="result" style="display: none;"></div>
+            <script>
+                window.addEventListener('DOMContentLoaded', async () => {
+                    try {
+                        await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ quoteId: '${id}' })
+                        });
+                        console.log('Quote ID sent to N8N server successfully');
+                    } catch (error) {
+                        console.error('Error sending quote ID to N8N:', error);
                     }
-                    .key-value-pair {
-                        display: flex;
-                        justify-content: space-between;
-                        padding: 5px 0;
+
+                    const storedUrls = localStorage.getItem('urlArr');
+                    if (storedUrls) {
+                        const urlArr = JSON.parse(storedUrls);
+                        console.log('Loaded urlArr from local storage:', urlArr);
+                    } else {
+                        console.log('No urls in local storage.');
                     }
-                    @media (max-width: 600px) {
-                        h1 {
-                            font-size: 1.5em;
-                        }
-                        .button {
-                            font-size: 14px;
-                            padding: 8px 16px;
-                        }
-                        #quote-details {
-                            padding: 15px;
-                        }
-                        #quote-details p {
-                            font-size: 1em;
-                        }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <img src='https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg' alt="Logo" class="logo"/>
-                    <h1>Quote Details</h1>
-                </div>
-                <div id="loader">Please Wait Loading Quote Details for you .......</div>
-                <div id="quote-details">
-                    <div class="key-value-pair"><span>Description:</span> <span id="description"></span></div>
-                    <div class="key-value-pair"><span>Highest Cost:</span> <span id="highest-cost"></span></div>
-                    <div class="key-value-pair"><span>Internal Currency Unit Price:</span> <span id="internal-currency-unit-price"></span></div>
-                    <div class="key-value-pair"><span>Is Taxable:</span> <span id="is-taxable"></span></div>
-                    <div class="key-value-pair"><span>Product Name:</span> <span id="product-name"></span></div>
-                    <div class="key-value-pair"><span>Product Type:</span> <span id="product-type"></span></div>
-                    <div class="key-value-pair"><span>Product Id:</span> <span id="product-id"></span></div>
-                    <div class="key-value-pair"><span>Quantity:</span> <span id="quantity"></span></div>
-                    <div class="key-value-pair"><span>Unit Price:</span> <span id="unit-price"></span></div>
-                </div>
-                <div id="result" style="display: none;"></div>
-                <script>
-                    window.addEventListener('DOMContentLoaded', async () => {
+
+                    setTimeout(async () => {
                         try {
-                            await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ quoteId: '${id}' })
-                            });
-                            console.log('Quote ID sent to N8N server successfully');
-                        } catch (error) {
-                            console.error('Error sending quote ID to N8N:', error);
-                        }
-
-                        const storedUrls = localStorage.getItem('urlArr');
-                        if (storedUrls) {
-                            const urlArr = JSON.parse(storedUrls);
-                            console.log('Loaded urlArr from local storage:', urlArr);
-                        } else {
-                            console.log('No urls in local storage.');
-                        }
-
-                        setTimeout(async () => {
-                            try {
-                                const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
-                                if (!detailsResponse.ok) {
-                                    throw new Error('Failed to fetch details');
-                                }
-
-                                const detailsResult = await detailsResponse.json();
-                                localStorage.setItem('details', JSON.stringify(detailsResult.details));
-                                console.log('details saved to local storage:', detailsResult.details);
-
-                                const details = detailsResult.details;
-
-                                document.getElementById('description').textContent = details.description || 'N/A';
-                                document.getElementById('highest-cost').textContent = details.Heighest_Cost || 'N/A';
-                                document.getElementById('internal-currency-unit-price').textContent = details.Internal_Currency_Unit_Price || 'N/A';
-                                document.getElementById('is-taxable').textContent = details.isTaxable || 'N/A';
-                                document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
-                                document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
-                                document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
-                                document.getElementById('quantity').textContent = details.quantity || 'N/A';
-                                document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
-
-                                document.getElementById('loader').style.display = 'none';
-                                document.getElementById('quote-details').style.display = 'block';
-
-                            } catch (error) {
-                                console.error('Error fetching details:', error);
+                            const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
+                            if (!detailsResponse.ok) {
+                                throw new Error('Failed to fetch details');
                             }
-                        }, 6000);
 
-                        setTimeout(() => {
-                            const fetchButton = document.createElement('button');
-                            fetchButton.textContent = 'Approve and Pay';
-                            fetchButton.className = 'button';
-                            fetchButton.addEventListener('click', async () => {
-                                try {
-                                    const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
-                                    if (!urlsResponse.ok) {
-                                        throw new Error('Failed to fetch URLs');
-                                    }
+                            const detailsResult = await detailsResponse.json();
+                            localStorage.setItem('details', JSON.stringify(detailsResult.details));
+                            console.log('details saved to local storage:', detailsResult.details);
 
-                                    const urlsResult = await urlsResponse.json();
-                                    localStorage.setItem('urlArr', JSON.stringify(urlsResult.urls));
-                                    console.log('urlArr saved to local storage:', urlsResult.urls);
+                            const details = detailsResult.details;
 
-                                    const resultElement = document.getElementById('result');
-                                    resultElement.style.display = 'block';
-                                    resultElement.textContent = 'Quote Approved & Payment Completed Successfully !!';
+                            document.getElementById('description').textContent = details.description || 'N/A';
+                            document.getElementById('highest-cost').textContent = details.Heighest_Cost || 'N/A';
+                            document.getElementById('internal-currency-unit-price').textContent = details.Internal_Currency_Unit_Price || 'N/A';
+                            document.getElementById('is-taxable').textContent = details.isTaxable || 'N/A';
+                            document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
+                            document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
+                            document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
+                            document.getElementById('quantity').textContent = details.quantity || 'N/A';
+                            document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
 
-                                    urlsResult.urls.forEach(url => {
-                                        window.open(url, '_blank');
-                                    });
-                                } catch (error) {
-                                    console.error('Error fetching URLs:', error);
+                            document.getElementById('loader').style.display = 'none';
+                            document.getElementById('quote-details').style.display = 'block';
+
+                        } catch (error) {
+                            console.error('Error fetching details:', error);
+                        }
+                    }, 6000);
+
+                    setTimeout(() => {
+                        const fetchButton = document.createElement('button');
+                        fetchButton.textContent = 'Approve and Pay';
+                        fetchButton.className = 'button';
+                        fetchButton.addEventListener('click', async () => {
+                            try {
+                                const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
+                                if (!urlsResponse.ok) {
+                                    throw new Error('Failed to fetch URLs');
                                 }
-                            });
-                            document.body.appendChild(fetchButton);
-                        }, 10000);
-                    });
-                </script>
-            </body>
-            </html>
-        `;
 
-        res.setHeader('Content-Type', 'text/html');
-        res.send(htmlContent);
-    } else {
-        res.status(400).json({ error: 'Missing id parameter in query string' });
-    }
+                                const urlsResult = await urlsResponse.json();
+                                localStorage.setItem('urlArr', JSON.stringify(urlsResult.urls));
+                                console.log('urlArr saved to local storage:', urlsResult.urls);
+
+                                const resultElement = document.getElementById('result');
+                                resultElement.style.display = 'block';
+                                resultElement.textContent = 'Quote Approved & Payment Completed Successfully !!';
+
+                                urlsResult.urls.forEach(url => {
+                                    window.open(url, '_blank');
+                                });
+                            } catch (error) {
+                                console.error('Error fetching URLs:', error);
+                            }
+                        });
+                        document.body.appendChild(fetchButton);
+                    }, 10000);
+                });
+            </script>
+        </body>
+        </html>
+    `;
+
+    res.setHeader('Content-Type', 'text/html');
+    res.send(htmlContent);
 });
-
 
 app.get("/sendticket", async (req, res) => {
     try {
