@@ -60,8 +60,24 @@ jobs:
         id: get-run-number
         run: echo "RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
+      - name: Tag previous latest image with run number
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          RUN_NUMBER: ${{ env.RUN_NUMBER }}
+          REPOSITORY: autotask-stripe
+        run: |
+          echo "ECR_REGISTRY=$ECR_REGISTRY"
+          echo "RUN_NUMBER=$RUN_NUMBER"
+          echo "REPOSITORY=$REPOSITORY"
+          
+          # Tag the previous latest image with its run number
+          PREVIOUS_LATEST_TAG=$(aws ecr describe-images --repository-name $REPOSITORY --image-ids imageTag=latest --query 'images[0].imageTags[0]' --output text)
+          docker pull $ECR_REGISTRY/$REPOSITORY:$PREVIOUS_LATEST_TAG
+          docker tag $ECR_REGISTRY/$REPOSITORY:$PREVIOUS_LATEST_TAG $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+          docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+
       - name: Build and push image to Amazon ECR
-        id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           RUN_NUMBER: ${{ env.RUN_NUMBER }}
@@ -71,15 +87,10 @@ jobs:
           echo "RUN_NUMBER=$RUN_NUMBER"
           echo "REPOSITORY=$REPOSITORY"
 
-          # Build a docker container
-          docker build -t $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER .
-          docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+          # Build and push the new latest image
+          docker build -t $ECR_REGISTRY/$REPOSITORY:latest .
+          docker push $ECR_REGISTRY/$REPOSITORY:latest
 
-          # If this is the latest push to main, tag the image as 'latest'
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            docker tag $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER $ECR_REGISTRY/$REPOSITORY:latest
-            docker push $ECR_REGISTRY/$REPOSITORY:latest
-          fi
 
 
           
