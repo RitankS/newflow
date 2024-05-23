@@ -659,13 +659,11 @@ app.put("/cancellationUpdate", async (req, res) => {
     }
 
     try {
-        const payload = { cancellationDetails };
+        const payload = { cancellationDetails , ticketId };
 
-        const createTicketNoteResponse = await fetchWithRetry('https://newflow.vercel.app/createTicketNote', {
+        const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: header,
             body: JSON.stringify(payload)
         });
 
