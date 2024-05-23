@@ -558,35 +558,108 @@ app.post("/createTicket" , async(req,res)=>{
     
 // handle cancellation through email
 
-app.get("/ticketDetails", async(req, res) => {
+app.get("/ticketDetails", async (req, res) => {
     const id = req.query.id;
     console.log(id);
-    const payload = {
-        id: id
+    const payload = { id: id };
+
+    if (!id) {
+        return res.status(400).json({ error: 'ID is required' });
     }
 
-    if(id){
-        try{
-            const response  = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation' , {
-                method: "POST",
-                headers: {
-                    'Content-Type': "application/json"
-                },
-                body: JSON.stringify(payload)
-            })
-            if(response.ok){
-                res.status(200).json({response , id})
-            }
-            else{
-                res.status(502).json("Error Processing")
-            }
+    try {
+        const response = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation', {
+            method: "POST",
+            headers: {
+                'Content-Type': "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            res.send(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Cancellation Process</title>
+                    <style>
+                        body, html {
+                            height: 100%;
+                            margin: 0;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            background: #f0f0f0;
+                            font-family: Arial, sans-serif;
+                        }
+                        .container {
+                            text-align: center;
+                        }
+                        .loading {
+                            font-size: 24px;
+                            margin-bottom: 20px;
+                        }
+                        .message {
+                            font-size: 32px;
+                            font-weight: bold;
+                            display: none;
+                        }
+                        @keyframes dots {
+                            0%, 20% {
+                                color: rgba(0,0,0,0);
+                                text-shadow:
+                                    .25em 0 0 rgba(0,0,0,0),
+                                    .5em 0 0 rgba(0,0,0,0);
+                            }
+                            40% {
+                                color: black;
+                                text-shadow:
+                                    .25em 0 0 rgba(0,0,0,0),
+                                    .5em 0 0 rgba(0,0,0,0);
+                            }
+                            60% {
+                                text-shadow:
+                                    .25em 0 0 black,
+                                    .5em 0 0 rgba(0,0,0,0);
+                            }
+                            80%, 100% {
+                                text-shadow:
+                                    .25em 0 0 black,
+                                    .5em 0 0 black;
+                            }
+                        }
+                        .loading::after {
+                            content: ' .';
+                            animation: dots 1s steps(5, end) infinite;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="loading">....... coming</div>
+                        <div class="message">Cancellation Process Initiated</div>
+                    </div>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            setTimeout(function() {
+                                document.querySelector('.loading').style.display = 'none';
+                                document.querySelector('.message').style.display = 'block';
+                            }, 10000); // 10 seconds
+                        });
+                    </script>
+                </body>
+                </html>
+            `);
+        } else {
+            res.status(502).json("Error Processing");
         }
-        catch(err){
-            res.status(500).json({err})
-        }
-       
+    } catch (err) {
+        res.status(500).json({ err });
     }
-});
+})
 
 app.get('/getsubscription/:ticketId', async (req, res) => {
     const ticketId = req.params.ticketId;
