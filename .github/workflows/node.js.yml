@@ -67,6 +67,3 @@ jobs:
           docker build -t $ECR_REGISTRY/$REPOSITORY:$COMMIT_SHA .
           docker push $ECR_REGISTRY/$REPOSITORY:$COMMIT_SHA
           
-          # Optionally, tag the image as 'latest' as well
-          docker tag $ECR_REGISTRY/$REPOSITORY:$COMMIT_SHA $ECR_REGISTRY/$REPOSITORY:latest
-          docker push $ECR_REGISTRY/$REPOSITORY:latest
