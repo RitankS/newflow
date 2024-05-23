@@ -611,18 +611,7 @@ app.get('/getsubscription/:ticketId', async (req, res) => {
     }
   });
 
-//let newCid;
-// app.post("/getCustId" , async(req,res)=>{
-//         const {custId} = req.body
-//         try{
-//            newCid = custId
-//            res.status(200).json({newCid})
-//         }
-//         catch(err){
-//             res.status(500).json({err})
-//         }
-// })
-// Endpoint to get subscription and cancel it
+
 app.get('/getsubscription', async (req, res) => {
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = stripe(STRIPE_KEY);
@@ -637,6 +626,7 @@ app.get('/getsubscription', async (req, res) => {
         });
   
         if (subscriptions.data && subscriptions.data.length > 0) {
+
             res.status(200).json({ subscriptions });
         } else {
             res.status(404).json({ error: 'No subscriptions found for this customer.' });
@@ -646,6 +636,32 @@ app.get('/getsubscription', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+
+app.post("/cancelSubs" , async(req,res)=>{
+    const {subsId} = req.body
+    try{
+        const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+         const Stripe = stripe(STRIPE_KEY);
+        const subscription = await Stripe.subscriptions.cancel(
+          subsId
+        );
+        if(subscription.ok){
+               const reqData = await subscription.json()
+               res.status(200).json({reqData})
+        }
+        else{
+             res.status(502).json("Error Processing Cancellation")
+        }
+    }
+    catch(err){
+        res.status(500).json({err})
+    }
+    
+})
+
+
+
+
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
