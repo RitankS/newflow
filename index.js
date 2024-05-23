@@ -637,27 +637,18 @@ app.get('/getsubscription', async (req, res) => {
     }
 });
 
-app.delete("/cancelSubs" , async(req,res)=>{
-    const {subsId} = req.body
-    try{
-        const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
-         const Stripe = stripe(STRIPE_KEY);
-        const subscription = await Stripe.subscriptions.cancel(
-          subsId
-        );
-        if(subscription.ok){
-               const reqData = await subscription.json()
-               res.status(200).json({reqData})
-        }
-        else{
-             res.status(502).json("Error Processing Cancellation")
-        }
+app.delete("/cancelSubs", async (req, res) => {
+    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const Stripe = stripe(STRIPE_KEY);
+    const { subsId } = req.body;
+    try {
+        const subscription = await Stripe.subscriptions.cancel(subsId);
+        res.status(200).json(subscription);
+    } catch (err) {
+        console.error("Error cancelling subscription:", err);
+        res.status(500).json({ error: err.message });
     }
-    catch(err){
-        res.status(500).json({err})
-    }
-    
-})
+});
 
 
 
