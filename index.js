@@ -650,22 +650,22 @@ app.delete("/cancelSubs", async (req, res) => {
     }
 });
 
-
 app.put("/cancellationUpdate", async (req, res) => {
-    const { cancellationDetails , ticketId } = req.body;
+    const { cancellationDetails, ticketId } = req.body;
 
-    if (!cancellationDetails && !ticketId) {
-        return res.status(400).json({ error: 'cancellationDetails is required' });
+    if (!cancellationDetails || !ticketId) {
+        return res.status(400).json({ error: 'cancellationDetails and ticketId are required' });
     }
 
     try {
         const payload = { cancellationDetails };
-
-        const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`, {
-            method: 'PUT',
-            headers: header,
-            body: JSON.stringify(payload)
-        });
+        const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,
+            {
+                method: 'PUT',
+                headers: header,
+                body: JSON.stringify(payload)
+            }
+        );
 
         if (createTicketNoteResponse.ok) {
             const data = await createTicketNoteResponse.json();
