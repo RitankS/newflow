@@ -741,7 +741,7 @@ app.get('/getsubscription', async (req, res) => {
 app.get("/ticketDetails", async(req, res) => {
     const id = req.query.id;
     console.log(id);
-    res.status(200).json({ id });
+    
 
     if(id){
         try{
@@ -753,7 +753,7 @@ app.get("/ticketDetails", async(req, res) => {
                 body: JSON.stringify(id)
             })
             if(response.ok){
-                res.status(200).json({response})
+                res.status(200).json({response , id})
             }
             else{
                 res.status(502).json("Error Processing")
