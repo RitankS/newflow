@@ -611,26 +611,27 @@ app.get('/getsubscription/:ticketId', async (req, res) => {
     }
   });
 
-let newCid;
-app.post("/getCustId" , async(req,res)=>{
-        const {custId} = req.body
-        try{
-           newCid = custId
-           res.status(200).json({newCid})
-        }
-        catch(err){
-            res.status(500).json({err})
-        }
-})
+//let newCid;
+// app.post("/getCustId" , async(req,res)=>{
+//         const {custId} = req.body
+//         try{
+//            newCid = custId
+//            res.status(200).json({newCid})
+//         }
+//         catch(err){
+//             res.status(500).json({err})
+//         }
+// })
 // Endpoint to get subscription and cancel it
 app.get('/getsubscription', async (req, res) => {
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
     const Stripe = stripe(STRIPE_KEY)
     try {
+        const {custId} = req.body
       console.log("The customer ID is", custId);
       
       const subscriptions = await Stripe.subscriptions.list({
-        customer: newCid,
+        customer: custId,
         limit: 1,
       });
   
