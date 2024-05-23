@@ -738,10 +738,32 @@ app.get('/getsubscription', async (req, res) => {
   
 // handle cancellation through email
 
-app.get("/ticketDetails", (req, res) => {
+app.get("/ticketDetails", async(req, res) => {
     const id = req.query.id;
     console.log(id);
     res.status(200).json({ id });
+
+    if(id){
+        try{
+            const response  = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation' , {
+                method: "POST",
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                body: JSON.stringify(id)
+            })
+            if(response.ok){
+                res.status(200).json({response})
+            }
+            else{
+                res.status(502).json("Error Processing")
+            }
+        }
+        catch(err){
+            res.status(500).json({err})
+        }
+       
+    }
 });
 
 app.listen(PORT, () => {
