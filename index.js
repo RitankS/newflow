@@ -356,16 +356,22 @@ app.get("/sendticket", async (req, res) => {
                     .success-icon {
                         font-size: 100px;
                         color: green;
-                        animation: rotate-horizontal 2s linear infinite;
+                        animation: scale-up-down 2s ease-in-out infinite;
                     }
                     .message {
                         font-size: 24px;
                         color: #333;
                         margin-top: 20px;
+                        opacity: 0;
+                        animation: slide-up 1s forwards 2s; /* Starts after 2 seconds */
                     }
-                    @keyframes rotate-horizontal {
-                        0% { transform: rotateX(0deg); }
-                        100% { transform: rotateX(360deg); }
+                    @keyframes scale-up-down {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.5); }
+                    }
+                    @keyframes slide-up {
+                        0% { opacity: 0; transform: translateY(20px); }
+                        100% { opacity: 1; transform: translateY(0); }
                     }
                 </style>
             </head>
@@ -384,7 +390,6 @@ app.get("/sendticket", async (req, res) => {
         res.status(500).json({ err: err.message });
     }
 });
-
 
 // Function to send the /send API request
 async function sendTicket() {
