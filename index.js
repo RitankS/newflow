@@ -637,7 +637,7 @@ app.get('/getsubscription', async (req, res) => {
     }
 });
 
-app.post("/cancelSubs" , async(req,res)=>{
+app.delete("/cancelSubs" , async(req,res)=>{
     const {subsId} = req.body
     try{
         const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
