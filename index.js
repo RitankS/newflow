@@ -652,14 +652,14 @@ app.delete("/cancelSubs", async (req, res) => {
 
 
 app.put("/cancellationUpdate", async (req, res) => {
-    const { cancellationDetails } = req.body;
+    const { cancellationDetails , ticketId } = req.body;
 
-    if (!cancellationDetails) {
+    if (!cancellationDetails && !ticketId) {
         return res.status(400).json({ error: 'cancellationDetails is required' });
     }
 
     try {
-        const payload = { cancellationDetails , ticketId };
+        const payload = { cancellationDetails };
 
         const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`, {
             method: 'PUT',
