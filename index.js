@@ -65,6 +65,43 @@ app.post('/open', async (req, res) => {
 
 
 let detailsArr = []
+app.post("/quoteDetails", async (req, res) => {
+    const {
+        id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+        Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+    } = req.body;
+
+    try {
+        console.log(
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        );
+
+        quoteDetails.id = id;
+        quoteDetails.description = description;
+        quoteDetails.Heighest_Cost = Heighest_Cost;
+        quoteDetails.Internal_Currency_Unit_Price = Internal_Currency_Unit_Price;
+        quoteDetails.isTaxable = isTaxable;
+        quoteDetails.Product_Name = Product_Name;
+        quoteDetails.Product_Type = Product_Type;
+        quoteDetails.Product_Id = Product_Id;
+        quoteDetails.quantity = quantity;
+        quoteDetails.Unit_Price = Unit_Price;
+        
+
+        detailsArr.push(description , quantity , Unit_Price , Product_Name , id)
+        console.log("detailsArr is" , detailsArr)
+        console.log(quoteDetails);
+        res.json({
+            id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
+            Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/resource', async (req, res) => {
     const id = req.query.id;
     console.log('Received request for /resource');
@@ -175,8 +212,8 @@ app.get('/resource', async (req, res) => {
                     color: #333;
                 }
                 .field-value {
-                    color: #222; /* Dark color */
                     font-weight: bold;
+                    color: #222; /* Darker color */
                 }
                 @media (max-width: 600px) {
                     h1 {
@@ -215,7 +252,8 @@ app.get('/resource', async (req, res) => {
                     <span class="field-name">Is Taxable:</span>
                     <span class="field-value" id="is-taxable"></span>
                 </div>
-                <div class="key-value-pair" style="text-align: right;">
+                <div class="key-value-pair">
+                    <span class="field-name">Product Name:</span>
                     <span class="field-value" id="product-name"></span>
                 </div>
                 <div class="key-value-pair">
@@ -253,7 +291,8 @@ app.get('/resource', async (req, res) => {
 
                     const storedUrls = localStorage.getItem('urlArr');
                     if (storedUrls) {
-                        const urlArr = JSON.parse(storedUrls)console.log('Loaded urlArr from local storage:', urlArr);
+                        const urlArr = JSON.parse(storedUrls);
+                        console.log('Loaded urlArr from local storage:', urlArr);
                     } else {
                         console.log('No urls in local storage.');
                     }
