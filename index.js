@@ -639,7 +639,7 @@ app.get("/ticketDetails", async (req, res) => {
                 </head>
                 <body>
                     <div class="container">
-                        <div class="loading">....... coming</div>
+                        <div class="loading">Initiating Cancellation</div>
                         <div class="message">Cancellation Process Initiated</div>
                     </div>
                     <script>
