@@ -661,7 +661,7 @@ app.post("/cancellationUpdate", async (req, res) => {
         const payload = { cancellationDetails };
         const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,
             {
-                method: 'PUT',
+                method: 'POST',
                 headers: header,
                 body: JSON.stringify(payload)
             }
