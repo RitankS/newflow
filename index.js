@@ -200,11 +200,20 @@ app.get('/resource', async (req, res) => {
                     justify-content: space-between;
                     padding: 5px 0;
                 }
-                .product-name {
-                    display: flex;
-                    justify-content: flex-start;
+                .description {
                     font-size: 1.2em;
                     font-weight: bold;
+                    text-decoration: underline;
+                    color: #333;
+                    text-align: center;
+                }
+                .field-name {
+                    font-weight: bold;
+                    color: #333;
+                }
+                .field-value {
+                    font-weight: bold;
+                    color: #222; /* Darker color */
                 }
                 @media (max-width: 600px) {
                     h1 {
@@ -230,15 +239,39 @@ app.get('/resource', async (req, res) => {
             </div>
             <div id="loader">Please Wait Loading Quote Details for you .......</div>
             <div id="quote-details">
-                <div class="product-name" id="product-name"></div>
-                <div class="key-value-pair"><span>Description:</span> <span id="description"></span></div>
-                <div class="key-value-pair"><span>Highest Cost:</span> <span id="highest-cost"></span></div>
-                <div class="key-value-pair"><span>Internal Currency Unit Price:</span> <span id="internal-currency-unit-price"></span></div>
-                <div class="key-value-pair"><span>Is Taxable:</span> <span id="is-taxable"></span></div>
-                <div class="key-value-pair"><span>Product Type:</span> <span id="product-type"></span></div>
-                <div class="key-value-pair"><span>Product Id:</span> <span id="product-id"></span></div>
-                <div class="key-value-pair"><span>Quantity:</span> <span id="quantity"></span></div>
-                <div class="key-value-pair"><span>Unit Price:</span> <span id="unit-price"></span></div>
+                <p class="description" id="description"></p>
+                <div class="key-value-pair">
+                    <span class="field-name">Highest Cost:</span>
+                    <span class="field-value" id="highest-cost"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Internal Currency Unit Price:</span>
+                    <span class="field-value" id="internal-currency-unit-price"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Is Taxable:</span>
+                    <span class="field-value" id="is-taxable"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Product Name:</span>
+                    <span class="field-value" id="product-name"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Product Type:</span>
+                    <span class="field-value" id="product-type"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Product Id:</span>
+                    <span class="field-value" id="product-id"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Quantity:</span>
+                    <span class="field-value" id="quantity"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Unit Price:</span>
+                    <span class="field-value" id="unit-price"></span>
+                </div>
             </div>
             <div id="result" style="display: none;"></div>
             <script>
