@@ -200,21 +200,6 @@ app.get('/resource', async (req, res) => {
                     justify-content: space-between;
                     padding: 5px 0;
                 }
-                .description {
-                    font-size: 1.2em;
-                    font-weight: bold;
-                    text-decoration: underline;
-                    color: #333;
-                    text-align: center;
-                }
-                .field-name {
-                    font-weight: bold;
-                    color: #333;
-                }
-                .field-value {
-                    font-weight: bold;
-                    color: #222; /* Darker color */
-                }
                 @media (max-width: 600px) {
                     h1 {
                         font-size: 1.5em;
@@ -239,38 +224,40 @@ app.get('/resource', async (req, res) => {
             </div>
             <div id="loader">Please Wait Loading Quote Details for you .......</div>
             <div id="quote-details">
-                <p class="description" id="description"></p>
+                <div class="key-value-pair">
+                    <span id="product-name" style="font-weight: bold;"></span>
+                </div>
+                <div class="key-value-pair">
+                    <span class="field-name">Description:</span>
+                    <span id="description" style="font-weight: bold; text-decoration: underline;"></span>
+                </div>
                 <div class="key-value-pair">
                     <span class="field-name">Highest Cost:</span>
-                    <span class="field-value" id="highest-cost"></span>
+                    <span id="highest-cost"></span>
                 </div>
                 <div class="key-value-pair">
                     <span class="field-name">Internal Currency Unit Price:</span>
-                    <span class="field-value" id="internal-currency-unit-price"></span>
+                    <span id="internal-currency-unit-price"></span>
                 </div>
                 <div class="key-value-pair">
                     <span class="field-name">Is Taxable:</span>
-                    <span class="field-value" id="is-taxable"></span>
-                </div>
-                <div class="key-value-pair">
-                    <span class="field-name">Product Name:</span>
-                    <span class="field-value" id="product-name"></span>
+                    <span id="is-taxable"></span>
                 </div>
                 <div class="key-value-pair">
                     <span class="field-name">Product Type:</span>
-                    <span class="field-value" id="product-type"></span>
+                    <span id="product-type"></span>
                 </div>
                 <div class="key-value-pair">
                     <span class="field-name">Product Id:</span>
-                    <span class="field-value" id="product-id"></span>
+                    <span id="product-id"></span>
                 </div>
                 <div class="key-value-pair">
                     <span class="field-name">Quantity:</span>
-                    <span class="field-value" id="quantity"></span>
+                    <span id="quantity"></span>
                 </div>
                 <div class="key-value-pair">
                     <span class="field-name">Unit Price:</span>
-                    <span class="field-value" id="unit-price"></span>
+                    <span id="unit-price"></span>
                 </div>
             </div>
             <div id="result" style="display: none;"></div>
@@ -311,13 +298,13 @@ app.get('/resource', async (req, res) => {
                             const details = detailsResult.details;
 
                             document.getElementById('description').textContent = details.description || 'N/A';
-                            document.getElementById('highest-cost').textContent = details.Heighest_Cost || 'N/A';
+                            document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
+                            document.getElementById('highest-cost').textContent = details.Highest_Cost || 'N/A';
                             document.getElementById('internal-currency-unit-price').textContent = details.Internal_Currency_Unit_Price || 'N/A';
                             document.getElementById('is-taxable').textContent = details.isTaxable || 'N/A';
-                            document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
                             document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
                             document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
-                            document.getElementById('quantity').textContent = details.quantity || 'N/A';
+                            document.getElementById('quantity').textContent = details.Quantity || 'N/A';
                             document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
 
                             document.getElementById('loader').style.display = 'none';
@@ -365,6 +352,7 @@ app.get('/resource', async (req, res) => {
     res.setHeader('Content-Type', 'text/html');
     res.send(htmlContent);
 });
+
 
 app.get("/sendticket", async (req, res) => {
     try {
