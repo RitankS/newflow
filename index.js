@@ -625,30 +625,27 @@ app.get('/getsubscription/:ticketId', async (req, res) => {
 // Endpoint to get subscription and cancel it
 app.get('/getsubscription', async (req, res) => {
     const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
-    const Stripe = stripe(STRIPE_KEY)
-    try {
-        const {custId} = req.body
-      console.log("The customer ID is", custId);
-      
-      const subscriptions = await Stripe.subscriptions.list({
-        customer: custId,
-        limit: 1,
-      });
-  
-       if (subscriptions.data && subscriptions.data.length > 0) {
-    //     const subsId = subscriptions.data[0].id; // Accessing the ID from the first element
-    //     const subscription = await Stripe.subscriptions.cancel(subsId);
-    //     console.log("The subscriber's ID:", subsId, "is cancelled!");
-        res.status(200).json({ subscriptions });
-      } else {
-        res.status(404).json({ error: 'No subscriptions found for this customer.' });
-      }
-    } catch (err) {
-      console.error("Error cancelling subscription:", err);
-      res.status(500).json({ error: err.message });
-    }
-  });
+    const Stripe = stripe(STRIPE_KEY);
 
+    try {
+        const custId = req.query.custId;  // Using query parameter instead of body
+        console.log("The customer ID is", custId);
+      
+        const subscriptions = await Stripe.subscriptions.list({
+            customer: custId,
+            limit: 1,
+        });
+  
+        if (subscriptions.data && subscriptions.data.length > 0) {
+            res.status(200).json({ subscriptions });
+        } else {
+            res.status(404).json({ error: 'No subscriptions found for this customer.' });
+        }
+    } catch (err) {
+        console.error("Error fetching subscription:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
