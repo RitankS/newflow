@@ -81,13 +81,6 @@ jobs:
           docker build -t $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER .
           docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
 
-          # Check if 'latest' tag exists and is immutable before tagging
-          if aws ecr describe-images --repository-name $REPOSITORY --image-ids imageTag=latest 2>&1 | grep -q "Image already exists"; then
-            echo "'latest' tag already exists and cannot be overwritten."
-          else
-            # Tag the image as 'latest' if it doesn't already exist
-            docker tag $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER $ECR_REGISTRY/$REPOSITORY:latest
-            docker push $ECR_REGISTRY/$REPOSITORY:latest
-          fi
+          
 
           
