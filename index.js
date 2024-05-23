@@ -741,7 +741,9 @@ app.get('/getsubscription', async (req, res) => {
 app.get("/ticketDetails", async(req, res) => {
     const id = req.query.id;
     console.log(id);
-    
+    const payload = {
+        id: id
+    }
 
     if(id){
         try{
@@ -750,7 +752,7 @@ app.get("/ticketDetails", async(req, res) => {
                 headers: {
                     'Content-Type': "application/json"
                 },
-                body: JSON.stringify(id)
+                body: JSON.stringify(payload)
             })
             if(response.ok){
                 res.status(200).json({response , id})
