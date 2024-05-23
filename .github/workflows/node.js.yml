@@ -56,30 +56,31 @@ jobs:
         with:
           mask-password: 'true'
 
-      - name: Check run number
-        id: check-run-number
-        run: echo "GITHUB_RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+      - name: Get run number
+        id: get-run-number
+        run: echo "RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build and push image to Amazon ECR
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          RUN_NUMBER: ${{ env.GITHUB_RUN_NUMBER }}
+          RUN_NUMBER: ${{ env.RUN_NUMBER }}
           REPOSITORY: autotask-stripe
         run: |
           echo "ECR_REGISTRY=$ECR_REGISTRY"
           echo "RUN_NUMBER=$RUN_NUMBER"
           echo "REPOSITORY=$REPOSITORY"
-          
-          # Ensure the run number is not empty
-          if [ -z "$RUN_NUMBER" ]; then
-            echo "Error: RUN_NUMBER is empty"
-            exit 1
-          fi
-          
-          # Build a docker container and push it to ECR 
+
+          # Build a docker container
           docker build -t $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER .
           docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+
+          # If this is the latest push to main, tag the image as 'latest'
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            docker tag $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER $ECR_REGISTRY/$REPOSITORY:latest
+            docker push $ECR_REGISTRY/$REPOSITORY:latest
+          fi
+
 
           
 
