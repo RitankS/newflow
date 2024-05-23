@@ -651,7 +651,42 @@ app.delete("/cancelSubs", async (req, res) => {
 });
 
 
+app.put("/cancellationUpdate" , async(req,res)=>{
+    const {cancellationDetails} = req.body
+    try{
+        const payload = {
+            cancellationDetails: cancellationDetails
+        }
+        const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
+              method: 'PUT',
+             headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+            if(createTicketNoteResponse.ok){
+                const data = await createTicketNoteResponse.json()
+                res.status(200).json(data)
+            }
+            else{
+                res.status(502).json("Error Generating ticket response")
+            }
+    }
+    catch(err){
+        res.status(500).json(err)
+    }
+})
 
+// Send the response data to /createTicketNote endpoint
+        // const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
+        //   method: 'PUT',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
+        // });
+  
+        // const createTicketNoteResult = await createTicketNoteResponse.json();
 
 
 app.listen(PORT, () => {
