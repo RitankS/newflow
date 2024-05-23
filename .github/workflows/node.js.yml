@@ -1,107 +1,107 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-# name: Node.js CI
-
-# on:
-#   push:
-#     branches: [ "main" ]
-  
-
-# jobs:
-#   build:
-
-#     runs-on: self-hosted
-
-#     strategy:
-#       matrix:
-#         node-version: [18.x]
-#         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-#     steps:
-#     - uses: actions/checkout@v3
-#     - name: Use Node.js ${{ matrix.node-version }}
-#       uses: actions/setup-node@v3
-#       with:
-#         node-version: ${{ matrix.node-version }}
-#         cache: 'npm'
-#     - run: npm ci
-#     - run: npm run build --if-present
-#     - run: pm2 restart index.js
-
-name: CICD
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: pm2 restart index.js
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'us-east-1'
+# name: CICD
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        with:
-          mask-password: 'true'
+# on:
+#   push:
+#     branches:
+#       - main
 
-      - name: Get run number
-        id: get-run-number
-        run: echo "RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout source
+#         uses: actions/checkout@v3
 
-      - name: Tag previous latest image with run number
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          RUN_NUMBER: ${{ env.RUN_NUMBER }}
-          REPOSITORY: autotask-stripe
-        run: |
-          echo "ECR_REGISTRY=$ECR_REGISTRY"
-          echo "RUN_NUMBER=$RUN_NUMBER"
-          echo "REPOSITORY=$REPOSITORY"
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v3
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: 'us-east-1'
+
+#       - name: Login to Amazon ECR
+#         id: login-ecr
+#         uses: aws-actions/amazon-ecr-login@v2
+#         with:
+#           mask-password: 'true'
+
+#       - name: Get run number
+#         id: get-run-number
+#         run: echo "RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+
+#       - name: Tag previous latest image with run number
+#         if: github.ref == 'refs/heads/main' && github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           RUN_NUMBER: ${{ env.RUN_NUMBER }}
+#           REPOSITORY: autotask-stripe
+#         run: |
+#           echo "ECR_REGISTRY=$ECR_REGISTRY"
+#           echo "RUN_NUMBER=$RUN_NUMBER"
+#           echo "REPOSITORY=$REPOSITORY"
           
-          # Tag the previous latest image with its run number
-          PREVIOUS_LATEST_TAG=$(aws ecr describe-images --repository-name $REPOSITORY --image-ids imageTag=latest --query 'images[0].imageTags[0]' --output text)
-          docker pull $ECR_REGISTRY/$REPOSITORY:$PREVIOUS_LATEST_TAG
-          docker tag $ECR_REGISTRY/$REPOSITORY:$PREVIOUS_LATEST_TAG $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
-          docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+#           # Tag the previous latest image with its run number
+#           PREVIOUS_LATEST_TAG=$(aws ecr describe-images --repository-name $REPOSITORY --image-ids imageTag=latest --query 'images[0].imageTags[0]' --output text)
+#           docker pull $ECR_REGISTRY/$REPOSITORY:$PREVIOUS_LATEST_TAG
+#           docker tag $ECR_REGISTRY/$REPOSITORY:$PREVIOUS_LATEST_TAG $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+#           docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
 
-      - name: Build and push image to Amazon ECR
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          RUN_NUMBER: ${{ env.RUN_NUMBER }}
-          REPOSITORY: autotask-stripe
-        run: |
-          echo "ECR_REGISTRY=$ECR_REGISTRY"
-          echo "RUN_NUMBER=$RUN_NUMBER"
-          echo "REPOSITORY=$REPOSITORY"
+#       - name: Build and push image to Amazon ECR
+#         env:
+#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+#           RUN_NUMBER: ${{ env.RUN_NUMBER }}
+#           REPOSITORY: autotask-stripe
+#         run: |
+#           echo "ECR_REGISTRY=$ECR_REGISTRY"
+#           echo "RUN_NUMBER=$RUN_NUMBER"
+#           echo "REPOSITORY=$REPOSITORY"
 
-          # Build the new latest image
-          docker build -t $ECR_REGISTRY/$REPOSITORY:latest .
+#           # Build the new latest image
+#           docker build -t $ECR_REGISTRY/$REPOSITORY:latest .
           
-          # Push the new latest image
-          docker push $ECR_REGISTRY/$REPOSITORY:latest
+#           # Push the new latest image
+#           docker push $ECR_REGISTRY/$REPOSITORY:latest
           
-          # Check if the image is available before tagging and pushing with the run number
-          if docker pull $ECR_REGISTRY/$REPOSITORY:latest; then
-            # Tag and push the new latest image with the run number
-            docker tag $ECR_REGISTRY/$REPOSITORY:latest $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
-            docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
-          else
-            echo "Failed to pull the latest image. Aborting tagging and pushing with the run number."
-            exit 1
-          fi
+#           # Check if the image is available before tagging and pushing with the run number
+#           if docker pull $ECR_REGISTRY/$REPOSITORY:latest; then
+#             # Tag and push the new latest image with the run number
+#             docker tag $ECR_REGISTRY/$REPOSITORY:latest $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+#             docker push $ECR_REGISTRY/$REPOSITORY:$RUN_NUMBER
+#           else
+#             echo "Failed to pull the latest image. Aborting tagging and pushing with the run number."
+#             exit 1
+#           fi
 
 
 
