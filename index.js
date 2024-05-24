@@ -87,10 +87,10 @@ app.post("/quoteDetails", async (req, res) => {
         quoteDetails.Product_Id = Product_Id;
         quoteDetails.quantity = quantity;
         quoteDetails.Unit_Price = Unit_Price;
-        
 
-        detailsArr.push(description , quantity , Unit_Price , Product_Name , id)
-        console.log("detailsArr is" , detailsArr)
+
+        detailsArr.push(description, quantity, Unit_Price, Product_Name, id)
+        console.log("detailsArr is", detailsArr)
         console.log(quoteDetails);
         res.json({
             id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
@@ -424,7 +424,7 @@ async function sendTicket() {
         cId,
         detailsArr
     };
-    console.log("payload" ,payload)
+    console.log("payload", payload)
     const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
         method: 'POST',
         headers: {
@@ -547,41 +547,41 @@ const header = {
     "UserName": "eghhb5beqqpwase@bask.com",
     "Secret": "0x~QS*6aw9P@M#3p2b$Y#8EgJ",
     "Content-Type": "application/json"
-  }
-  
+}
 
 
 
-app.post("/createTicket" , async(req,res)=>{
-    const {cId , description , desc , qunat , unit , id} = req.body
-    try{
+
+app.post("/createTicket", async (req, res) => {
+    const { cId, description, desc, qunat, unit, id } = req.body
+    try {
         const payload = {
-            companyID : cId,
+            companyID: cId,
             dueDateTime: new Date(),
             priority: 1,
             status: 1,
             title: "Payment Completed",
             queueID: 5,
             description: `The payment for Quote ${id}is done , Stripe customer id is ${description} & the company Name is ${desc} , qunantity of product is ${qunat} & unit price is ${unit}`
-          };
-      
-          const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
+        };
+
+        const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
             method: 'POST',
-            headers:header,
+            headers: header,
             body: JSON.stringify(payload)
-          });
-      
-          const responseData = await response.json();
-          console.log(responseData);
-          res.status(200).json(responseData)
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+        res.status(200).json(responseData)
     }
-    catch(err){
+    catch (err) {
         console.log(err)
         res.status(500).json(err)
     }
 })
 
-    
+
 // handle cancellation through email
 
 app.get("/ticketDetails", async (req, res) => {
@@ -689,26 +689,26 @@ app.get("/ticketDetails", async (req, res) => {
 
 app.get('/getsubscription/:ticketId', async (req, res) => {
     const ticketId = req.params.ticketId;
-  
+
     try {
-      const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
-        method: 'GET',
-        headers: header
-      });
-  
-      if (getTicketDetails.ok) {
-        const result = await getTicketDetails.json();
-        const description = result.item.description;
-        res.status(200).json({ ticketId, description });
-      } else {
-        console.error(`Failed to fetch details for ticket ${ticketId}`);
-        res.status(500).json({ error: `Failed to fetch details for ticket ${ticketId}` });
-      }
+        const getTicketDetails = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/tickets/${ticketId}`, {
+            method: 'GET',
+            headers: header
+        });
+
+        if (getTicketDetails.ok) {
+            const result = await getTicketDetails.json();
+            const description = result.item.description;
+            res.status(200).json({ ticketId, description });
+        } else {
+            console.error(`Failed to fetch details for ticket ${ticketId}`);
+            res.status(500).json({ error: `Failed to fetch details for ticket ${ticketId}` });
+        }
     } catch (err) {
-      console.error(`Error fetching details for ticket ${ticketId}:`, err);
-      res.status(500).json({ error: err.message });
+        console.error(`Error fetching details for ticket ${ticketId}:`, err);
+        res.status(500).json({ error: err.message });
     }
-  });
+});
 
 
 app.get('/getsubscription', async (req, res) => {
@@ -718,12 +718,12 @@ app.get('/getsubscription', async (req, res) => {
     try {
         const custId = req.query.custId;  // Using query parameter instead of body
         console.log("The customer ID is", custId);
-      
+
         const subscriptions = await Stripe.subscriptions.list({
             customer: custId,
             limit: 1,
         });
-  
+
         if (subscriptions.data && subscriptions.data.length > 0) {
 
             res.status(200).json({ subscriptions });
@@ -757,13 +757,13 @@ app.post("/cancellationUpdate", async (req, res) => {
     }
 
     try {
-        const payload = { 
-            
-    Description: `The subscription is Cancelled and the cancellation id is ${cancellationDetails}`,
-	NoteType: 1,
-	Publish: 1,
-	Title: "Subscription Cancellation Update"
-         };
+        const payload = {
+
+            Description: `The subscription is Cancelled and the cancellation id is ${cancellationDetails}`,
+            NoteType: 1,
+            Publish: 1,
+            Title: "Subscription Cancellation Update"
+        };
         const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,
             {
                 method: 'POST',
@@ -786,16 +786,60 @@ app.post("/cancellationUpdate", async (req, res) => {
     }
 });
 // Send the response data to /createTicketNote endpoint
-        // const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
-        //   method: 'PUT',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
-        // });
-  
-        // const createTicketNoteResult = await createTicketNoteResponse.json();
+// const createTicketNoteResponse = await fetch('https://newflow.vercel.app/createTicketNote', {
+//   method: 'PUT',
+//   headers: {
+//     'Content-Type': 'application/json'
+//   },
+//   body: JSON.stringify({ ticketId: req.body.ticketId, subscription })
+// });
 
+// const createTicketNoteResult = await createTicketNoteResponse.json();
+
+
+//five9
+
+app.post("/session", async (req, res) => {
+    const { num } = req.body
+    try {
+        const response = await fetch('https://app.five9.com/appsvcs/rs/svc/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Set the content type to JSON
+            },
+            body: JSON.stringify({
+                passwordCredentials: credentials,
+                appKey: "web-ui",
+                policy: "AttachExisting"
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to login. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const { tokenId, userId, context } = data;
+        const { farmId } = context;
+        const thirdResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${userId}/interactions/make_external_call`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer-${tokenId}`,
+                'farmId': farmId
+            },
+            body: JSON.stringify({ "number": num, "skipDNCCheck": false, "checkMultipleContacts": true, "campaignId": "1137757" })
+        });
+
+        if (!thirdResponse.ok) {
+            throw new Error(`Failed to make external call. Status: ${thirdResponse.status}`);
+        }
+        res.status(200).json(thirdResponse)
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
