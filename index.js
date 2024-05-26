@@ -624,79 +624,68 @@ app.get("/ticketDetails", async (req, res) => {
         if (response.ok) {
             const data = await response.json();
             res.send(`
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Cancellation Process</title>
-                    <style>
-                        body, html {
-                            height: 100%;
-                            margin: 0;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            background: #f0f0f0;
-                            font-family: Arial, sans-serif;
-                        }
-                        .container {
-                            text-align: center;
-                        }
-                        .loading {
-                            font-size: 24px;
-                            margin-bottom: 20px;
-                        }
-                        .message {
-                            font-size: 32px;
-                            font-weight: bold;
-                            display: none;
-                        }
-                        @keyframes dots {
-                            0%, 20% {
-                                color: rgba(0,0,0,0);
-                                text-shadow:
-                                    .25em 0 0 rgba(0,0,0,0),
-                                    .5em 0 0 rgba(0,0,0,0);
-                            }
-                            40% {
-                                color: black;
-                                text-shadow:
-                                    .25em 0 0 rgba(0,0,0,0),
-                                    .5em 0 0 rgba(0,0,0,0);
-                            }
-                            60% {
-                                text-shadow:
-                                    .25em 0 0 black,
-                                    .5em 0 0 rgba(0,0,0,0);
-                            }
-                            80%, 100% {
-                                text-shadow:
-                                    .25em 0 0 black,
-                                    .5em 0 0 black;
-                            }
-                        }
-                        .loading::after {
-                            content: ' .';
-                            animation: dots 1s steps(5, end) infinite;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="loading">Initiating Cancellation</div>
-                        <div class="message">Cancellation Process Initiated</div>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Payment Successful</title>
+                <style>
+                    body, html {
+                        height: 100%;
+                        margin: 0;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        background: #f0f0f0;
+                        font-family: Arial, sans-serif;
+                    }
+                    .container {
+                        text-align: center;
+                    }
+                    .success-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 300px;
+                        height: 300px;
+                        border: 2px solid #ccc;
+                        border-radius: 10px;
+                        background: white;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    }
+                    .circle {
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 50%;
+                        background-color: green;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                    }
+                    .tick {
+                        font-size: 50px;
+                        color: white;
+                    }
+                    .message {
+                        margin-top: 20px;
+                        font-size: 24px;
+                        font-weight: bold;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="success-container">
+                        <div class="circle">
+                            <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
+                        </div>
+                        <div class="message">Payment Successful</div>
                     </div>
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            setTimeout(function() {
-                                document.querySelector('.loading').style.display = 'none';
-                                document.querySelector('.message').style.display = 'block';
-                            }, 10000); // 10 seconds
-                        });
-                    </script>
-                </body>
-                </html>
+                </div>
+            </body>
+            </html>
             `);
         } else {
             res.status(502).json("Error Processing");
