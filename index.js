@@ -139,7 +139,7 @@ app.get('/resource', async (req, res) => {
                 width: 100%;
                 max-width: 600px;
                 position: relative;
-                margin-top: 35px;
+                margin-top: 55px;
             }
             .logo {
                 position: absolute;
@@ -154,7 +154,7 @@ app.get('/resource', async (req, res) => {
                 color: #333;
                 margin: 0;
                 flex: 1;
-                margin-top: 20px;
+                margin-top: 25px;
             }
             .button {
                 background-color: #ff6600;
