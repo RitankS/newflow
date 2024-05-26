@@ -641,9 +641,6 @@ app.get("/ticketDetails", async (req, res) => {
                         font-family: Arial, sans-serif;
                     }
                     .container {
-                        text-align: center;
-                    }
-                    .success-container {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
@@ -654,6 +651,7 @@ app.get("/ticketDetails", async (req, res) => {
                         border-radius: 10px;
                         background: white;
                         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        text-align: center;
                     }
                     .circle {
                         width: 100px;
@@ -663,13 +661,13 @@ app.get("/ticketDetails", async (req, res) => {
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        margin-bottom: 20px;
                     }
                     .tick {
                         font-size: 50px;
                         color: white;
                     }
                     .message {
-                        margin-top: 20px;
                         font-size: 24px;
                         font-weight: bold;
                     }
@@ -677,15 +675,14 @@ app.get("/ticketDetails", async (req, res) => {
             </head>
             <body>
                 <div class="container">
-                    <div class="success-container">
-                        <div class="circle">
-                            <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
-                        </div>
-                        <div class="message">Payment Successful</div>
+                    <div class="circle">
+                        <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
                     </div>
+                    <div class="message">Payment Successful</div>
                 </div>
             </body>
             </html>
+            
             `);
         } else {
             res.status(502).json("Error Processing");
