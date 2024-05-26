@@ -113,7 +113,7 @@ app.get('/resource', async (req, res) => {
 
     const htmlContent = `
     <!DOCTYPE html>
-    <html lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -187,7 +187,6 @@ app.get('/resource', async (req, res) => {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 600px;
-            text-align: center;
         }
         #quote-details p {
             margin: 10px 0;
@@ -196,11 +195,13 @@ app.get('/resource', async (req, res) => {
         #product-name {
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: left;
         }
         .description {
             font-weight: bold;
             text-decoration: underline;
             margin-bottom: 20px;
+            text-align: center;
         }
         .key-value-pair {
             display: flex;
@@ -210,12 +211,13 @@ app.get('/resource', async (req, res) => {
         .field-name {
             font-weight: bold;
             color: #333;
-            flex: 1;
             text-align: right;
+            width: 40%;
             padding-right: 10px;
         }
         .field-value {
-            flex: 2;
+            text-align: left;
+            width: 60%;
         }
         @media (max-width: 600px) {
             h1 {
@@ -242,124 +244,124 @@ app.get('/resource', async (req, res) => {
     <div id="loader">Please Wait Loading Quote Details for you .......</div>
     <div id="quote-details">
         <div id="description" class="description"></div>
-        <div id="product-name" class="key-value-pair"></div>
+        <div id="product-name"></div>
         <div class="key-value-pair">
+            <span class="field-value" id="highest-cost"></span>
             <span class="field-name">Highest Cost:</span>
-            <span id="highest-cost" class="field-value"></span>
         </div>
         <div class="key-value-pair">
+            <span class="field-value" id="internal-currency-unit-price"></span>
             <span class="field-name">Internal Currency Unit Price:</span>
-            <span id="internal-currency-unit-price" class="field-value"></span>
         </div>
         <div class="key-value-pair">
+            <span class="field-value" id="is-taxable"></span>
             <span class="field-name">Is Taxable:</span>
-            <span id="is-taxable" class="field-value"></span>
         </div>
         <div class="key-value-pair">
+            <span class="field-value" id="product-type"></span>
             <span class="field-name">Product Type:</span>
-            <span id="product-type" class="field-value"></span>
         </div>
         <div class="key-value-pair">
+            <span class="field-value" id="product-id"></span>
             <span class="field-name">Product Id:</span>
-            <span id="product-id" class="field-value"></span>
         </div>
         <div class="key-value-pair">
+            <span class="field-value" id="quantity"></span>
             <span class="field-name">Quantity:</span>
-            <span id="quantity" class="field-value"></span>
         </div>
         <div class="key-value-pair">
+            <span class="field-value" id="unit-price"></span>
             <span class="field-name">Unit Price:</span>
-            <span id="unit-price" class="field-value"></span>
         </div>
     </div>
+    <div id="result" style="display: none;"></div>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ quoteId: '${id}' })
+                });
+                console.log('Quote ID sent to N8N server successfully');
+            } catch (error) {
+                console.error('Error sending quote ID to N8N:', error);
+            }
 
-        <div id="result" style="display: none;"></div>
-        <script>
-            window.addEventListener('DOMContentLoaded', async () => {
+            const storedUrls = localStorage.getItem('urlArr');
+            if (storedUrls) {
+                const urlArr = JSON.parse(storedUrls);
+                console.log('Loaded urlArr from local storage:', urlArr);
+            } else {
+                console.log('No urls in local storage.');
+            }
+
+            setTimeout(async () => {
                 try {
-                    await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ quoteId: '${id}' })
-                    });
-                    console.log('Quote ID sent to N8N server successfully');
-                } catch (error) {
-                    console.error('Error sending quote ID to N8N:', error);
-                }
-    
-                const storedUrls = localStorage.getItem('urlArr');
-                if (storedUrls) {
-                    const urlArr = JSON.parse(storedUrls);
-                    console.log('Loaded urlArr from local storage:', urlArr);
-                } else {
-                    console.log('No urls in local storage.');
-                }
-    
-                setTimeout(async () => {
-                    try {
-                        const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
-                        if (!detailsResponse.ok) {
-                            throw new Error('Failed to fetch details');
-                        }
-    
-                        const detailsResult = await detailsResponse.json();
-                        localStorage.setItem('details', JSON.stringify(detailsResult.details));
-                        console.log('details saved to local storage:', detailsResult.details);
-    
-                        const details = detailsResult.details;
-    
-                        document.getElementById('description').textContent = details.description || 'N/A';
-                        document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
-                        document.getElementById('highest-cost').textContent = details.Highest_Cost || 'N/A';
-                        document.getElementById('internal-currency-unit-price').textContent = details.Internal_Currency_Unit_Price || 'N/A';
-                        document.getElementById('is-taxable').textContent = details.isTaxable || 'N/A';
-                        document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
-                        document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
-                        document.getElementById('quantity').textContent = details.Quantity || 'N/A';
-                        document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
-    
-                        document.getElementById('loader').style.display = 'none';
-                        document.getElementById('quote-details').style.display = 'block';
-    
-                    } catch (error) {
-                        console.error('Error fetching details:', error);
+                    const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
+                    if (!detailsResponse.ok) {
+                        throw new Error('Failed to fetch details');
                     }
-                }, 6000);
-    
-                setTimeout(() => {
-                    const fetchButton = document.createElement('button');
-                    fetchButton.textContent = 'Approve and Pay';
-                    fetchButton.className = 'button';
-                    fetchButton.addEventListener('click', async () => {
-                        try {
-                            const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
-                            if (!urlsResponse.ok) {
-                                throw new Error('Failed to fetch URLs');
-                            }
-    
-                            const urlsResult = await urlsResponse.json();
-                            localStorage.setItem('urlArr', JSON.stringify(urlsResult.urls));
-                            console.log('urlArr saved to local storage:', urlsResult.urls);
-    
-                            const resultElement = document.getElementById('result');
-                            resultElement.style.display = 'block';
-                            resultElement.textContent = 'Quote Approved & Payment Completed Successfully !!';
-    
-                            urlsResult.urls.forEach(url => {
-                                window.open(url, '_blank');
-                            });
-                        } catch (error) {
-                            console.error('Error fetching URLs:', error);
+
+                    const detailsResult = await detailsResponse.json();
+                    localStorage.setItem('details', JSON.stringify(detailsResult.details));
+                    console.log('details saved to local storage:', detailsResult.details);
+
+                    const details = detailsResult.details;
+
+                    document.getElementById('description').textContent = details.description || 'N/A';
+                    document.getElementById('product-name').textContent = details.Product_Name || 'N/A';
+                    document.getElementById('highest-cost').textContent = details.Highest_Cost || 'N/A';
+                    document.getElementById('internal-currency-unit-price').textContent = details.Internal_Currency_Unit_Price || 'N/A';
+                    document.getElementById('is-taxable').textContent = details.isTaxable || 'N/A';
+                    document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
+                    document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
+                    document.getElementById('quantity').textContent = details.Quantity || 'N/A';
+                    document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
+
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('quote-details').style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error fetching details:', error);
+                }
+            }, 6000);
+
+            setTimeout(() => {
+                const fetchButton = document.createElement('button');
+                fetchButton.textContent = 'Approve and Pay';
+                fetchButton.className = 'button';
+                fetchButton.addEventListener('click', async () => {
+                    try {
+                        const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
+                        if (!urlsResponse.ok) {
+                            throw new Error('Failed to fetch URLs');
                         }
-                    });
-                    document.body.appendChild(fetchButton);
-                }, 10000);
-            });
-        </script>
-    </body>
-    </html>
+
+                        const urlsResult = await urlsResponse.json();
+                        localStorage.setItem('urlArr', JSON.stringify(urlsResult.urls));
+                        console.log('urlArr saved to local storage:', urlsResult.urls);
+
+                        const resultElement = document.getElementById('result');
+                        resultElement.style.display = 'block';
+                        resultElement.textContent = 'Quote Approved & Payment Completed Successfully !!';
+
+                        urlsResult.urls.forEach(url => {
+                            window.open(url, '_blank');
+                        });
+                    } catch (error) {
+                        console.error('Error fetching URLs:', error);
+                    }
+                });
+                document.body.appendChild(fetchButton);
+            }, 10000);
+        });
+    </script>
+</body>
+</html>
+
     
     `;
 
