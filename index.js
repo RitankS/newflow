@@ -683,6 +683,7 @@ app.get("/ticketDetails", async (req, res) => {
             </body>
             </html>
             
+            
             `);
         } else {
             res.status(502).json("Error Processing");
