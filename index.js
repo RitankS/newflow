@@ -214,7 +214,7 @@ app.get('/resource', async (req, res) => {
             color: #333;
             text-align: right;
             width: 200px; /* Set a fixed width */
-            margin-left: 120px; /* Add margin for spacing */
+            margin-left: 160px; /* Add margin for spacing */
         }
         .field-value {
             text-align: right;
