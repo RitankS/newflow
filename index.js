@@ -142,9 +142,9 @@ app.get('/resource', async (req, res) => {
             position: relative;
         }
         .logo {
-            position: relative;
+            position: absolute;
             left: 0;
-            height: 30px;
+            height: 50px;
             width: auto;
         }
         h1 {
