@@ -247,31 +247,31 @@ app.get('/resource', async (req, res) => {
         <div id="description" class="description"></div>
         <div id="product-name"></div>
         <div class="key-value-pair">
-            <span class="field-name">Highest Cost:</span>
+            <span class="field-name">Highest Cost</span>
             <span class="field-value" id="highest-cost"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-name">Internal Currency Unit Price:</span>
+            <span class="field-name">Internal Unit Price</span>
             <span class="field-value" id="internal-currency-unit-price"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-name">Is Taxable:</span>
+            <span class="field-name">Is Taxable</span>
             <span class="field-value" id="is-taxable"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-name">Product Type:</span>
+            <span class="field-name">Product Type</span>
             <span class="field-value" id="product-type"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-name">Product Id:</span>
+            <span class="field-name">Product Id</span>
             <span class="field-value" id="product-id"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-name">Quantity:</span>
+            <span class="field-name">Quantity</span>
             <span class="field-value" id="quantity"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-name">Unit Price:</span>
+            <span class="field-name">Unit Price</span>
             <span class="field-value" id="unit-price"></span>
         </div>
     </div>
