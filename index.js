@@ -114,167 +114,165 @@ app.get('/resource', async (req, res) => {
     const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Quote Details</title>
-        <style>
-            body {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-start;
-                min-height: 100vh;
-                margin: 0;
-                font-family: Arial, sans-serif;
-                background: #FFFFFF;
-                color: #333;
-                padding: 20px;
-                box-sizing: border-box;
-            }
-            .header {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 20px;
-                width: 100%;
-                max-width: 600px;
-                position: relative;
-            }
-            .logo {
-                position: absolute;
-                left: 0;
-                height: 50px;
-                width: auto;
-            }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Details</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #FFFFFF;
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+        .logo {
+            position: absolute;
+            left: 0;
+            height: 50px;
+            width: auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            color: #333;
+            margin: 0;
+            flex: 1;
+        }
+        .button {
+            background-color: #ff6600;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #e65c00;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        #loader {
+            display: block;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffcc00;
+            text-align: center;
+        }
+        #quote-details {
+            display: none;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        #quote-details p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        #product-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .description {
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 20px;
+        }
+        .key-value-pair {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        .field-name {
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+            text-align: right;
+            padding-right: 10px;
+        }
+        .field-value {
+            flex: 2;
+        }
+        @media (max-width: 600px) {
             h1 {
-                text-align: center;
-                font-size: 2em;
-                color: #333;
-                margin: 0;
-                flex: 1;
+                font-size: 1.5em;
             }
             .button {
-                background-color: #ff6600;
-                color: white;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 16px;
-                margin-top: 20px;
-                transition: background-color 0.3s ease;
-            }
-            .button:hover {
-                background-color: #e65c00;
-            }
-            #result {
-                margin-top: 20px;
-            }
-            #loader {
-                display: block;
-                font-size: 18px;
-                font-weight: bold;
-                color: #ffcc00;
-                text-align: center;
+                font-size: 14px;
+                padding: 8px 16px;
             }
             #quote-details {
-                display: none;
-                border: 2px solid #ccc;
-                border-radius: 10px;
-                padding: 20px;
-                background: white;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                width: 100%;
-                max-width: 600px;
+                padding: 15px;
             }
             #quote-details p {
-                margin: 10px 0;
-                font-size: 1.1em;
+                font-size: 1em;
             }
-            #product-name {
-                font-weight: bold;
-                margin-bottom: 10px;
-            }
-            .description {
-                text-align: center;
-                font-weight: bold;
-                text-decoration: underline;
-                margin-bottom: 20px;
-            }
-            .key-value-pair {
-                display: flex;
-                justify-content: space-between;
-                padding: 5px 0;
-            }
-            .field-name {
-                font-weight: bold;
-                color: #333;
-                flex: 1;
-                text-align: right;
-                padding-right: 10px;
-            }
-            .field-value {
-                flex: 2;
-            }
-            @media (max-width: 600px) {
-                h1 {
-                    font-size: 1.5em;
-                }
-                .button {
-                    font-size: 14px;
-                    padding: 8px 16px;
-                }
-                #quote-details {
-                    padding: 15px;
-                }
-                #quote-details p {
-                    font-size: 1em;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="header">
-            <img src='https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg' alt="Logo" class="logo"/>
-            <h1>Quote Details</h1>
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src='https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg' alt="Logo" class="logo"/>
+        <h1>Quote Details</h1>
+    </div>
+    <div id="loader">Please Wait Loading Quote Details for you .......</div>
+    <div id="quote-details">
+        <div id="description" class="description"></div>
+        <div id="product-name" class="key-value-pair"></div>
+        <div class="key-value-pair">
+            <span class="field-name">Highest Cost:</span>
+            <span id="highest-cost" class="field-value"></span>
         </div>
-        <div id="loader">Please Wait Loading Quote Details for you .......</div>
-        <div id="quote-details">
-            <div id="product-name" class="description"></div>
-            <div class="key-value-pair">
-                <span class="field-name">Description:</span>
-                <span id="description" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Highest Cost:</span>
-                <span id="highest-cost" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Internal Currency Unit Price:</span>
-                <span id="internal-currency-unit-price" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Is Taxable:</span>
-                <span id="is-taxable" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Product Type:</span>
-                <span id="product-type" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Product Id:</span>
-                <span id="product-id" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Quantity:</span>
-                <span id="quantity" class="field-value"></span>
-            </div>
-            <div class="key-value-pair">
-                <span class="field-name">Unit Price:</span>
-                <span id="unit-price" class="field-value"></span>
-            </div>
+        <div class="key-value-pair">
+            <span class="field-name">Internal Currency Unit Price:</span>
+            <span id="internal-currency-unit-price" class="field-value"></span>
         </div>
+        <div class="key-value-pair">
+            <span class="field-name">Is Taxable:</span>
+            <span id="is-taxable" class="field-value"></span>
+        </div>
+        <div class="key-value-pair">
+            <span class="field-name">Product Type:</span>
+            <span id="product-type" class="field-value"></span>
+        </div>
+        <div class="key-value-pair">
+            <span class="field-name">Product Id:</span>
+            <span id="product-id" class="field-value"></span>
+        </div>
+        <div class="key-value-pair">
+            <span class="field-name">Quantity:</span>
+            <span id="quantity" class="field-value"></span>
+        </div>
+        <div class="key-value-pair">
+            <span class="field-name">Unit Price:</span>
+            <span id="unit-price" class="field-value"></span>
+        </div>
+    </div>
+
         <div id="result" style="display: none;"></div>
         <script>
             window.addEventListener('DOMContentLoaded', async () => {
