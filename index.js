@@ -195,7 +195,7 @@ app.get('/resource', async (req, res) => {
         #product-name {
             font-weight: bold;
             margin-bottom: 10px;
-            text-align: right;
+            text-align: left;
         }
         .description {
             font-weight: bold;
@@ -212,12 +212,12 @@ app.get('/resource', async (req, res) => {
         .field-name {
             font-weight: bold;
             color: #333;
-            text-align: left;
+            text-align: right;
             width: 200px; /* Set a fixed width */
             margin-right: 10px; /* Add margin for spacing */
         }
         .field-value {
-            text-align: left;
+            text-align: right;
             flex: 1; /* Take the remaining space */
         }
         @media (max-width: 600px) {
