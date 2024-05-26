@@ -205,19 +205,20 @@ app.get('/resource', async (req, res) => {
         }
         .key-value-pair {
             display: flex;
-            justify-content: space-between;
+            flex-direction: row;
+            justify-content: flex-start;
             padding: 5px 0;
         }
         .field-name {
             font-weight: bold;
             color: #333;
-            text-align: right;
-            width: 40%;
-            padding-right: 10px;
+            text-align: left;
+            width: 200px; /* Set a fixed width */
+            margin-right: 10px; /* Add margin for spacing */
         }
         .field-value {
             text-align: left;
-            width: 60%;
+            flex: 1; /* Take the remaining space */
         }
         @media (max-width: 600px) {
             h1 {
@@ -246,32 +247,32 @@ app.get('/resource', async (req, res) => {
         <div id="description" class="description"></div>
         <div id="product-name"></div>
         <div class="key-value-pair">
-            <span class="field-value" id="highest-cost"></span>
             <span class="field-name">Highest Cost:</span>
+            <span class="field-value" id="highest-cost"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-value" id="internal-currency-unit-price"></span>
             <span class="field-name">Internal Currency Unit Price:</span>
+            <span class="field-value" id="internal-currency-unit-price"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-value" id="is-taxable"></span>
             <span class="field-name">Is Taxable:</span>
+            <span class="field-value" id="is-taxable"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-value" id="product-type"></span>
             <span class="field-name">Product Type:</span>
+            <span class="field-value" id="product-type"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-value" id="product-id"></span>
             <span class="field-name">Product Id:</span>
+            <span class="field-value" id="product-id"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-value" id="quantity"></span>
             <span class="field-name">Quantity:</span>
+            <span class="field-value" id="quantity"></span>
         </div>
         <div class="key-value-pair">
-            <span class="field-value" id="unit-price"></span>
             <span class="field-name">Unit Price:</span>
+            <span class="field-value" id="unit-price"></span>
         </div>
     </div>
     <div id="result" style="display: none;"></div>
@@ -361,7 +362,6 @@ app.get('/resource', async (req, res) => {
     </script>
 </body>
 </html>
-
     
     `;
 
