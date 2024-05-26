@@ -195,7 +195,7 @@ app.get('/resource', async (req, res) => {
         #product-name {
             font-weight: bold;
             margin-bottom: 10px;
-            text-align: left;
+            text-align: right;
         }
         .description {
             font-weight: bold;
