@@ -379,54 +379,64 @@ app.get("/sendticket", async (req, res) => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         await sendTicket()
         const htmlContent = `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Payment Success</title>
-                <style>
-                    body {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
-                        font-family: Arial, sans-serif;
-                        background-color: #f0f0f0;
-                    }
-                    .container {
-                        text-align: center;
-                    }
-                    .success-icon {
-                        font-size: 100px;
-                        color: green;
-                        animation: scale-up-down 2s ease-in-out infinite;
-                    }
-                    .message {
-                        font-size: 24px;
-                        color: #333;
-                        margin-top: 20px;
-                        opacity: 0;
-                        animation: slide-up 1s forwards 2s; /* Starts after 2 seconds */
-                    }
-                    @keyframes scale-up-down {
-                        0%, 100% { transform: scale(1); }
-                        50% { transform: scale(1.5); }
-                    }
-                    @keyframes slide-up {
-                        0% { opacity: 0; transform: translateY(20px); }
-                        100% { opacity: 1; transform: translateY(0); }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="success-icon">&#10004;</div>
-                    <div class="message">Payment Successful</div>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Successful</title>
+            <style>
+                body, html {
+                    height: 100%;
+                    margin: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: #f0f0f0;
+                    font-family: Arial, sans-serif;
+                }
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    width: 300px;
+                    height: 300px;
+                    border: 2px solid #ccc;
+                    border-radius: 10px;
+                    background: white;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                }
+                .circle {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    background-color: green;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }
+                .tick {
+                    font-size: 50px;
+                    color: white;
+                }
+                .message {
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="circle">
+                    <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
                 </div>
-            </body>
-            </html>
+                <div class="message">Payment Successful</div>
+            </div>
+        </body>
+        </html>
         `;
 
         res.send(htmlContent);
