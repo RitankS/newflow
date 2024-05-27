@@ -820,6 +820,9 @@ const credentials = {
 
 };
 
+let authData = {}
+
+
 app.post("/session", async (req, res) => {
     const { num } = req.body
     try {
@@ -842,6 +845,7 @@ app.post("/session", async (req, res) => {
         const data = await response.json();
         const { tokenId, userId, context } = data;
         const { farmId } = context;
+        authData = {tokenId , farmId , userId}
         const thirdResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${userId}/interactions/make_external_call`, {
             method: 'POST',
             headers: {
@@ -849,7 +853,9 @@ app.post("/session", async (req, res) => {
                 'Authorization': `Bearer-${tokenId}`,
                 'farmId': farmId
             },
-            body: JSON.stringify({ "number": num, "skipDNCCheck": false, "checkMultipleContacts": true, "campaignId": "1137757" })
+            
+            body: JSON.stringify({ "number": num, "skipDNCCheck": false, "checkMultipleContacts": true, "campaignId": "1137757" }),
+            
         });
 
         if (!thirdResponse.ok) {
@@ -859,6 +865,23 @@ app.post("/session", async (req, res) => {
     }
     catch (err) {
         console.log(err)
+        res.status(500).json(err)
+    }
+})
+
+app.get("/agentCalls" , async(req,res)=>{
+    try{
+       const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${authData.userId}/interactions`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer-${authData.tokenId}`,
+            'farmId': authData.farmId
+        }
+       })
+       res.status(200).json(getAgentResponse)
+    }
+    catch(err){
         res.status(500).json(err)
     }
 })
