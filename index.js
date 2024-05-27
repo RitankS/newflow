@@ -491,10 +491,10 @@ app.get("/sendticket", async (req, res) => {
                     justify-content: center;
                     width: 300px;
                     height: 300px;
-                    border: 2px solid #ccc;
+                    border: 4px solid #ccc;
                     border-radius: 10px;
                     background: white;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    box-shadow: 10 10 10px rgba(0, 0, 0, 0.1);
                     text-align: center;
                 }
                 .circle {
@@ -527,8 +527,9 @@ app.get("/sendticket", async (req, res) => {
                     <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
                 </div>
                 <div class="message">Payment Successful</div>
-                <div class="reference-id">Your Stripe Reference ID is: ${custId}</div>
+                
             </div>
+            <div class="reference-id">Reference ID <b>${custId}<b></div>
         </body>
         </html>
         `;
