@@ -872,71 +872,71 @@ app.post("/session", async (req, res) => {
 
 
 
-const updateVoiceCall=async(payload , tId)=>{
-    try{
-        const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${tId}/Notes`,{
+const updateVoiceCall = async (payload, tId) => {
+    try {
+        const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${tId}/Notes`, {
             method: "POST",
             headers: header,
             body: JSON.stringify(payload)
-          })
-          if(ticketUpdate.ok){
-            console.log("Empty response", payloadempty)
-            return ticketUpdate
-        }
-        else{
-            return 'unable to update'
-        }
-    }
-    catch(err){
-        return err.message
-    }
-}
+        });
 
-app.get("/agentCalls" , async(req,res)=>{
-    const {ticketId} = req.body
-    try{
-        tId = ticketId
-       const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
-        method: "GET",
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer-e38056f5-1be6-11ef-3a57-ce555bd74682`,
-            'farmId': "3000000000000000011"
+        if (ticketUpdate.ok) {
+            console.log("Response", await ticketUpdate.json());
+            return ticketUpdate.json();
+        } else {
+            return 'Unable to update';
         }
-       })
-       console.log("token , farmId , userId", authData)
-
-       const payloadempty = {
-        Description: `The Call is Unanswered`,
-        NoteType: 1,
-        Publish: 1,
-        Title: "Voice Call Update"
+    } catch (err) {
+        return err.message;
     }
-    const payload = {
-        Description: `The Call details are ${getAgentResponse}`,
-        NoteType: 1,
-        Publish: 1,
-        Title: "Voice Call Update"
-    }
+};
 
-       if(getAgentResponse.ok){
-        if(getAgentResponse == []){
-             const updateTicket = await updateVoiceCall(payloadempty , ticketId)
-             console.log(updateTicket)
+app.get("/agentCalls", async (req, res) => {
+    const { ticketId } = req.body;
+
+    try {
+        const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer e38056f5-1be6-11ef-3a57-ce555bd74682`,
+                'farmId': "3000000000000000011"
             }
-            else{
-                res.status(404).json("Unable to Update")
+        });
+
+        const agentResponse = await getAgentResponse.json();
+
+        const payloadempty = {
+            Description: `The Call is Unanswered`,
+            NoteType: 1,
+            Publish: 1,
+            Title: "Voice Call Update"
+        };
+
+        const payload = {
+            Description: `The Call details are ${JSON.stringify(agentResponse)}`,
+            NoteType: 1,
+            Publish: 1,
+            Title: "Voice Call Update"
+        };
+
+        if (getAgentResponse.ok) {
+            if (agentResponse.length === 0) {
+                const updateTicket = await updateVoiceCall(payloadempty, ticketId);
+                console.log(updateTicket);
+                res.status(200).json(updateTicket);
+            } else {
+                const updateTicket = await updateVoiceCall(payload, ticketId);
+                console.log(updateTicket);
+                res.status(200).json(updateTicket);
             }
-       }
-       else{
-           const updateTicket = await updateVoiceCall(payload, ticketId)
-           console.log(updateTicket)
-       }
+        } else {
+            res.status(404).json("Unable to Update");
+        }
+    } catch (err) {
+        res.status(500).json(err.message);
     }
-    catch(err){
-        res.status(500).json(err)
-    }
-})
+});
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
