@@ -870,10 +870,30 @@ app.post("/session", async (req, res) => {
     }
 })
 
-app.get("/agentCalls" , async(req,res)=>{
-    const {ticketId} = req.query.ticketId
+const updateVoiceCall=async(payload)=>{
     try{
-       const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/300000001719390/interactions`, {
+        const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,{
+            method: "POST",
+            headers: header,
+            body: JSON.stringify(payload)
+          })
+          if(ticketUpdate.ok){
+            console.log("Empty response", payloadempty)
+            return ticketUpdate
+        }
+        else{
+            return 'unable to update'
+        }
+    }
+    catch(err){
+        return err.message
+    }
+}
+
+app.get("/agentCalls" , async(req,res)=>{
+    const {ticketId} = req.body
+    try{
+       const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json',
@@ -882,46 +902,32 @@ app.get("/agentCalls" , async(req,res)=>{
         }
        })
        console.log("token , farmId , userId", authData)
+
+       const payloadempty = {
+        Description: `The Call is Unanswered`,
+        NoteType: 1,
+        Publish: 1,
+        Title: "Voice Call Update"
+    }
+    const payload = {
+        Description: `The Call details are ${getAgentResponse}`,
+        NoteType: 1,
+        Publish: 1,
+        Title: "Voice Call Update"
+    }
+
        if(getAgentResponse.ok){
-        const payloadempty = {
-            Description: `The Call is Unanswered`,
-            NoteType: 1,
-            Publish: 1,
-            Title: "Voice Call Update"
-        }
-        const payload = {
-            Description: `The Call details are ${getAgentResponse}`,
-            NoteType: 1,
-            Publish: 1,
-            Title: "Voice Call Update"
-        }
         if(getAgentResponse == []){
-              const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,{
-                method: "POST",
-                headers: header,
-                body: JSON.stringify(payloadempty)
-              })
-            if(ticketUpdate.ok){
-                console.log("Empty response", payloadempty)
-                res.status(200).json(ticketUpdate)
+             const updateTicket = await updateVoiceCall(payloadempty)
+             console.log(updateTicket)
             }
             else{
                 res.status(404).json("Unable to Update")
             }
-        }
-        else{
-            const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,{
-                method: "POST",
-                headers: header,
-                body: JSON.stringify(payload)
-              })
-              if(ticketUpdate.ok){
-                console.log("non-empty response" , ticketUpdate)
-                res.status(200).json(ticketUpdate)
-              }else{
-                res.status(404).json("Unable to Update the ticket")
-              }
-        }
+       }
+       else{
+           const updateTicket = await updateVoiceCall(payload)
+           console.log(updateTicket)
        }
     }
     catch(err){
