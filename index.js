@@ -870,9 +870,11 @@ app.post("/session", async (req, res) => {
     }
 })
 
-const updateVoiceCall=async(payload)=>{
+
+
+const updateVoiceCall=async(payload , tId)=>{
     try{
-        const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,{
+        const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${tId}/Notes`,{
             method: "POST",
             headers: header,
             body: JSON.stringify(payload)
@@ -893,6 +895,7 @@ const updateVoiceCall=async(payload)=>{
 app.get("/agentCalls" , async(req,res)=>{
     const {ticketId} = req.body
     try{
+        tId = ticketId
        const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
         method: "GET",
         headers: {
@@ -918,7 +921,7 @@ app.get("/agentCalls" , async(req,res)=>{
 
        if(getAgentResponse.ok){
         if(getAgentResponse == []){
-             const updateTicket = await updateVoiceCall(payloadempty)
+             const updateTicket = await updateVoiceCall(payloadempty , ticketId)
              console.log(updateTicket)
             }
             else{
@@ -926,7 +929,7 @@ app.get("/agentCalls" , async(req,res)=>{
             }
        }
        else{
-           const updateTicket = await updateVoiceCall(payload)
+           const updateTicket = await updateVoiceCall(payload, ticketId)
            console.log(updateTicket)
        }
     }
