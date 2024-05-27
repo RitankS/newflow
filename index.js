@@ -282,7 +282,7 @@ app.get('/resource', async (req, res) => {
         <script>
             window.addEventListener('DOMContentLoaded', async () => {
                 try {
-                    await fetch('https://testingautotsk.app.n8n.cloud/webhook/autotask', {
+                    await fetch('https://testingautotask.app.n8n.cloud/webhook/autotask', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -454,7 +454,7 @@ async function sendTicket() {
         detailsArr
     };
     console.log("payload", payload)
-    const sendSubsId = await fetch('https://testingautotsk.app.n8n.cloud/webhook/createTicketForPayment', {
+    const sendSubsId = await fetch('https://testingautotask.app.n8n.cloud/webhook/createTicketForPayment', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -623,7 +623,7 @@ app.get("/ticketDetails", async (req, res) => {
     }
 
     try {
-        const response = await fetch('https://testingautotsk.app.n8n.cloud/webhook/cancellation', {
+        const response = await fetch('https://testingautotask.app.n8n.cloud/webhook/cancellation', {
             method: "POST",
             headers: {
                 'Content-Type': "application/json"
