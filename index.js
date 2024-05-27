@@ -892,9 +892,10 @@ const updateVoiceCall = async (payload, tId) => {
 };
 
 app.get("/agentCalls", async (req, res) => {
-    const { ticketId } = req.body;
+    
 
     try {
+        const ticketId = req.query.ticketId
         const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
             method: "GET",
             headers: {
