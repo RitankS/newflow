@@ -509,7 +509,7 @@ app.post("/pay", async (req, res) => {
 
         const priceId = myPrice.id;
         const session = await Stripe.checkout.sessions.create({
-            success_url: 'https://newflow.vercel.app/sendticket',
+            success_url: `https://newflow.vercel.app/sendticket/${sessionId}`,
             line_items: [
                 {
                     price: priceId,
@@ -518,6 +518,7 @@ app.post("/pay", async (req, res) => {
             ],
             mode: 'payment',
         });
+        const sessionId = session.id
         res.status(200).json({ session, custId })
     }
     catch (err) {
@@ -551,7 +552,7 @@ app.post("/monthly", async (req, res) => {
 
         const session = await Stripe.checkout.sessions.create({
             customer: custId,
-            success_url: 'https://newflow.vercel.app/sendticket',
+            success_url: `https://newflow.vercel.app/sendticket/${subssessionsId}`,
             line_items: [
                 {
                     price: priceId,
@@ -613,7 +614,7 @@ app.post("/createTicket", async (req, res) => {
 
 // handle cancellation through email
 
-app.get("/ticketDetails", async (req, res) => {
+app.get(`/ticketDetails`, async (req, res) => {
     const id = req.query.id;
     console.log(id);
     const payload = { id: id };
@@ -765,9 +766,11 @@ app.delete("/cancelSubs", async (req, res) => {
     }
 });
 
+
+
 app.post("/cancellationUpdate", async (req, res) => {
     const { cancellationDetails, ticketId } = req.body;
-
+    
     if (!cancellationDetails || !ticketId) {
         return res.status(400).json({ error: 'cancellationDetails and ticketId are required' });
     }
@@ -897,6 +900,7 @@ app.post("/getId", async (req, res) => {
     try {
         const runTickets = await agentCalls(ticketId);
         console.log(ticketId);
+        console.log("runTickets" , runTickets)
         res.status(200).json({ ticketId, runTickets });
     } catch (err) {
         res.status(500).json({ message: err.message });
