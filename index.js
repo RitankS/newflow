@@ -893,7 +893,11 @@ const updateVoiceCall = async (payload, tId) => {
 
 app.get("/agentCalls", async (req, res) => {
     try {
-        const ticketId = req.query.ticketId
+        const ticketId = req.query.ticketId; // Changed to query parameter
+        if (!ticketId) {
+            return res.status(400).json({ message: "Missing ticketId parameter" });
+        }
+
         const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
             method: "GET",
             headers: {
@@ -903,7 +907,13 @@ app.get("/agentCalls", async (req, res) => {
             }
         });
 
+        if (!getAgentResponse.ok) {
+            console.error('Error fetching agent interactions:', getAgentResponse.statusText);
+            res.status(getAgentResponse.status).json({ message: 'Error fetching agent interactions' });
+        }
+
         const agentResponse = await getAgentResponse.json();
+        console.log(agentResponse);
 
         const payloadempty = {
             Description: `The Call is Unanswered`,
@@ -919,21 +929,18 @@ app.get("/agentCalls", async (req, res) => {
             Title: "Voice Call Update"
         };
 
-        if (getAgentResponse.ok) {
-            if (agentResponse.length === 0) {
-                const updateTicket = await updateVoiceCall(payloadempty, ticketId);
-                console.log(updateTicket);
-                res.status(200).json(updateTicket);
-            } else {
-                const updateTicket = await updateVoiceCall(payload, ticketId);
-                console.log(updateTicket);
-                res.status(200).json(updateTicket);
-            }
+        if (Array.isArray(agentResponse) && agentResponse.length === 0) {
+            const updateTicket = await updateVoiceCall(payloadempty, ticketId);
+            console.log(updateTicket);
+            res.status(200).json(updateTicket);
         } else {
-            res.status(404).json("Unable to Update");
+            const updateTicket = await updateVoiceCall(payload, ticketId);
+            console.log(updateTicket);
+            res.status(200).json(updateTicket);
         }
     } catch (err) {
-        res.status(500).json(err.message);
+        console.error('Error in /agentCalls route:', err);
+        res.status(500).json({ message: err.message });
     }
 });
 
