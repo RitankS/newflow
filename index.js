@@ -372,117 +372,6 @@ app.get('/resource', async (req, res) => {
     res.send(htmlContent);
 });
 
-
-app.get("/sendticket", async (req, res) => {
-    try {
-        // Simulate sending the ticket, replace with your actual sendTicket function
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        await sendTicket()
-        const htmlContent = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Payment Successful</title>
-            <style>
-                body, html {
-                    height: 100%;
-                    margin: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    background: #f0f0f0;
-                    font-family: Arial, sans-serif;
-                }
-                .container {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    width: 300px;
-                    height: 300px;
-                    border: 2px solid #ccc;
-                    border-radius: 10px;
-                    background: white;
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                }
-                .circle {
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    background-color: green;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-bottom: 20px;
-                }
-                .tick {
-                    font-size: 50px;
-                    color: white;
-                }
-                .message {
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="circle">
-                    <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
-                </div>
-                <div class="message">Payment Successful</div>
-            </div>
-        </body>
-        </html>
-        `;
-
-        res.send(htmlContent);
-    } catch (err) {
-        console.error("Error in /sendticket:", err);
-        res.status(500).json({ err: err.message });
-    }
-});
-
-// Function to send the /send API request
-async function sendTicket() {
-    const payload = {
-        custId,
-        cId,
-        detailsArr
-    };
-    console.log("payload", payload)
-    const sendSubsId = await fetch('https://testingautotask.app.n8n.cloud/webhook/createTicketForPayment', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-    });
-
-    if (!sendSubsId.ok) {
-        const errorText = await sendSubsId.text();
-        throw new Error("Error from webhook: " + errorText);
-    }
-}
-
-// Your existing /send API endpoint
-app.post("/send", async (req, res) => {
-    console.log("Received request at /sendPaymentTicket:", req.body);
-
-    const { custId, nextDate } = req.body;
-    try {
-        await sendTicket(); // Call the sendTicket function
-
-        res.send("Ticket Created");
-    } catch (err) {
-        console.error("Error in /sendPaymentTicket:", err);
-        res.status(500).send(err.message);
-    }
-});
-
 let subssessionsId;
 let nextDate;
 
@@ -571,6 +460,123 @@ app.post("/monthly", async (req, res) => {
         res.status(500).json({ err: err.message });
     }
 });
+
+app.get("/sendticket", async (req, res) => {
+    try {
+        const cid = custId
+        // Simulate sending the ticket, replace with your actual sendTicket function
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await sendTicket()
+        const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Successful</title>
+            <style>
+                body, html {
+                    height: 100%;
+                    margin: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: #FFFFFF;
+                    font-family: Arial, sans-serif;
+                }
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    width: 300px;
+                    height: 300px;
+                    border: 2px solid #ccc;
+                    border-radius: 10px;
+                    background: white;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    text-align: center;
+                }
+                .circle {
+                    width: 100px;
+                    height: 100px;
+                    border-radius: 50%;
+                    background-color: green;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }
+                .tick {
+                    font-size: 50px;
+                    color: white;
+                }
+                .message {
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                .reference-id {
+                    margin-top: 20px;
+                    font-size: 18px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="circle">
+                    <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
+                </div>
+                <div class="message">Payment Successful</div>
+                <div class="reference-id">Your Stripe Reference ID is: ${custId}</div>
+            </div>
+        </body>
+        </html>
+        `;
+
+        res.send(htmlContent);
+    } catch (err) {
+        console.error("Error in /sendticket:", err);
+        res.status(500).json({ err: err.message });
+    }
+});
+
+// Function to send the /send API request
+async function sendTicket() {
+    const payload = {
+        custId,
+        cId,
+        detailsArr
+    };
+    console.log("payload", payload)
+    const sendSubsId = await fetch('https://testingautotask.app.n8n.cloud/webhook/createTicketForPayment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    if (!sendSubsId.ok) {
+        const errorText = await sendSubsId.text();
+        throw new Error("Error from webhook: " + errorText);
+    }
+}
+
+// Your existing /send API endpoint
+app.post("/send", async (req, res) => {
+    console.log("Received request at /sendPaymentTicket:", req.body);
+
+    const { custId, nextDate } = req.body;
+    try {
+        await sendTicket(); // Call the sendTicket function
+
+        res.send("Ticket Created");
+    } catch (err) {
+        console.error("Error in /sendPaymentTicket:", err);
+        res.status(500).send(err.message);
+    }
+});
+
 
 const header = {
     "ApiIntegrationCode": "BECBVKJQMKFAUNC27DM5QEAKY5B",
