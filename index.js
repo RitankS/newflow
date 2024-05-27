@@ -846,6 +846,7 @@ app.post("/session", async (req, res) => {
         const { tokenId, userId, context } = data;
         const { farmId } = context;
         authData = {tokenId , farmId , userId}
+        console.log(authData)
         const thirdResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${userId}/interactions/make_external_call`, {
             method: 'POST',
             headers: {
@@ -879,6 +880,7 @@ app.get("/agentCalls" , async(req,res)=>{
             'farmId': authData.farmId
         }
        })
+       console.log("token , farmId , userId", authData)
        res.status(200).json(getAgentResponse)
     }
     catch(err){
