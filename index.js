@@ -407,7 +407,7 @@ app.post("/pay", async (req, res) => {
             ],
             mode: 'payment',
         });
-         
+
         res.status(200).json({ session, custId })
     }
     catch (err) {
@@ -470,68 +470,73 @@ app.get("/sendticket", async (req, res) => {
         const htmlContent = `
         <!DOCTYPE html>
         <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Payment Successful</title>
-            <style>
-                body, html {
-                    height: 100%;
-                    margin: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    background: #FFFFFF;
-                    font-family: Arial, sans-serif;
-                }
-                .container {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    width: 300px;
-                    height: 300px;
-                    border: 4px solid #ccc;
-                    border-radius: 10px;
-                    background: white;
-                    box-shadow: 10 10 10px rgba(0, 0, 0, 0.1);
-                    text-align: center;
-                }
-                .circle {
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    background-color: green;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-bottom: 20px;
-                }
-                .tick {
-                    font-size: 50px;
-                    color: white;
-                }
-                .message {
-                    font-size: 24px;
-                    font-weight: bold;
-                }
-                .reference-id {
-                    margin-top: 20px;
-                    font-size: 18px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="circle">
-                    <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
-                </div>
-                <div class="message">Payment Successful</div>
-                
-            </div>
-            <div class="reference-id">Reference ID <b>${custId}<b></div>
-        </body>
-        </html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #FFFFFF;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            height: 300px;
+            border: 4px solid #ccc;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: green;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .tick {
+            font-size: 50px;
+            color: white;
+        }
+        .message {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .reference-id {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
+    <div class="container">
+        <div class="circle">
+            <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
+        </div>
+        <div class="message">Payment Successful</div>
+    </div>
+    <div class="reference-id">Reference ID: <b>${custId}</b></div>
+</body>
+</html>
         `;
 
         res.send(htmlContent);
@@ -777,7 +782,7 @@ app.delete("/cancelSubs", async (req, res) => {
 
 app.post("/cancellationUpdate", async (req, res) => {
     const { cancellationDetails, ticketId } = req.body;
-    
+
     if (!cancellationDetails || !ticketId) {
         return res.status(400).json({ error: 'cancellationDetails and ticketId are required' });
     }
@@ -855,7 +860,7 @@ app.post("/session", async (req, res) => {
         const data = await response.json();
         const { tokenId, userId, context } = data;
         const { farmId } = context;
-        authData = {tokenId , farmId , userId}
+        authData = { tokenId, farmId, userId }
         console.log(authData)
         const thirdResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${userId}/interactions/make_external_call`, {
             method: 'POST',
@@ -864,9 +869,9 @@ app.post("/session", async (req, res) => {
                 'Authorization': `Bearer-${tokenId}`,
                 'farmId': farmId
             },
-            
+
             body: JSON.stringify({ "number": num, "skipDNCCheck": false, "checkMultipleContacts": true, "campaignId": "1137757" }),
-            
+
         });
 
         if (!thirdResponse.ok) {
@@ -907,14 +912,14 @@ app.post("/getId", async (req, res) => {
     try {
         const runTickets = await agentCalls(ticketId);
         console.log(ticketId);
-        console.log("runTickets" , runTickets)
+        console.log("runTickets", runTickets)
         res.status(200).json({ ticketId, runTickets });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
-const agentCalls =async (ticketId) => {
+const agentCalls = async (ticketId) => {
     try {
         if (ticketId) {
             return "Ticket Id is Missing"
