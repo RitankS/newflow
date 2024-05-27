@@ -891,14 +891,26 @@ const updateVoiceCall = async (payload, tId) => {
     }
 };
 
-app.get("/agentCalls", async (req, res) => {
+
+app.post("/getId" , async(req,res)=>{
+    const {ticketId} = req.body
+    try{
+           const runTickets = await  agentCalls(ticketId)
+        console.log(ticketId)
+           res.status(200).json(ticketId ,runTickets)
+    }
+    catch(err){
+        res.status(200).json(err.message)
+    }
+})
+
+const agentCalls =async (ticketId) => {
     try {
-        const ticketId = req.query.ticketId; // Changed to query parameter
-        if (!ticketId) {
-            return res.status(400).json({ message: "Missing ticketId parameter" });
+        if (ticketId) {
+            return "Ticket Id is Missing"
         }
 
-        const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${ticketId}/interactions`, {
+        const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${authData.userId}/interactions`, {
             method: "GET",
             headers: {
                 'Content-Type': 'application/json',
@@ -909,7 +921,7 @@ app.get("/agentCalls", async (req, res) => {
 
         if (!getAgentResponse.ok) {
             console.error('Error fetching agent interactions:', getAgentResponse.statusText);
-            res.status(getAgentResponse.status).json({ message: 'Error fetching agent interactions' });
+            return 'error fetching details'
         }
 
         const agentResponse = await getAgentResponse.json();
@@ -932,17 +944,17 @@ app.get("/agentCalls", async (req, res) => {
         if (Array.isArray(agentResponse) && agentResponse.length === 0) {
             const updateTicket = await updateVoiceCall(payloadempty, ticketId);
             console.log(updateTicket);
-            res.status(200).json(updateTicket);
+            return updateTicket
         } else {
             const updateTicket = await updateVoiceCall(payload, ticketId);
             console.log(updateTicket);
-            res.status(200).json(updateTicket);
+            return updateTicket
         }
     } catch (err) {
         console.error('Error in /agentCalls route:', err);
-        res.status(500).json({ message: err.message });
+        return err.message
     }
-});
+};
 
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
