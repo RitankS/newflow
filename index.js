@@ -871,17 +871,58 @@ app.post("/session", async (req, res) => {
 })
 
 app.get("/agentCalls" , async(req,res)=>{
+    const {ticketId} = req.query.ticketId
     try{
-       const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${authData.userId}/interactions`, {
+       const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/300000001719390/interactions`, {
         method: "GET",
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer-${authData.tokenId}`,
-            'farmId': authData.farmId
+            'Authorization': `Bearer-e38056f5-1be6-11ef-3a57-ce555bd74682`,
+            'farmId': "3000000000000000011"
         }
        })
        console.log("token , farmId , userId", authData)
-       res.status(200).json(getAgentResponse)
+       if(getAgentResponse.ok){
+        const payloadempty = {
+            Description: `The Call is Unanswered`,
+            NoteType: 1,
+            Publish: 1,
+            Title: "Voice Call Update"
+        }
+        const payload = {
+            Description: `The Call details are ${getAgentResponse}`,
+            NoteType: 1,
+            Publish: 1,
+            Title: "Voice Call Update"
+        }
+        if(getAgentResponse == []){
+              const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,{
+                method: "POST",
+                headers: header,
+                body: JSON.stringify(payloadempty)
+              })
+            if(ticketUpdate.ok){
+                console.log("Empty response", payloadempty)
+                res.status(200).json(ticketUpdate)
+            }
+            else{
+                res.status(404).json("Unable to Update")
+            }
+        }
+        else{
+            const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,{
+                method: "POST",
+                headers: header,
+                body: JSON.stringify(payload)
+              })
+              if(ticketUpdate.ok){
+                console.log("non-empty response" , ticketUpdate)
+                res.status(200).json(ticketUpdate)
+              }else{
+                res.status(404).json("Unable to Update the ticket")
+              }
+        }
+       }
     }
     catch(err){
         res.status(500).json(err)
