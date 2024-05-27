@@ -892,17 +892,16 @@ const updateVoiceCall = async (payload, tId) => {
 };
 
 
-app.post("/getId" , async(req,res)=>{
-    const {ticketId} = req.body
-    try{
-           const runTickets = await  agentCalls(ticketId)
-        console.log(ticketId)
-           res.status(200).json(ticketId ,runTickets)
+app.post("/getId", async (req, res) => {
+    const { ticketId } = req.body;
+    try {
+        const runTickets = await agentCalls(ticketId);
+        console.log(ticketId);
+        res.status(200).json({ ticketId, runTickets });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-    catch(err){
-        res.status(200).json(err.message)
-    }
-})
+});
 
 const agentCalls =async (ticketId) => {
     try {
