@@ -936,7 +936,7 @@ app.post("/getId", async (req, res) => {
 
 const agentCalls = async (ticketId) => {
     try {
-        if (ticketId) {
+        if (!ticketId) {
             return "Ticket Id is Missing"
         }
 
