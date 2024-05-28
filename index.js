@@ -1041,6 +1041,44 @@ app.post("/createsession" , async(req,res)=>{
     }
 })
 
+app.post("/connectupdate", async (req, res) => {
+    const { connectDetails, ticketId } = req.body;
+
+    if (!connectDetails || !ticketId) {
+        return res.status(400).json({ error: 'cancellationDetails and ticketId are required' });
+    }
+
+    try {
+        const payload = {
+
+            Description: `Screenc connect session created the connect session id is ${connectDetails}`,
+            NoteType: 1,
+            Publish: 1,
+            Title: "Subscription Cancellation Update"
+        };
+        const createTicketNoteResponse = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${ticketId}/Notes`,
+            {
+                method: 'POST',
+                headers: header,
+                body: JSON.stringify(payload)
+            }
+        );
+
+        if (createTicketNoteResponse.ok) {
+            const data = await createTicketNoteResponse.json();
+            res.status(200).json(data);
+        } else {
+            const errorText = await createTicketNoteResponse.text();
+            console.error("Error response from createTicketNote:", errorText);
+            res.status(502).json({ error: 'Error generating ticket response' });
+        }
+    } catch (err) {
+        console.error("Error during cancellation update:", err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
