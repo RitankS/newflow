@@ -984,6 +984,35 @@ const agentCalls = async (ticketId) => {
     }
 };
 
+
+//screen connect 
+app.post("/createsession" , async(req,res)=>{
+    const {companyName} = req.body
+    try{
+        const data = [1, companyName, true, 'MyCode', []];
+        const getSession  = await fetch('https://bask.screenconnect.com/App_Extensions/2d558935-686a-4bd0-9991-07539f5fe749/Service.ashx/CreateSession' , {
+           method: "POST",
+           headers: {
+               'Content-Type': 'application/json',
+               'CTRLAuthHeader': 'autotaskconnectwiseintegrations',
+               'Origin': 'https://bask.screenconnect.com'
+           },
+           body: JSON.stringify(data)
+        })
+
+        if(getSession.ok){
+           const data = await getSession.json()
+           console.log(data)
+           res.status(200).json(data)
+        }else{
+           res.status(404).json("service is nt reachable")
+        }
+    }
+    catch(err){
+        res.status(500).json(err)
+    }
+})
+
 app.listen(PORT, () => {
     console.log('Server is listening on PORT :' + PORT);
 });
