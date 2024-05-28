@@ -989,6 +989,7 @@ const agentCalls = async (ticketId) => {
 app.post("/createsession" , async(req,res)=>{
     const {companyName} = req.body
     try{
+        console.log("companyName is" , companyName)
         const data = [1, companyName, true, 'MyCode', []];
         const getSession  = await fetch('https://bask.screenconnect.com/App_Extensions/2d558935-686a-4bd0-9991-07539f5fe749/Service.ashx/CreateSession' , {
            method: "POST",
@@ -1003,7 +1004,7 @@ app.post("/createsession" , async(req,res)=>{
         if(getSession.ok){
            const data = await getSession.json()
            console.log(data)
-           res.status(200).json(data)
+           res.status(200).json({data})
         }else{
            res.status(404).json("service is nt reachable")
         }
