@@ -1002,7 +1002,7 @@ app.post("/sendemail" , async(req,res)=>{
             from: 'saxena.ritank@gmail.com',
             to: client,
             subject: 'Nanoheal Screen connect request',
-            text:`Please follow the link https://https://bask.screenconnect.com/ and mention this screenconnect id in the form ${connecCode}`
+            text:`Please follow the link https://bask.screenconnect.com/ and mention this screenconnect id in the form ${connecCode}`
         };
         const response = await transporter.sendMail(mailOptions);
         console.log('Email sent: ' + response);
