@@ -2,6 +2,8 @@ import express from 'express';
 import stripe from 'stripe';
 import open from 'open';
 import cron from 'node-cron';
+import nodemailer from "nodemailer"
+
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -983,8 +985,33 @@ const agentCalls = async (ticketId) => {
         return err.message
     }
 };
+//smtp details
 
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'saxena.ritank@gmail.com',
+        pass: 'jxtyxdltbkihtcpc'
+    }
+});
 
+app.post("/sendemail" , async(req,res)=>{
+    const { connecCode, client } = req.body;
+    try{
+        let mailOptions = {
+            from: 'saxena.ritank@gmail.com',
+            to: client,
+            subject: 'Nanoheal Screen connect request',
+            text:`Please follow the link and mention this screenconnect id in the form ${connecCode}`
+        };
+        const response = await transporter.sendMail(mailOptions);
+        console.log('Email sent: ' + response);
+        res.status(200).json({ response });
+    }
+    catch(err){
+        res.status(500).json(err)
+    }
+})
 //screen connect 
 app.post("/createsession" , async(req,res)=>{
     const {companyName} = req.body
