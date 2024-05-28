@@ -904,30 +904,33 @@ app.post("/session", async (req, res) => {
 
 const updateVoiceCall = async (payload, tId) => {
     try {
-        const ticketUpdate = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${tId}/Notes`, {
+        const response = await fetch(`https://webservices24.autotask.net/atservicesrest/v1.0/Tickets/${tId}/Notes`, {
             method: "POST",
-            headers: header,
+            headers:header,
             body: JSON.stringify(payload)
         });
 
-        if (ticketUpdate.ok) {
-            console.log("Response", await ticketUpdate.json());
-            return ticketUpdate.json();
-        } else {
+        if (!response.ok) {
+            console.error(`Failed to update ticket: ${response.statusText}`);
             return 'Unable to update';
         }
+
+        const jsonResponse = await response.json();
+        console.log("Response", jsonResponse);
+        return jsonResponse;
+
     } catch (err) {
+        console.error('Error in updateVoiceCall function:', err);
         return err.message;
     }
 };
-
 
 app.post("/getId", async (req, res) => {
     const { ticketId } = req.body;
     try {
         const runTickets = await agentCalls(ticketId);
         console.log(ticketId);
-        console.log("runTickets", runTickets)
+        console.log("runTickets", runTickets);
         res.status(200).json({ ticketId, runTickets });
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -937,7 +940,7 @@ app.post("/getId", async (req, res) => {
 const agentCalls = async (ticketId) => {
     try {
         if (!ticketId) {
-            return "Ticket Id is Missing"
+            return "Ticket Id is Missing";
         }
 
         const getAgentResponse = await fetch(`https://app-atl.five9.com/appsvcs/rs/svc/agents/${authData.userId}/interactions`, {
@@ -951,14 +954,14 @@ const agentCalls = async (ticketId) => {
 
         if (!getAgentResponse.ok) {
             console.error('Error fetching agent interactions:', getAgentResponse.statusText);
-            return 'error fetching details'
+            return 'Error fetching details';
         }
 
         const agentResponse = await getAgentResponse.json();
         console.log(agentResponse);
 
-        const payloadempty = {
-            Description: `The Call is Unanswered`,
+        const payloadEmpty = {
+            Description: "The Call is Unanswered",
             NoteType: 1,
             Publish: 1,
             Title: "Voice Call Update"
@@ -971,20 +974,17 @@ const agentCalls = async (ticketId) => {
             Title: "Voice Call Update"
         };
 
-        if (Array.isArray(agentResponse) && agentResponse.length === 0) {
-            const updateTicket = await updateVoiceCall(payloadempty, ticketId);
-            console.log(updateTicket);
-            return updateTicket
-        } else {
-            const updateTicket = await updateVoiceCall(payload, ticketId);
-            console.log(updateTicket);
-            return updateTicket
-        }
+        const updatePayload = Array.isArray(agentResponse) && agentResponse.length === 0 ? payloadEmpty : payload;
+        const updateTicket = await updateVoiceCall(updatePayload, ticketId);
+        console.log(updateTicket);
+        return updateTicket;
+
     } catch (err) {
-        console.error('Error in /agentCalls route:', err);
-        return err.message
+        console.error('Error in agentCalls function:', err);
+        return err.message;
     }
 };
+
 //smtp details
 
 let transporter = nodemailer.createTransport({
