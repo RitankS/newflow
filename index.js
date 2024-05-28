@@ -650,81 +650,74 @@ app.get(`/ticketDetails`, async (req, res) => {
             const data = await response.json();
             res.send(`
             <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Payment Successful</title>
-                <style>
-                    body, html {
-                        height: 100%;
-                        margin: 0;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        background: #FFFFFF;
-                        font-family: Arial, sans-serif;
-                        text-align: center;
-                    }
-                    .logo {
-                        width: 100px;
-                        margin-bottom: 20px;
-                    }
-                    .container {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        width: 300px;
-                        height: 300px;
-                        border: 4px solid #ccc;
-                        border-radius: 10px;
-                        background: white;
-                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                        margin-bottom: 20px; /* Added margin bottom to separate from footer */
-                    }
-                    .circle {
-                        width: 100px;
-                        height: 100px;
-                        border-radius: 50%;
-                        background-color: green;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        margin-bottom: 20px;
-                    }
-                    .tick {
-                        font-size: 50px;
-                        color: white;
-                    }
-                    .message {
-                        font-size: 24px;
-                        font-weight: bold;
-                    }
-                    .reference-id {
-                        margin-top: 20px;
-                        font-size: 18px;
-                    }
-                    .footer {
-                        font-size: 12px;
-                        color: #777;
-                    }
-                </style>
-            </head>
-            <body>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
-                <div class="container">
-                    <div class="circle">
-                        <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
-                    </div>
-                    <div class="message">Payment Successful</div>
-                </div>
-                <div class="reference-id">Reference ID: <b>${custId}</b></div>
-                <div class="footer">For any kind of queries contact Bask at your_email or your_number</div>
-            </body>
-            </html>
-            
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #FFFFFF;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            height: 300px;
+            border: 4px solid #ccc;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: green;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .tick {
+            font-size: 50px;
+            color: white;
+        }
+        .message {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .reference-id {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
+    <div class="container">
+        <div class="circle">
+            <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
+        </div>
+        <div class="message">Payment Successful</div>
+    </div>
+    <div class="reference-id">Reference ID: <b>${custId}</b></div>
+</body>
+</html>
 
             
             
