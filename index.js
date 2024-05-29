@@ -528,12 +528,15 @@ app.get("/sendticket", async (req, res) => {
                     font-size: 18px;
                 }
                 .thank-you {
-                    margin-bottom: 30px; /* Added margin bottom */
+                    margin-bottom: 60px; /* Added margin bottom */
                 }
                 .footer {
                     margin-top: 20px;
                     font-size: 12px;
                     color: #777;
+                }
+                .small-text{
+                    margin-top: 80px;
                 }
             </style>
         </head>
@@ -552,8 +555,7 @@ app.get("/sendticket", async (req, res) => {
                     <br>
                     <span class="small-text">A confirmation email with your payment details has been sent to your inbox. In the meantime, an agent will be reaching out shortly to answer any questions and guide you through the next steps.</span>
                 </div>
-        
-                <div class="reference-id">Reference ID: <b>${custId}</b></div>
+    
             </div>
             <div class="footer">For Queries Please Contact at your_email</div>
         </body>
