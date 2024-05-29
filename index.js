@@ -498,27 +498,26 @@ app.get("/sendticket", async (req, res) => {
                     align-items: center;
                     justify-content: center;
                     width: 300px;
-                    height: 300px;
+                    height: 700px;
                     border: 4px solid #ccc;
                     border-radius: 10px;
                     background: white;
                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                     padding: 20px;
                 }
-                .circle {
-                    width: 100px;
-                    height: 100px;
-                    border-radius: 50%;
-                    background-color: green;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-bottom: 20px;
-                }
-                .tick {
-                    font-size: 50px;
-                    color: white;
-                }
+                .star {
+                    width: 80px;  
+                    height: 80px;
+                    aspect-ratio: 1;
+                    margin-bottom: 10%;
+                    background: green;
+                     clip-path: polygon(100% 50%,78.53% 59.27%,90.45% 79.39%,67.63% 74.27%,65.45% 97.55%,50% 80%,34.55% 97.55%,32.37% 74.27%,9.55% 79.39%,21.47% 59.27%,0% 50%,21.47% 40.73%,9.55% 20.61%,32.37% 25.73%,34.55% 2.45%,50% 20%,65.45% 2.45%,67.63% 25.73%,90.45% 20.61%,78.53% 40.73%);
+                  }
+              .tick {
+                  font-size: 20px;
+                  color: white;
+                  padding:25px;
+              }
                 .message {
                     font-size: 24px;
                     font-weight: bold;
@@ -537,11 +536,11 @@ app.get("/sendticket", async (req, res) => {
         <body>
             <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
             <div class="container">
-                <div class="circle">
+                <div class="star">
                     <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
                 </div>
                 <div class="message">Payment Successful</div>
-                <div class="reference-id">Reference ID: <b>${custId}</b></div>
+    
                 <div class="thank-you">
                     Thank you for your payment, we are glad you have chosen Bask for your help desk needs.
                     <br>
