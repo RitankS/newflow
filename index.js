@@ -306,7 +306,7 @@ app.get('/resource', async (req, res) => {
     
                 setTimeout(async () => {
                     try {
-                        const detailsResponse = await fetch('https://newflow.vercel.app/get-details');
+                        const detailsResponse = await fetch('https://autotask-workflow-n8ncrcl.nanoheal.work/get-details');
                         if (!detailsResponse.ok) {
                             throw new Error('Failed to fetch details');
                         }
@@ -341,7 +341,7 @@ app.get('/resource', async (req, res) => {
                     fetchButton.className = 'button';
                     fetchButton.addEventListener('click', async () => {
                         try {
-                            const urlsResponse = await fetch('https://newflow.vercel.app/get-urls');
+                            const urlsResponse = await fetch('https://autotask-workflow-n8ncrcl.nanoheal.work/get-urls');
                             if (!urlsResponse.ok) {
                                 throw new Error('Failed to fetch URLs');
                             }
@@ -400,7 +400,7 @@ app.post("/pay", async (req, res) => {
 
         const priceId = myPrice.id;
         const session = await Stripe.checkout.sessions.create({
-            success_url: `https://newflow.vercel.app/sendticket`,
+            success_url: `https://autotask-workflow-n8ncrcl.nanoheal.work/sendticket`,
             line_items: [
                 {
                     price: priceId,
@@ -443,7 +443,7 @@ app.post("/monthly", async (req, res) => {
 
         const session = await Stripe.checkout.sessions.create({
             customer: custId,
-            success_url: `https://newflow.vercel.app/sendticket`,
+            success_url: `https://autotask-workflow-n8ncrcl.nanoheal.work/sendticket`,
             line_items: [
                 {
                     price: priceId,
@@ -656,75 +656,89 @@ app.get(`/ticketDetails`, async (req, res) => {
             const data = await response.json();
             res.send(`
             <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful</title>
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: #FFFFFF;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .logo {
-            width: 100px;
-            margin-bottom: 20px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 300px;
-            height: 300px;
-            border: 4px solid #ccc;
-            border-radius: 10px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: green;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .tick {
-            font-size: 50px;
-            color: white;
-        }
-        .message {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .reference-id {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-    </style>
-</head>
-<body>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
-    <div class="container">
-        <div class="circle">
-            <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
-        </div>
-        <div class="message">Payment Successful</div>
-    </div>
-    <div class="reference-id">Reference ID: <b>${custId}</b></div>
-</body>
-</html>
-
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Payment Successful</title>
+                <style>
+                    body, html {
+                        height: 100%;
+                        margin: 0;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        background: #FFFFFF;
+                        font-family: Arial, sans-serif;
+                        text-align: center;
+                    }
+                    .logo {
+                        width: 100px;
+                        margin-bottom: 20px;
+                    }
+                    .container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 300px;
+                        height: 300px;
+                        border: 4px solid #ccc;
+                        border-radius: 10px;
+                        background: white;
+                        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        padding: 20px;
+                    }
+                    .circle {
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 50%;
+                        background-color: green;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        margin-bottom: 20px;
+                    }
+                    .tick {
+                        font-size: 50px;
+                        color: white;
+                    }
+                    .message {
+                        font-size: 24px;
+                        font-weight: bold;
+                    }
+                    .reference-id {
+                        margin-top: 20px;
+                        font-size: 18px;
+                    }
+                    .footer {
+                        margin-top: 20px;
+                        font-size: 12px;
+                        color: #777;
+                    }
+                </style>
+            </head>
+            <body>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
+                <div class="container">
+                    <div class="circle">
+                        <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
+                    </div>
+                    <div class="message">Payment Successful</div>
+                    <div class="reference-id">Reference ID: <b>${custId}</b></div>
+                    <div class="thank-you">
+                        Thank you for your payment, we are glad you have chosen Bask for your help desk needs.
+                        <br>
+                        Your payment reference ID: <b>${custId}</b>
+                        <br>
+                        <span class="small-text">A confirmation email with your payment details has been sent to your inbox. In the meantime, an agent will be reaching out shortly to answer any questions and guide you through the next steps.</span>
+                    </div>
+                </div>
+                <div class="footer">For Queries Please Contact at your_email</div>
+            </body>
+            </html>
+            
             
             
             
