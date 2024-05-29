@@ -471,94 +471,94 @@ app.get("/sendticket", async (req, res) => {
         await sendTicket()
         const htmlContent = `
         <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Successful</title>
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: #FFFFFF;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
-        .logo {
-            width: 100px;
-            margin-bottom: 20px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 300px;
-            border: 4px solid #ccc;
-            border-radius: 10px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-        .star {
-            width: 80px;  
-            height: 80px;
-            aspect-ratio: 1;
-            margin-bottom: 10%;
-            margin-top: 5px; /* Added margin top */
-            background: green;
-            clip-path: polygon(100% 50%,78.53% 59.27%,90.45% 79.39%,67.63% 74.27%,65.45% 97.55%,50% 80%,34.55% 97.55%,32.37% 74.27%,9.55% 79.39%,21.47% 59.27%,0% 50%,21.47% 40.73%,9.55% 20.61%,32.37% 25.73%,34.55% 2.45%,50% 20%,65.45% 2.45%,67.63% 25.73%,90.45% 20.61%,78.53% 40.73%);
-        }
-        .tick {
-            font-size: 20px;
-            color: white;
-            padding: 25px;
-        }
-        .message {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 2px; /* Added margin top */
-        }
-        .reference-id {
-            margin-top: 10px; /* Added margin top */
-            font-size: 18px;
-        }
-        .thank-you {
-            margin-top: 50px; /* Added margin top */
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777;
-        }
-    </style>
-</head>
-<body>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
-    <div class="container">
-        <div class="star">
-            <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
-        </div>
-        <div class="message">Payment Successful</div>
-
-        <div class="reference-id">Reference ID: <b>${custId}</b></div>
-
-        <div class="thank-you">
-            Thank you for your payment, we are glad you have chosen Bask for your help desk needs.
-            <br>
-            Your payment reference ID: <b>${custId}</b>
-            <br>
-            <span class="small-text">A confirmation email with your payment details has been sent to your inbox. In the meantime, an agent will be reaching out shortly to answer any questions and guide you through the next steps.</span>
-        </div>
-    </div>
-    <div class="footer">For Queries Please Contact at your_email</div>
-</body>
-</html>
-
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Successful</title>
+            <style>
+                body, html {
+                    height: 100%;
+                    margin: 0;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    background: #FFFFFF;
+                    font-family: Arial, sans-serif;
+                    text-align: center;
+                }
+                .logo {
+                    width: 100px;
+                    margin-bottom: 20px;
+                }
+                .container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    width: 300px;
+                    border: 4px solid #ccc;
+                    border-radius: 10px;
+                    background: white;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                    padding: 20px;
+                }
+                .star {
+                    width: 80px;  
+                    height: 80px;
+                    aspect-ratio: 1;
+                    margin-bottom: 10%;
+                    margin-top: 5px; /* Added margin top */
+                    background: green;
+                    clip-path: polygon(100% 50%,78.53% 59.27%,90.45% 79.39%,67.63% 74.27%,65.45% 97.55%,50% 80%,34.55% 97.55%,32.37% 74.27%,9.55% 79.39%,21.47% 59.27%,0% 50%,21.47% 40.73%,9.55% 20.61%,32.37% 25.73%,34.55% 2.45%,50% 20%,65.45% 2.45%,67.63% 25.73%,90.45% 20.61%,78.53% 40.73%);
+                }
+                .tick {
+                    font-size: 20px;
+                    color: white;
+                    padding: 25px;
+                }
+                .message {
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-top: 2px; /* Added margin top */
+                }
+                .reference-id {
+                    margin-top: 10px; /* Added margin top */
+                    font-size: 18px;
+                }
+                .thank-you {
+                    margin-bottom: 30px; /* Added margin bottom */
+                }
+                .footer {
+                    margin-top: 20px;
+                    font-size: 12px;
+                    color: #777;
+                }
+            </style>
+        </head>
+        <body>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8c/Bask-logo.jpg" alt="Logo" class="logo">
+            <div class="container">
+                <div class="star">
+                    <div class="tick">&#10004;</div> <!-- Unicode for check mark -->
+                </div>
+                <div class="message">Payment Successful</div>
+        
+                <div class="thank-you">
+                    Thank you for your payment, we are glad you have chosen Bask for your help desk needs.
+                    <br>
+                    Your payment reference ID: <b>${custId}</b>
+                    <br>
+                    <span class="small-text">A confirmation email with your payment details has been sent to your inbox. In the meantime, an agent will be reaching out shortly to answer any questions and guide you through the next steps.</span>
+                </div>
+        
+                <div class="reference-id">Reference ID: <b>${custId}</b></div>
+            </div>
+            <div class="footer">For Queries Please Contact at your_email</div>
+        </body>
+        </html>
+        
         
         `;
 
