@@ -528,7 +528,7 @@ app.get("/sendticket", async (req, res) => {
                     font-size: 18px;
                 }
                 .thank-you {
-                    margin-bottom: 60px; /* Added margin bottom */
+                 padding:"20%"
                 }
                 .footer {
                     margin-top: 20px;
@@ -536,8 +536,9 @@ app.get("/sendticket", async (req, res) => {
                     color: #777;
                 }
                 .small-text{
-                    margin-top: 80px;
+                    font-size:"small"
                 }
+                
             </style>
         </head>
         <body>
