@@ -526,6 +526,11 @@ app.get("/sendticket", async (req, res) => {
             margin-top: 20px;
             font-size: 18px;
         }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
     </style>
 </head>
 <body>
@@ -537,6 +542,7 @@ app.get("/sendticket", async (req, res) => {
         <div class="message">Payment Successful</div>
     </div>
     <div class="reference-id">Reference ID: <b>${custId}</b></div>
+    <div class="footer">For Queries Please Contact at your_email</div>
 </body>
 </html>
         `;
