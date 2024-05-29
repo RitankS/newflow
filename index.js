@@ -400,7 +400,7 @@ app.post("/pay", async (req, res) => {
 
         const priceId = myPrice.id;
         const session = await Stripe.checkout.sessions.create({
-            success_url: `https://newflow.vercel.app/sendticket?custId=${custId}`,
+            success_url: `https://newflow.vercel.app/sendticket`,
             line_items: [
                 {
                     price: priceId,
@@ -443,7 +443,7 @@ app.post("/monthly", async (req, res) => {
 
         const session = await Stripe.checkout.sessions.create({
             customer: custId,
-            success_url: `https://newflow.vercel.app/sendticket/${custId}`,
+            success_url: `https://newflow.vercel.app/sendticket`,
             line_items: [
                 {
                     price: priceId,
