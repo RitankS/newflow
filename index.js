@@ -391,7 +391,7 @@ app.post("/pay", async (req, res) => {
         });
         custId = customer.id
         const myPrice = await Stripe.prices.create({
-            currency: 'INR',
+            currency: 'usd',
             unit_amount: newPrice,
             product_data: {
                 name: name,
@@ -430,7 +430,7 @@ app.post("/monthly", async (req, res) => {
         console.log("Customer ID:", custId);
 
         const newprice = await Stripe.prices.create({
-            currency: 'inr',
+            currency: 'usd',
             unit_amount: newPrice * 100,
             recurring: {
                 interval: 'month',
