@@ -70,7 +70,7 @@ let detailsArr = []
 app.post("/quoteDetails", async (req, res) => {
     const {
         id, description, Heighest_Cost, Internal_Currency_Unit_Price, isTaxable,
-        Product_Name, Product_Type, Product_Id, quantity, Unit_Price
+        Product_Name, Product_Type, Product_Id, quantity, Unit_Cost
     } = req.body;
 
     try {
@@ -88,7 +88,7 @@ app.post("/quoteDetails", async (req, res) => {
         quoteDetails.Product_Type = Product_Type;
         quoteDetails.Product_Id = Product_Id;
         quoteDetails.quantity = quantity;
-        quoteDetails.Unit_Price = Unit_Price;
+        quoteDetails.Unit_Cost = Unit_Cost;
 
 
         detailsArr.push(description, quantity, Unit_Price, Product_Name, id)
@@ -276,7 +276,7 @@ app.get('/resource', async (req, res) => {
                 <span class="field-value" id="quantity"></span>
             </div>
             <div class="key-value-pair">
-                <span class="field-name">Unit Price:</span>
+                <span class="field-name">Unit Cost:</span>
                 <span class="field-value" id="unit-price"></span>
             </div>
         </div>
@@ -325,7 +325,7 @@ app.get('/resource', async (req, res) => {
                         document.getElementById('product-type').textContent = details.Product_Type || 'N/A';
                         document.getElementById('product-id').textContent = details.Product_Id || 'N/A';
                         document.getElementById('quantity').textContent = details.Quantity || 'N/A';
-                        document.getElementById('unit-price').textContent = details.Unit_Price || 'N/A';
+                        document.getElementById('unit-price').textContent = details.Unit_Cost || 'N/A';
     
                         document.getElementById('loader').style.display = 'none';
                         document.getElementById('quote-details').style.display = 'block';
@@ -379,7 +379,7 @@ let nextDate;
 
 let custId
 app.post("/pay", async (req, res) => {
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const STRIPE_KEY = "sk_test_pfo7bAfdfSSkasZkBysq1gf7";
     const { price, name, custName, email } = req.body;
     const Stripe = new stripe(STRIPE_KEY);
 
@@ -419,7 +419,7 @@ app.post("/pay", async (req, res) => {
 
 
 app.post("/monthly", async (req, res) => {
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const STRIPE_KEY = "sk_test_pfo7bAfdfSSkasZkBysq1gf7";
     const Stripe = stripe(STRIPE_KEY);
     const { custName, price, name } = req.body;
     const newPrice = Math.ceil(parseFloat(price));
@@ -455,8 +455,8 @@ app.post("/monthly", async (req, res) => {
         subssessionsId = session.id;
         nextDate = session.days_until_due;
 
-        console.log("Subscription Session ID:", custId);
-        res.status(200).json({ session, nextDate, custId });
+        console.log("Subscription Session ID:", subssessionsId);
+        res.status(200).json({ session, nextDate, subssessionsId });
     } catch (err) {
         console.error("Error in /monthly:", err);
         res.status(500).json({ err: err.message });
@@ -577,7 +577,8 @@ async function sendTicket() {
     const payload = {
         custId,
         cId,
-        detailsArr
+        detailsArr,
+        subssessionsId
     };
     console.log("payload", payload)
     const sendSubsId = await fetch('https://testingautotask.app.n8n.cloud/webhook/createTicketForPayment', {
@@ -630,7 +631,7 @@ app.post("/createTicket", async (req, res) => {
             status: 1,
             title: "Payment Completed",
             queueID: 5,
-            description: `The payment for Quote ${id}is done , Stripe customer id is ${description} & the company Name is ${desc} , qunantity of product is ${qunat} & unit price is ${unit}`
+            description: `The payment for Quote ${id} is done , Stripe customer id is ${description} , Product Name is ${desc} , qunantity of product is ${qunat} , unit price is ${unit} & Subscription Id is  `
         };
 
         const response = await fetch('https://webservices24.autotask.net/atservicesrest/v1.0/Tickets', {
@@ -780,7 +781,7 @@ app.get('/getsubscription/:ticketId', async (req, res) => {
 
 
 app.get('/getsubscription', async (req, res) => {
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+    const STRIPE_KEY = "sk_test_pfo7bAfdfSSkasZkBysq1gf7";
     const Stripe = stripe(STRIPE_KEY);
 
     try {
@@ -805,7 +806,8 @@ app.get('/getsubscription', async (req, res) => {
 });
 
 app.delete("/cancelSubs", async (req, res) => {
-    const STRIPE_KEY = "sk_test_51Nv0dVSHUS8UbeVicJZf3XZJf72DL9Fs3HP1rXnQzHtaXxMKXwWfua2zi8LQjmmboeNJc3odYs7cvT9Q5YIChY5I00Pocly1O1";
+
+    const STRIPE_KEY = "sk_test_pfo7bAfdfSSkasZkBysq1gf7";
     const Stripe = stripe(STRIPE_KEY);
     const { subsId } = req.body;
     try {
